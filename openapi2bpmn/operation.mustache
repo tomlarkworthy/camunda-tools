@@ -65,7 +65,7 @@
             "value": "{{{contentType}}}",
             "binding": {
                 "type": "camunda:in",
-                "target": "hp_Content-Type",
+                "target": "pre SET headers String $['Content-Type']",
                 "expression": true
             }
         }
@@ -86,7 +86,7 @@
             "value": "content",
             "binding": {
                 "type": "camunda:in",
-                "target": "content"
+                "target": "request"
             }
         }
         {{/contentJson}}{{#contentParams}}
@@ -106,30 +106,59 @@
             "value": "cp_{{name}}",
             "binding": {
                 "type": "camunda:in",
-                "target": "cp_{{name}}"
+                "target": "pre SET request {{type}} $['{{{name}}}']"
             }
         }
         {{/contentParams}}{{#responseParams}}
         ,{
-            "label": "JSON output binding: {{{name}}}",
-            "description": {{{description}}},
+            "label": "JSON response binding: {{{name}}}",
             "type": "String",
-            "value": null,
+            "description": {{{description}}},
+            "value": "{{{name}}}",
             "binding": {
                 "type": "camunda:outputParameter",
-                "source": "${ {{{name}}} }"
+                "source": "${ res_{{{name}}} }"
+            }
+        }
+        ,{
+            "label": "JSON response",
+            "type": "Hidden",
+            "value": "res_{{name}}",
+            "binding": {
+                "type": "camunda:in",
+                "target": "post EXTRACT response {{type}} $['{{{name}}}']",
+                "expression": true
             }
         }
         ,{
             "label": "{{{name}}}",
             "type": "Hidden",
-            "value": "{{{name}}}",
+            "value": "res_{{{name}}}",
             "binding": {
                 "type": "camunda:out",
-                "source": "{{{name}}}"
+                "source": "res_{{{name}}}"
             }
         }
-        {{/responseParams}}{{#queryParams}}
+        {{/responseParams}}
+        ,{
+            "label": "Full JSON response binding",
+            "type": "String",
+            "description": "What process variable to assign the full response to",
+            "value": "response",
+            "binding": {
+                "type": "camunda:outputParameter",
+                "source": "${ response }"
+            }
+        }
+        ,{
+            "label": "response variable",
+            "type": "Hidden",
+            "value": "response",
+            "binding": {
+                "type": "camunda:out",
+                "source": "response"
+            }
+        }{{#queryParams}}
         ,{
             "label": "Query parameter: {{name}}",
             "type": "String",
@@ -146,7 +175,7 @@
             "value": "qp_{{name}}",
             "binding": {
                 "type": "camunda:in",
-                "target": "qp_{{name}}"
+                "target": "pre SET query {{type}} $['{{{name}}}']"
             }
         }
         {{/queryParams}}{{#formDataParams}}
@@ -186,7 +215,7 @@
             "value": "hp_{{name}}",
             "binding": {
                 "type": "camunda:in",
-                "target": "hp_{{name}}"
+                "target": "pre SET headers {{type}} $['{{{name}}}']"
             }
         }
         {{/headerParams}}

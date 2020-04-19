@@ -35,8 +35,8 @@ interface Parameter {
  * Convert p1/{id}/p3/{id2} to p1/${pp_id}/p3/${pp_id2}
  */
 function pathTemplate2expression(template: string): string {
-    return template.replace(/(?<={)\s*\S+\s*(?=})/g, match => 'pp_'+ match)
-                   .replace(/{\s*\S+\s*}/g, match => '$'+ match);
+    return template.replace(/(?<={)\s*[^{}]+\s*(?=})/g, match => 'pp_'+ match)
+                   .replace(/{\s*[^{}]+\s*}/g, match => '$'+ match);
 }
 
 
@@ -106,9 +106,9 @@ function writeOperations(api: openapi3.OpenAPIObject, out: fs.WriteStream) {
                 path: path,
                 urlExpression: baseUrl + pathTemplate2expression(path),
                 method: method.toUpperCase(),
-                queryParams: params.filter(p => p.in == 'query'),
-                pathParams: params.filter(p => p.in == 'path'),
-                headerParams: params.filter(p => p.in == 'header'),
+                queryParams: params.filter(p => p.in == 'query').map(p => ({...p, type: "String"})),
+                pathParams: params.filter(p => p.in == 'path').map(p => ({...p, type: "String"})),
+                headerParams: params.filter(p => p.in == 'header').map(p => ({...p, type: "String"})),
                 formDataParams: params.filter(p => <any>p.in == 'formData'), // Swagger 2.0 support
                 contentParams: contentParams,
                 contentType: contentType,

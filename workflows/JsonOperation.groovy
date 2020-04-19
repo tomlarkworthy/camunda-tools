@@ -1,6 +1,7 @@
 import java.util.regex.Pattern
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.PathNotFoundException;
 import static org.camunda.spin.Spin.*;
 
 /**
@@ -13,9 +14,9 @@ import static org.camunda.spin.Spin.*;
 * post_EXTRACT_response_List_$.items  : 'taskList'
 */
 // <COMMAND>_<TARGET>_<DATATYPE>_<PATH>
-def command_re = ~/^(\S+)_(\S+)_(\S+)_(.*)$/
+def command_re = ~/^(\S+) (\S+) (\S+) (.*)$/
 
-def prefix = execution.getVariableLocal("prefix") ? execution.getVariableLocal("prefix") + "_" : "_";
+def prefix = execution.getVariableLocal("prefix") ? execution.getVariableLocal("prefix") + " ": " ";
 
 def popPath(path) { // This is bullshit that we need
     def parentkey_re = ~/^(?<parent>.*)\['(?<key>.*)'\]$/
@@ -31,6 +32,7 @@ def exec(command, target, datatype, path, value) {
     def configuration = Configuration.defaultConfiguration().jsonProvider();
 
     if (command == "SET") {
+        if (value == null) return;
         // read current value for the output
         def output = execution.getVariable(target);
         if (output == null) output = "{}";
@@ -44,20 +46,23 @@ def exec(command, target, datatype, path, value) {
                 .using(configuration)
                 .parse(output.toString())
                 .put(parentPath, key, value) // see https://github.com/json-path/JsonPath/issues/570
-                .json();
-
+                .jsonString(); // TODO we should probably stay in Spin
+        println("Result " + result.toString());
         execution.setVariable(target, result);
     } else if (command == "EXTRACT") {
         // read current value for the target
         def input = execution.getVariable(target)
         if (input == null) input = "{}";
-        println("input " + input.toString())
-        Object data = JsonPath
-                .using(configuration)
-                .parse(input.toString())
-                .read(path);
-        // Set value
-        execution.setVariable(value, data);
+        try {
+            Object data = JsonPath
+                    .using(configuration)
+                    .parse(input.toString())
+                    .read(path);
+            println "Extracted: " + data.toString();
+            execution.setVariable(value, data);
+        } catch (PathNotFoundException e) {
+            System.err.println(e.getMessage()); 
+        }
     } else {
         System.err.println "Unrecognised command: " + command; 
     }

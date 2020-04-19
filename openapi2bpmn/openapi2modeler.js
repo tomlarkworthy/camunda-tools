@@ -30,8 +30,8 @@ function resolveRef(doc, ref) {
  * Convert p1/{id}/p3/{id2} to p1/${pp_id}/p3/${pp_id2}
  */
 function pathTemplate2expression(template) {
-    return template.replace(/(?<={)\s*\S+\s*(?=})/g, match => 'pp_' + match)
-        .replace(/{\s*\S+\s*}/g, match => '$' + match);
+    return template.replace(/(?<={)\s*[^{}]+\s*(?=})/g, match => 'pp_' + match)
+        .replace(/{\s*[^{}]+\s*}/g, match => '$' + match);
 }
 function writeOperations(api, out) {
     const baseUrl = (api.host ? "https://" + api.host // Swagger 2.0 support
@@ -96,9 +96,9 @@ function writeOperations(api, out) {
                 path: path,
                 urlExpression: baseUrl + pathTemplate2expression(path),
                 method: method.toUpperCase(),
-                queryParams: params.filter(p => p.in == 'query'),
-                pathParams: params.filter(p => p.in == 'path'),
-                headerParams: params.filter(p => p.in == 'header'),
+                queryParams: params.filter(p => p.in == 'query').map(p => ({ ...p, type: "String" })),
+                pathParams: params.filter(p => p.in == 'path').map(p => ({ ...p, type: "String" })),
+                headerParams: params.filter(p => p.in == 'header').map(p => ({ ...p, type: "String" })),
                 formDataParams: params.filter(p => p.in == 'formData'),
                 contentParams: contentParams,
                 contentType: contentType,
@@ -145,24 +145,26 @@ function extractContentFields(api, schema) {
     return results;
 }
 {
-    const api = require("./slack_web_openapi_v2.json");
-    const out = fs.createWriteStream("../.camunda/element-templates/slack.json");
-    writeOperations(api, out);
-    out.end();
-}
-{
-    const api = require("./docs_v1.json");
-    const out = fs.createWriteStream("../.camunda/element-templates/docs_v1.json");
-    writeOperations(api, out);
-    out.end();
-}
-{
     const api = require("./tasks_v1.json");
     const out = fs.createWriteStream("../.camunda/element-templates/tasks_v1.json");
     writeOperations(api, out);
     out.end();
 }
 /*
+{
+    const api: openapi3.OpenAPIObject = require("./slack_web_openapi_v2.json")
+    const out = fs.createWriteStream("../.camunda/element-templates/slack.json");
+    writeOperations(api, out);
+    out.end();
+}
+{
+    const api: openapi3.OpenAPIObject = require("./docs_v1.json")
+    const out = fs.createWriteStream("../.camunda/element-templates/docs_v1.json");
+    writeOperations(api, out);
+    out.end();
+
+    
+}
 {
     const api: openapi3.OpenAPIObject = require("./youtube_data_v3.json")
     const out = fs.createWriteStream("../.camunda/element-templates/youtube_data_v3.json");

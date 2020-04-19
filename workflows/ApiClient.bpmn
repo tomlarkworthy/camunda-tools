@@ -9,60 +9,46 @@
         <camunda:connector>
           <camunda:inputOutput>
             <camunda:inputParameter name="url">
-              <camunda:script scriptFormat="groovy">def variables = execution.getVariables();
-println("variables " + variables);
-def queryParams = variables.findAll { 
-   it.key.startsWith("qp_")
-}.collect { id, value -&gt;
-    id + "=" + value
+              <camunda:script scriptFormat="groovy">import static org.camunda.spin.Spin.*;
+if (execution.hasVariable("query")) {
+   query = JSON(execution.getVariable("query")).mapTo("java.util.Map&lt;java.lang.String, java.lang.String&gt;");
+} else {
+   query = [:]
+}
+
+def queryParams = query.findAll { 
+   it.value != null 
+}.collect {
+   id, value -&gt; id + "=" + value
 }
 def queryString = queryParams.size() == 0 ? ""
                                           : "?" + queryParams.join("&amp;")
-def url = 
-   execution.getVariable("url") + 
-   queryString
+def url = execution.getVariable("url") + queryString
 println(url)
 url</camunda:script>
             </camunda:inputParameter>
             <camunda:inputParameter name="headers">
-              <camunda:script scriptFormat="groovy">def headers = [:]
-execution.getVariables().findAll { 
-   it.key.startsWith("hp_")
-}.each { key, value -&gt;
-    headers[key.substring(3)] = value;
-}
+              <camunda:script scriptFormat="groovy">import static org.camunda.spin.Spin.*;
+if (!execution.hasVariable("headers")) return [:];
+// execution.getVariable("headers").mapTo("java.util.Map&lt;java.lang.String, java.lang.String&gt;");
+// TODO we should have headers as native types probably
+def headers = JSON(execution.getVariable("headers")).mapTo("java.util.Map&lt;java.lang.String, java.lang.String&gt;");
+println "headers " + headers
 headers</camunda:script>
             </camunda:inputParameter>
             <camunda:inputParameter name="method">${method}</camunda:inputParameter>
             <camunda:inputParameter name="payload">
-              <camunda:script scriptFormat="groovy">import groovy.json.jsonSlurper;
-
-// No content parameter, no body
-if (!execution.hasVariable("content")) return null;
-
-// Otherwise start with the base content
-def json = jsonSlurper.parseText(
-    execution.getVariable("content");
-)
-
-// Override with the additional fields
-def contentParams = variables.findAll { 
-   it.key.startsWith("cp_")
-}.collect { id, value -&gt;
-    def key = id.substring(3);
-    json[key] = value;
-}
-
-// Serialize to a string
-JsonOutput.toJson(json)</camunda:script>
+              <camunda:script scriptFormat="groovy">// No request parameter, no body
+if (!execution.hasVariable("request")) return null;
+def request = execution.getVariable("request").toString();
+println "request: " + request
+request</camunda:script>
             </camunda:inputParameter>
-            <camunda:outputParameter name="response">${response}</camunda:outputParameter>
+            <camunda:inputParameter name="debug">true</camunda:inputParameter>
             <camunda:outputParameter name="statusCode">
               <camunda:script scriptFormat="groovy">statusCode.toInteger()</camunda:script>
             </camunda:outputParameter>
-            <camunda:outputParameter name="headers">
-              <camunda:map />
-            </camunda:outputParameter>
+            <camunda:outputParameter name="response">${response}</camunda:outputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
         </camunda:connector>
@@ -86,8 +72,8 @@ JsonOutput.toJson(json)</camunda:script>
       <bpmn:script>import java.util.regex.Pattern
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.PathNotFoundException;
 import static org.camunda.spin.Spin.*;
-
 
 /**
 * Looks for process variables of the form
@@ -98,16 +84,14 @@ import static org.camunda.spin.Spin.*;
 * pre_SET_request_String_$['token']   : 'ksadklasdkhjasdkljashda'
 * post_EXTRACT_response_List_$.items  : 'taskList'
 */
-
 // &lt;COMMAND&gt;_&lt;TARGET&gt;_&lt;DATATYPE&gt;_&lt;PATH&gt;
-def command_re = ~/^(\S+)_(\S+)_(\S+)_(.*)$/
+def command_re = ~/^(\S+) (\S+) (\S+) (.*)$/
 
-def prefix = execution.getVariableLocal("prefix") ? execution.getVariableLocal("prefix") + "_" : "_";
+def prefix = execution.getVariableLocal("prefix") ? execution.getVariableLocal("prefix") + " ": " ";
 
-def popPath(path) {
+def popPath(path) { // This is bullshit that we need
     def parentkey_re = ~/^(?&lt;parent&gt;.*)\['(?&lt;key&gt;.*)'\]$/
-    fullPath = JsonPath.compile(path).getPath();
-    println ("fullPath " + fullPath);
+    fullPath = JsonPath.compile(path).getPath(); // Canonicalize the path so simplify the regex
     def matcher = fullPath =~ parentkey_re
     matcher.matches()
     return [matcher.group('parent'), matcher.group('key')]
@@ -119,37 +103,40 @@ def exec(command, target, datatype, path, value) {
     def configuration = Configuration.defaultConfiguration().jsonProvider();
 
     if (command == "SET") {
+        if (value == null) return;
         // read current value for the output
         def output = execution.getVariable(target);
         if (output == null) output = "{}";
-        println ("Setting " + output.toString() + " path " + path + " value " + value);
+        // println ("Setting " + output.toString() + " path " + path + " value " + value);
 
+        // JsonPath.set will not create a key, so we have to go one level up and put 
+        // the key. Which is an annoyance
         (parentPath, key) = popPath(path)
+        
         Object result = JsonPath
                 .using(configuration)
                 .parse(output.toString())
-                .put(parentPath, key, value)
-                .json();
-
-        println ("Set " + target + " to " + result);
+                .put(parentPath, key, value) // see https://github.com/json-path/JsonPath/issues/570
+                .jsonString(); // TODO we should probably stay in Spin
+        println("Result " + result.toString());
         execution.setVariable(target, result);
     } else if (command == "EXTRACT") {
         // read current value for the target
         def input = execution.getVariable(target)
         if (input == null) input = "{}";
-        println("input " + input.toString())
-        Object data = JsonPath
-                .using(configuration)
-                .parse(input.toString())
-                .read(path);
-        // Set value
-        // todo, type
-        execution.setVariable(value, data);
+        try {
+            Object data = JsonPath
+                    .using(configuration)
+                    .parse(input.toString())
+                    .read(path);
+            println "Extracted: " + data.toString();
+            execution.setVariable(value, data);
+        } catch (PathNotFoundException e) {
+            System.err.println(e.getMessage()); 
+        }
     } else {
         System.err.println "Unrecognised command: " + command; 
     }
-
-    println "Command processed"
 }
 
 execution.getVariables().findAll { 
@@ -180,8 +167,8 @@ execution.getVariables().findAll {
       <bpmn:script>import java.util.regex.Pattern
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.PathNotFoundException;
 import static org.camunda.spin.Spin.*;
-
 
 /**
 * Looks for process variables of the form
@@ -192,16 +179,14 @@ import static org.camunda.spin.Spin.*;
 * pre_SET_request_String_$['token']   : 'ksadklasdkhjasdkljashda'
 * post_EXTRACT_response_List_$.items  : 'taskList'
 */
-
 // &lt;COMMAND&gt;_&lt;TARGET&gt;_&lt;DATATYPE&gt;_&lt;PATH&gt;
-def command_re = ~/^(\S+)_(\S+)_(\S+)_(.*)$/
+def command_re = ~/^(\S+) (\S+) (\S+) (.*)$/
 
-def prefix = execution.getVariableLocal("prefix") ? execution.getVariableLocal("prefix") + "_" : "_";
+def prefix = execution.getVariableLocal("prefix") ? execution.getVariableLocal("prefix") + " ": " ";
 
-def popPath(path) {
+def popPath(path) { // This is bullshit that we need
     def parentkey_re = ~/^(?&lt;parent&gt;.*)\['(?&lt;key&gt;.*)'\]$/
-    fullPath = JsonPath.compile(path).getPath();
-    println ("fullPath " + fullPath);
+    fullPath = JsonPath.compile(path).getPath(); // Canonicalize the path so simplify the regex
     def matcher = fullPath =~ parentkey_re
     matcher.matches()
     return [matcher.group('parent'), matcher.group('key')]
@@ -213,37 +198,40 @@ def exec(command, target, datatype, path, value) {
     def configuration = Configuration.defaultConfiguration().jsonProvider();
 
     if (command == "SET") {
+        if (value == null) return;
         // read current value for the output
         def output = execution.getVariable(target);
         if (output == null) output = "{}";
-        println ("Setting " + output.toString() + " path " + path + " value " + value);
+        // println ("Setting " + output.toString() + " path " + path + " value " + value);
 
+        // JsonPath.set will not create a key, so we have to go one level up and put 
+        // the key. Which is an annoyance
         (parentPath, key) = popPath(path)
+        
         Object result = JsonPath
                 .using(configuration)
                 .parse(output.toString())
-                .put(parentPath, key, value)
-                .json();
-
-        println ("Set " + target + " to " + result);
+                .put(parentPath, key, value) // see https://github.com/json-path/JsonPath/issues/570
+                .jsonString(); // TODO we should probably stay in Spin
+        println("Result " + result.toString());
         execution.setVariable(target, result);
     } else if (command == "EXTRACT") {
         // read current value for the target
         def input = execution.getVariable(target)
         if (input == null) input = "{}";
-        println("input " + input.toString())
-        Object data = JsonPath
-                .using(configuration)
-                .parse(input.toString())
-                .read(path);
-        // Set value
-        // todo, type
-        execution.setVariable(value, data);
+        try {
+            Object data = JsonPath
+                    .using(configuration)
+                    .parse(input.toString())
+                    .read(path);
+            println "Extracted: " + data.toString();
+            execution.setVariable(value, data);
+        } catch (PathNotFoundException e) {
+            System.err.println(e.getMessage()); 
+        }
     } else {
         System.err.println "Unrecognised command: " + command; 
     }
-
-    println "Command processed"
 }
 
 execution.getVariables().findAll { 
@@ -277,7 +265,7 @@ execution.getVariables().findAll {
         <di:waypoint x="220" y="117" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_1xx666m_di" bpmnElement="Event_1xx666m">
-        <dc:Bounds x="622" y="99" width="36" height="36" />
+        <dc:Bounds x="632" y="99" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1o4gipc_di" bpmnElement="Flow_1o4gipc">
         <di:waypoint x="460" y="117" />
@@ -295,7 +283,7 @@ execution.getVariables().findAll {
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_046k02p_di" bpmnElement="Flow_046k02p">
         <di:waypoint x="590" y="117" />
-        <di:waypoint x="622" y="117" />
+        <di:waypoint x="632" y="117" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

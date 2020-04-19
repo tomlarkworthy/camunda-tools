@@ -12,97 +12,243 @@
           <camunda:inputParameter name="qp_alt" />
           <camunda:inputParameter name="qp_fields" />
           <camunda:inputParameter name="qp_key" />
-          <camunda:inputParameter name="qp_oauth_token" />
           <camunda:inputParameter name="qp_prettyPrint" />
           <camunda:inputParameter name="qp_quotaUser" />
           <camunda:inputParameter name="qp_userIp" />
-          <camunda:outputParameter>${ etag }</camunda:outputParameter>
-          <camunda:outputParameter>${ items }</camunda:outputParameter>
-          <camunda:outputParameter>${ kind }</camunda:outputParameter>
-          <camunda:outputParameter>${ nextPageToken }</camunda:outputParameter>
+          <camunda:inputParameter name="qp_oauth_token">${token}</camunda:inputParameter>
+          <camunda:outputParameter name="etag">${ res_etag }</camunda:outputParameter>
+          <camunda:outputParameter name="items">${ res_items }</camunda:outputParameter>
+          <camunda:outputParameter name="kind">${ res_kind }</camunda:outputParameter>
+          <camunda:outputParameter name="nextPageToken">${ res_nextPageToken }</camunda:outputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
         <camunda:in sourceExpression="GET" target="method" />
         <camunda:in sourceExpression="https://www.googleapis.com/tasks/v1/users/@me/lists" target="url" />
-        <camunda:out source="etag" target="etag" />
-        <camunda:out source="items" target="items" />
-        <camunda:out source="kind" target="kind" />
-        <camunda:out source="nextPageToken" target="nextPageToken" />
-        <camunda:in source="qp_maxResults" target="qp_maxResults" />
-        <camunda:in source="qp_pageToken" target="qp_pageToken" />
-        <camunda:in source="qp_alt" target="qp_alt" />
-        <camunda:in source="qp_fields" target="qp_fields" />
-        <camunda:in source="qp_key" target="qp_key" />
-        <camunda:in source="qp_oauth_token" target="qp_oauth_token" />
-        <camunda:in source="qp_prettyPrint" target="qp_prettyPrint" />
-        <camunda:in source="qp_quotaUser" target="qp_quotaUser" />
-        <camunda:in source="qp_userIp" target="qp_userIp" />
+        <camunda:in sourceExpression="res_etag" target="post EXTRACT response String $[&#39;etag&#39;]" />
+        <camunda:out source="res_etag" target="res_etag" />
+        <camunda:in sourceExpression="res_items" target="post EXTRACT response List $[&#39;items&#39;]" />
+        <camunda:out source="res_items" target="res_items" />
+        <camunda:in sourceExpression="res_kind" target="post EXTRACT response String $[&#39;kind&#39;]" />
+        <camunda:out source="res_kind" target="res_kind" />
+        <camunda:in sourceExpression="res_nextPageToken" target="post EXTRACT response String $[&#39;nextPageToken&#39;]" />
+        <camunda:out source="res_nextPageToken" target="res_nextPageToken" />
+        <camunda:out source="response" target="response" />
+        <camunda:in source="qp_maxResults" target="pre SET query String $[&#39;maxResults&#39;]" />
+        <camunda:in source="qp_pageToken" target="pre SET query String $[&#39;pageToken&#39;]" />
+        <camunda:in source="qp_alt" target="pre SET query String $[&#39;alt&#39;]" />
+        <camunda:in source="qp_fields" target="pre SET query String $[&#39;fields&#39;]" />
+        <camunda:in source="qp_key" target="pre SET query String $[&#39;key&#39;]" />
+        <camunda:in source="qp_oauth_token" target="pre SET query String $[&#39;oauth_token&#39;]" />
+        <camunda:in source="qp_prettyPrint" target="pre SET query String $[&#39;prettyPrint&#39;]" />
+        <camunda:in source="qp_quotaUser" target="pre SET query String $[&#39;quotaUser&#39;]" />
+        <camunda:in source="qp_userIp" target="pre SET query String $[&#39;userIp&#39;]" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0y4lcbo</bpmn:incoming>
+      <bpmn:incoming>Flow_0fw0s3e</bpmn:incoming>
       <bpmn:outgoing>Flow_0wy2nrc</bpmn:outgoing>
     </bpmn:callActivity>
-    <bpmn:sequenceFlow id="Flow_0y4lcbo" sourceRef="StartEvent_1" targetRef="Activity_1a29bfy" />
+    <bpmn:sequenceFlow id="Flow_0y4lcbo" sourceRef="StartEvent_1" targetRef="Activity_08tigs4" />
     <bpmn:endEvent id="Event_15c7zh6">
-      <bpmn:incoming>Flow_11v9oqv</bpmn:incoming>
+      <bpmn:incoming>Flow_1unk568</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_0wy2nrc" sourceRef="Activity_1a29bfy" targetRef="Activity_08num9v" />
-    <bpmn:sequenceFlow id="Flow_11v9oqv" sourceRef="Activity_08num9v" targetRef="Event_15c7zh6" />
+    <bpmn:sequenceFlow id="Flow_11v9oqv" sourceRef="Activity_08num9v" targetRef="Activity_0zqh3za" />
     <bpmn:scriptTask id="Activity_08num9v" scriptFormat="groovy">
       <bpmn:incoming>Flow_0wy2nrc</bpmn:incoming>
       <bpmn:outgoing>Flow_11v9oqv</bpmn:outgoing>
-      <bpmn:script>println "statusCode: " + statusCode + " res: " + response</bpmn:script>
+      <bpmn:script>println "Response: " + response;
+println "Tasks: " + items;</bpmn:script>
     </bpmn:scriptTask>
-    <bpmn:callActivity id="Activity_01ws57l" name="POST /users.setPhoto" camunda:modelerTemplate="POST-/users.setPhoto" calledElement="ApiClient">
+    <bpmn:sequenceFlow id="Flow_1qu1plj" sourceRef="Activity_0zqh3za" targetRef="Activity_1ux4gk3" />
+    <bpmn:callActivity id="Activity_0zqh3za" name="POST /lists/{tasklist}/tasks" camunda:modelerTemplate="POST-/lists/{tasklist}/tasks" calledElement="ApiClient">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="fp_image" />
-          <camunda:inputParameter name="fp_crop_w" />
-          <camunda:inputParameter name="fp_token" />
-          <camunda:inputParameter name="fp_crop_y" />
-          <camunda:inputParameter name="fp_crop_x" />
-          <camunda:outputParameter name="statusCode">${ statusCode }</camunda:outputParameter>
+          <camunda:inputParameter name="content">{}</camunda:inputParameter>
+          <camunda:inputParameter name="cp_completed" />
+          <camunda:inputParameter name="cp_deleted" />
+          <camunda:inputParameter name="cp_due" />
+          <camunda:inputParameter name="cp_etag" />
+          <camunda:inputParameter name="cp_hidden" />
+          <camunda:inputParameter name="cp_id" />
+          <camunda:inputParameter name="cp_kind" />
+          <camunda:inputParameter name="cp_links" />
+          <camunda:inputParameter name="cp_notes" />
+          <camunda:inputParameter name="cp_parent" />
+          <camunda:inputParameter name="cp_position" />
+          <camunda:inputParameter name="cp_selfLink" />
+          <camunda:inputParameter name="cp_status" />
+          <camunda:inputParameter name="cp_updated" />
+          <camunda:inputParameter name="qp_parent" />
+          <camunda:inputParameter name="qp_previous" />
+          <camunda:inputParameter name="qp_alt" />
+          <camunda:inputParameter name="qp_fields" />
+          <camunda:inputParameter name="qp_key" />
+          <camunda:inputParameter name="qp_prettyPrint" />
+          <camunda:inputParameter name="qp_quotaUser" />
+          <camunda:inputParameter name="qp_userIp" />
+          <camunda:inputParameter name="pp_tasklist">MTgwNzg1NDQ1Mjk4MjgyMzQ0Mjc6MDow</camunda:inputParameter>
+          <camunda:inputParameter name="cp_title">Futu1</camunda:inputParameter>
+          <camunda:inputParameter name="qp_oauth_token">${token}</camunda:inputParameter>
+          <camunda:outputParameter name="completed">${ res_completed }</camunda:outputParameter>
+          <camunda:outputParameter name="deleted">${ res_deleted }</camunda:outputParameter>
+          <camunda:outputParameter name="due">${ res_due }</camunda:outputParameter>
+          <camunda:outputParameter name="etag">${ res_etag }</camunda:outputParameter>
+          <camunda:outputParameter name="hidden">${ res_hidden }</camunda:outputParameter>
+          <camunda:outputParameter name="id">${ res_id }</camunda:outputParameter>
+          <camunda:outputParameter name="kind">${ res_kind }</camunda:outputParameter>
+          <camunda:outputParameter name="links">${ res_links }</camunda:outputParameter>
+          <camunda:outputParameter name="notes">${ res_notes }</camunda:outputParameter>
+          <camunda:outputParameter name="parent">${ res_parent }</camunda:outputParameter>
+          <camunda:outputParameter name="position">${ res_position }</camunda:outputParameter>
+          <camunda:outputParameter name="selfLink">${ res_selfLink }</camunda:outputParameter>
+          <camunda:outputParameter name="status">${ res_status }</camunda:outputParameter>
+          <camunda:outputParameter name="title">${ res_title }</camunda:outputParameter>
+          <camunda:outputParameter name="updated">${ res_updated }</camunda:outputParameter>
           <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
         <camunda:in sourceExpression="POST" target="method" />
-        <camunda:in sourceExpression="https://slack.com/api/users.setPhoto" target="url" />
-        <camunda:in sourceExpression="application/x-www-form-urlencoded" target="hp_Content-Type" />
-        <camunda:in source="fp_image" target="fp_image" />
-        <camunda:in source="fp_crop_w" target="fp_crop_w" />
-        <camunda:in source="fp_token" target="fp_token" />
-        <camunda:in source="fp_crop_y" target="fp_crop_y" />
-        <camunda:in source="fp_crop_x" target="fp_crop_x" />
-        <camunda:out source="statusCode" target="statusCode" />
+        <camunda:in sourceExpression="https://www.googleapis.com/tasks/v1/lists/${pp_tasklist}/tasks" target="url" />
+        <camunda:in sourceExpression="application/json" target="pre SET headers String $[&#39;Content-Type&#39;]" />
+        <camunda:in source="content" target="request" />
+        <camunda:in source="cp_completed" target="pre SET request String $[&#39;completed&#39;]" />
+        <camunda:in source="cp_deleted" target="pre SET request Boolean $[&#39;deleted&#39;]" />
+        <camunda:in source="cp_due" target="pre SET request String $[&#39;due&#39;]" />
+        <camunda:in source="cp_etag" target="pre SET request String $[&#39;etag&#39;]" />
+        <camunda:in source="cp_hidden" target="pre SET request Boolean $[&#39;hidden&#39;]" />
+        <camunda:in source="cp_id" target="pre SET request String $[&#39;id&#39;]" />
+        <camunda:in source="cp_kind" target="pre SET request String $[&#39;kind&#39;]" />
+        <camunda:in source="cp_links" target="pre SET request List $[&#39;links&#39;]" />
+        <camunda:in source="cp_notes" target="pre SET request String $[&#39;notes&#39;]" />
+        <camunda:in source="cp_parent" target="pre SET request String $[&#39;parent&#39;]" />
+        <camunda:in source="cp_position" target="pre SET request String $[&#39;position&#39;]" />
+        <camunda:in source="cp_selfLink" target="pre SET request String $[&#39;selfLink&#39;]" />
+        <camunda:in source="cp_status" target="pre SET request String $[&#39;status&#39;]" />
+        <camunda:in source="cp_title" target="pre SET request String $[&#39;title&#39;]" />
+        <camunda:in source="cp_updated" target="pre SET request String $[&#39;updated&#39;]" />
+        <camunda:in sourceExpression="res_completed" target="post EXTRACT response String $[&#39;completed&#39;]" />
+        <camunda:out source="res_completed" target="res_completed" />
+        <camunda:in sourceExpression="res_deleted" target="post EXTRACT response Boolean $[&#39;deleted&#39;]" />
+        <camunda:out source="res_deleted" target="res_deleted" />
+        <camunda:in sourceExpression="res_due" target="post EXTRACT response String $[&#39;due&#39;]" />
+        <camunda:out source="res_due" target="res_due" />
+        <camunda:in sourceExpression="res_etag" target="post EXTRACT response String $[&#39;etag&#39;]" />
+        <camunda:out source="res_etag" target="res_etag" />
+        <camunda:in sourceExpression="res_hidden" target="post EXTRACT response Boolean $[&#39;hidden&#39;]" />
+        <camunda:out source="res_hidden" target="res_hidden" />
+        <camunda:in sourceExpression="res_id" target="post EXTRACT response String $[&#39;id&#39;]" />
+        <camunda:out source="res_id" target="res_id" />
+        <camunda:in sourceExpression="res_kind" target="post EXTRACT response String $[&#39;kind&#39;]" />
+        <camunda:out source="res_kind" target="res_kind" />
+        <camunda:in sourceExpression="res_links" target="post EXTRACT response List $[&#39;links&#39;]" />
+        <camunda:out source="res_links" target="res_links" />
+        <camunda:in sourceExpression="res_notes" target="post EXTRACT response String $[&#39;notes&#39;]" />
+        <camunda:out source="res_notes" target="res_notes" />
+        <camunda:in sourceExpression="res_parent" target="post EXTRACT response String $[&#39;parent&#39;]" />
+        <camunda:out source="res_parent" target="res_parent" />
+        <camunda:in sourceExpression="res_position" target="post EXTRACT response String $[&#39;position&#39;]" />
+        <camunda:out source="res_position" target="res_position" />
+        <camunda:in sourceExpression="res_selfLink" target="post EXTRACT response String $[&#39;selfLink&#39;]" />
+        <camunda:out source="res_selfLink" target="res_selfLink" />
+        <camunda:in sourceExpression="res_status" target="post EXTRACT response String $[&#39;status&#39;]" />
+        <camunda:out source="res_status" target="res_status" />
+        <camunda:in sourceExpression="res_title" target="post EXTRACT response String $[&#39;title&#39;]" />
+        <camunda:out source="res_title" target="res_title" />
+        <camunda:in sourceExpression="res_updated" target="post EXTRACT response String $[&#39;updated&#39;]" />
+        <camunda:out source="res_updated" target="res_updated" />
         <camunda:out source="response" target="response" />
+        <camunda:in source="qp_parent" target="pre SET query String $[&#39;parent&#39;]" />
+        <camunda:in source="qp_previous" target="pre SET query String $[&#39;previous&#39;]" />
+        <camunda:in source="qp_alt" target="pre SET query String $[&#39;alt&#39;]" />
+        <camunda:in source="qp_fields" target="pre SET query String $[&#39;fields&#39;]" />
+        <camunda:in source="qp_key" target="pre SET query String $[&#39;key&#39;]" />
+        <camunda:in source="qp_oauth_token" target="pre SET query String $[&#39;oauth_token&#39;]" />
+        <camunda:in source="qp_prettyPrint" target="pre SET query String $[&#39;prettyPrint&#39;]" />
+        <camunda:in source="qp_quotaUser" target="pre SET query String $[&#39;quotaUser&#39;]" />
+        <camunda:in source="qp_userIp" target="pre SET query String $[&#39;userIp&#39;]" />
       </bpmn:extensionElements>
+      <bpmn:incoming>Flow_11v9oqv</bpmn:incoming>
+      <bpmn:outgoing>Flow_1qu1plj</bpmn:outgoing>
     </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_0fw0s3e" sourceRef="Activity_08tigs4" targetRef="Activity_1a29bfy" />
+    <bpmn:scriptTask id="Activity_08tigs4" name="hardcode token" scriptFormat="groovy" camunda:resultVariable="token">
+      <bpmn:incoming>Flow_0y4lcbo</bpmn:incoming>
+      <bpmn:outgoing>Flow_0fw0s3e</bpmn:outgoing>
+      <bpmn:script>"ya29.a0Ae4lvC1w9561LCO24X9HkVfrc11KssOnAAqxHH5jinaAJ1opy3GkjiX9Ade7Rv9qn5XAnE1rs6bDn0zCffAUqJs5ZIokAp_lo2cNGWSzBLjF6bGK-mL1mKNYRkYSLBba50tp1fs6VYDs26uonp-_7Jq6Omy41aslVRY"</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_1unk568" sourceRef="Activity_1ux4gk3" targetRef="Event_15c7zh6" />
+    <bpmn:scriptTask id="Activity_1ux4gk3" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1qu1plj</bpmn:incoming>
+      <bpmn:outgoing>Flow_1unk568</bpmn:outgoing>
+      <bpmn:script>println "Response: " + response;</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:textAnnotation id="TextAnnotation_0a489lm">
+      <bpmn:text>Fetch users tasks based on oauth_token</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1yeinos" sourceRef="Activity_1a29bfy" targetRef="TextAnnotation_0a489lm" />
+    <bpmn:textAnnotation id="TextAnnotation_1ln3eo2">
+      <bpmn:text>Upsert a task into the users first task list</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1jsf5cp" sourceRef="Activity_0zqh3za" targetRef="TextAnnotation_1ln3eo2" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="TemplateTest">
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
-        <dc:Bounds x="122" y="99" width="36" height="36" />
+        <dc:Bounds x="152" y="189" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1dolfcd_di" bpmnElement="Activity_1a29bfy">
-        <dc:Bounds x="220" y="77" width="100" height="80" />
+        <dc:Bounds x="340" y="167" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0y4lcbo_di" bpmnElement="Flow_0y4lcbo">
-        <di:waypoint x="158" y="117" />
-        <di:waypoint x="220" y="117" />
+        <di:waypoint x="188" y="207" />
+        <di:waypoint x="210" y="207" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_15c7zh6_di" bpmnElement="Event_15c7zh6">
-        <dc:Bounds x="482" y="99" width="36" height="36" />
+        <dc:Bounds x="852" y="189" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0wy2nrc_di" bpmnElement="Flow_0wy2nrc">
-        <di:waypoint x="320" y="117" />
-        <di:waypoint x="350" y="117" />
+        <di:waypoint x="440" y="207" />
+        <di:waypoint x="470" y="207" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_11v9oqv_di" bpmnElement="Flow_11v9oqv">
-        <di:waypoint x="450" y="117" />
-        <di:waypoint x="482" y="117" />
+        <di:waypoint x="570" y="207" />
+        <di:waypoint x="600" y="207" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_1afaf00_di" bpmnElement="Activity_08num9v">
-        <dc:Bounds x="350" y="77" width="100" height="80" />
+        <dc:Bounds x="470" y="167" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_01ws57l_di" bpmnElement="Activity_01ws57l">
-        <dc:Bounds x="180" y="230" width="100" height="80" />
+      <bpmndi:BPMNEdge id="Flow_1qu1plj_di" bpmnElement="Flow_1qu1plj">
+        <di:waypoint x="700" y="207" />
+        <di:waypoint x="730" y="207" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_00vm71u_di" bpmnElement="Activity_0zqh3za">
+        <dc:Bounds x="600" y="167" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0a489lm_di" bpmnElement="TextAnnotation_0a489lm">
+        <dc:Bounds x="440" y="80" width="100" height="54" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1yeinos_di" bpmnElement="Association_1yeinos">
+        <di:waypoint x="430" y="167" />
+        <di:waypoint x="463" y="134" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_1ln3eo2_di" bpmnElement="TextAnnotation_1ln3eo2">
+        <dc:Bounds x="700" y="80" width="100" height="54" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1jsf5cp_di" bpmnElement="Association_1jsf5cp">
+        <di:waypoint x="690" y="167" />
+        <di:waypoint x="723" y="134" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0fw0s3e_di" bpmnElement="Flow_0fw0s3e">
+        <di:waypoint x="310" y="207" />
+        <di:waypoint x="340" y="207" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_19t400p_di" bpmnElement="Activity_08tigs4">
+        <dc:Bounds x="210" y="167" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1unk568_di" bpmnElement="Flow_1unk568">
+        <di:waypoint x="830" y="207" />
+        <di:waypoint x="852" y="207" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_07h6fh3_di" bpmnElement="Activity_1ux4gk3">
+        <dc:Bounds x="730" y="167" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

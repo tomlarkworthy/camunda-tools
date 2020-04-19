@@ -1,14 +1,17 @@
-def variables = execution.getVariables();
-println("variables " + variables);
-def queryParams = variables.findAll { 
-   it.key.startsWith("qp_")
-}.collect { id, value ->
-    id + "=" + value
+import static org.camunda.spin.Spin.*;
+if (execution.hasVariable("query")) {
+   query = JSON(execution.getVariable("query")).mapTo("java.util.Map<java.lang.String, java.lang.String>");
+} else {
+   query = [:]
+}
+
+def queryParams = query.findAll { 
+   it.value != null 
+}.collect {
+   id, value -> id + "=" + value
 }
 def queryString = queryParams.size() == 0 ? ""
                                           : "?" + queryParams.join("&")
-def url = 
-   execution.getVariable("url") + 
-   queryString
+def url = execution.getVariable("url") + queryString
 println(url)
 url
