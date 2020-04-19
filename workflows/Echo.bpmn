@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0cqopu9" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
+  <bpmn:process id="Echo" name="Echo" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_0fjxlkl</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0fjxlkl" sourceRef="StartEvent_1" targetRef="Gateway_0mt3mgo" />
+    <bpmn:callActivity id="PushPubsub" name="Publish Echo" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:exclusive="false" camunda:jobPriority="1" calledElement="PubsubPublish">
+      <bpmn:extensionElements>
+        <camunda:in businessKey="#{execution.processBusinessKey}" />
+        <camunda:in source="topic" target="topic" />
+        <camunda:in source="project" target="project" />
+        <camunda:in source="message" target="message" />
+        <camunda:inputOutput>
+          <camunda:inputParameter name="topic">myTopic</camunda:inputParameter>
+          <camunda:inputParameter name="project">larkworthy-tester</camunda:inputParameter>
+          <camunda:inputParameter name="message">
+            <camunda:script scriptFormat="groovy">import groovy.json.JsonOutput
+JsonOutput.toJson([
+    messageName: "echo",
+    businessKey: execution.processBusinessKey,
+    processInstanceId: execution.processInstanceId
+])</camunda:script>
+          </camunda:inputParameter>
+        </camunda:inputOutput>
+        <camunda:failedJobRetryTimeCycle>R999999/PT5S</camunda:failedJobRetryTimeCycle>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0zou8kx</bpmn:incoming>
+      <bpmn:outgoing>Flow_1cyjot4</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:receiveTask id="Activity_0avp8zm" name="Wait for Echo" camunda:jobPriority="2" messageRef="Message_0aqvsvq">
+      <bpmn:incoming>Flow_0at5xd4</bpmn:incoming>
+      <bpmn:outgoing>Flow_0i6u2tm</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:endEvent id="Event_0aw4vxw">
+      <bpmn:incoming>Flow_10kjc16</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0zou8kx" sourceRef="Gateway_0mt3mgo" targetRef="PushPubsub" />
+    <bpmn:sequenceFlow id="Flow_0at5xd4" sourceRef="Gateway_0mt3mgo" targetRef="Activity_0avp8zm" />
+    <bpmn:parallelGateway id="Gateway_0mt3mgo">
+      <bpmn:incoming>Flow_0fjxlkl</bpmn:incoming>
+      <bpmn:outgoing>Flow_0zou8kx</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0at5xd4</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_0i6u2tm" sourceRef="Activity_0avp8zm" targetRef="Gateway_0mblpjs" />
+    <bpmn:sequenceFlow id="Flow_10kjc16" sourceRef="Gateway_0mblpjs" targetRef="Event_0aw4vxw" />
+    <bpmn:parallelGateway id="Gateway_0mblpjs">
+      <bpmn:incoming>Flow_0i6u2tm</bpmn:incoming>
+      <bpmn:incoming>Flow_1cyjot4</bpmn:incoming>
+      <bpmn:outgoing>Flow_10kjc16</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_1cyjot4" sourceRef="PushPubsub" targetRef="Gateway_0mblpjs" />
+  </bpmn:process>
+  <bpmn:message id="Message_0aqvsvq" name="echo" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Echo">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="162" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0fjxlkl_di" bpmnElement="Flow_0fjxlkl">
+        <di:waypoint x="188" y="180" />
+        <di:waypoint x="205" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_15rku3g_di" bpmnElement="PushPubsub">
+        <dc:Bounds x="280" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0psem4g_di" bpmnElement="Activity_0avp8zm">
+        <dc:Bounds x="280" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0aw4vxw_di" bpmnElement="Event_0aw4vxw">
+        <dc:Bounds x="472" y="162" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0zou8kx_di" bpmnElement="Flow_0zou8kx">
+        <di:waypoint x="230" y="155" />
+        <di:waypoint x="230" y="120" />
+        <di:waypoint x="280" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0at5xd4_di" bpmnElement="Flow_0at5xd4">
+        <di:waypoint x="230" y="205" />
+        <di:waypoint x="230" y="250" />
+        <di:waypoint x="280" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Gateway_12c8goe_di" bpmnElement="Gateway_0mt3mgo">
+        <dc:Bounds x="205" y="155" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0i6u2tm_di" bpmnElement="Flow_0i6u2tm">
+        <di:waypoint x="380" y="250" />
+        <di:waypoint x="430" y="250" />
+        <di:waypoint x="430" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10kjc16_di" bpmnElement="Flow_10kjc16">
+        <di:waypoint x="455" y="180" />
+        <di:waypoint x="472" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Gateway_1kucqok_di" bpmnElement="Gateway_0mblpjs">
+        <dc:Bounds x="405" y="155" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1cyjot4_di" bpmnElement="Flow_1cyjot4">
+        <di:waypoint x="380" y="120" />
+        <di:waypoint x="430" y="120" />
+        <di:waypoint x="430" y="155" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

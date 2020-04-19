@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1608m3e" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
+  <bpmn:process id="PubsubPublish" name="PubsubPublish" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="project" label="project" type="string" defaultValue="larkworthy-tester" />
+          <camunda:formField id="topic" label="topic" type="string" defaultValue="out" />
+          <camunda:formField id="message" label="message" type="string" defaultValue="hello world" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_1bc5zu8</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:callActivity id="FetchToken" name="FetchToken" calledElement="FetchToken">
+      <bpmn:extensionElements>
+        <camunda:out source="token" target="token" />
+        <camunda:inputOutput>
+          <camunda:outputParameter name="token">${token}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1bc5zu8</bpmn:incoming>
+      <bpmn:outgoing>Flow_0utyh8l</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_1bc5zu8" sourceRef="StartEvent_1" targetRef="FetchToken" />
+    <bpmn:endEvent id="Event_1875zce">
+      <bpmn:incoming>Flow_02l13be</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_02l13be" sourceRef="Activity_1jw7b7e" targetRef="Event_1875zce" />
+    <bpmn:callActivity id="Activity_1jw7b7e" name="publish" calledElement="Http">
+      <bpmn:extensionElements>
+        <camunda:in source="headers" target="headers" />
+        <camunda:in sourceExpression="https://pubsub.googleapis.com/v1/projects/${project}/topics/${topic}:publish" target="url" />
+        <camunda:in sourceExpression="POST" target="method" />
+        <camunda:inputOutput>
+          <camunda:inputParameter name="headers">
+            <camunda:script scriptFormat="groovy">[
+    Authorization: "Bearer " + token
+]</camunda:script>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="payload">
+            <camunda:script scriptFormat="groovy">import groovy.json.JsonOutput
+import java.util.Base64
+
+def encoded = Base64.getEncoder().encodeToString(message.getBytes());
+JsonOutput.toJson([
+    messages: [
+        data: encoded 
+    ]
+])</camunda:script>
+          </camunda:inputParameter>
+        </camunda:inputOutput>
+        <camunda:out source="response" target="response" />
+        <camunda:out source="statusCode" target="statusCode" />
+        <camunda:out source="headers" target="headers" />
+        <camunda:in source="payload" target="payload" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0utyh8l</bpmn:incoming>
+      <bpmn:outgoing>Flow_02l13be</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:boundaryEvent id="Event_0dn48ac" attachedToRef="Activity_1jw7b7e">
+      <bpmn:outgoing>Flow_03wrs60</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_12x769u" errorRef="Error_08tmsn2" camunda:errorCodeVariable="errorCode" camunda:errorMessageVariable="errorMessage" />
+    </bpmn:boundaryEvent>
+    <bpmn:endEvent id="Event_0ihp1t6">
+      <bpmn:incoming>Flow_115qfnw</bpmn:incoming>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_1ybjccq" errorRef="Error_0zvmets" />
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_115qfnw" sourceRef="Activity_0t1dbw7" targetRef="Event_0ihp1t6" />
+    <bpmn:sequenceFlow id="Flow_03wrs60" sourceRef="Event_0dn48ac" targetRef="Activity_0t1dbw7" />
+    <bpmn:scriptTask id="Activity_0t1dbw7" name="Log error&#10;&#10;" scriptFormat="javascript">
+      <bpmn:incoming>Flow_03wrs60</bpmn:incoming>
+      <bpmn:outgoing>Flow_115qfnw</bpmn:outgoing>
+      <bpmn:script>java.lang.System.err.println (errorCode + ": " + errorMessage)</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_0utyh8l" sourceRef="FetchToken" targetRef="Activity_1jw7b7e" />
+  </bpmn:process>
+  <bpmn:error id="Error_0zvmets" name="PublishError" errorCode="errorCode" camunda:errorMessage="errorMessage" />
+  <bpmn:error id="Error_08tmsn2" name="HttpError" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="PubsubPublish">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="182" y="85" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0itkn6y_di" bpmnElement="FetchToken">
+        <dc:Bounds x="250" y="60" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1bc5zu8_di" bpmnElement="Flow_1bc5zu8">
+        <di:waypoint x="218" y="103" />
+        <di:waypoint x="250" y="103" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1875zce_di" bpmnElement="Event_1875zce">
+        <dc:Bounds x="502" y="82" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_02l13be_di" bpmnElement="Flow_02l13be">
+        <di:waypoint x="480" y="100" />
+        <di:waypoint x="502" y="100" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0vwsf7v_di" bpmnElement="Activity_1jw7b7e">
+        <dc:Bounds x="380" y="60" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_13mp6hi_di" bpmnElement="Event_0dn48ac">
+        <dc:Bounds x="442" y="122" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_07y8g09_di" bpmnElement="Event_0ihp1t6">
+        <dc:Bounds x="502" y="202" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_115qfnw_di" bpmnElement="Flow_115qfnw">
+        <di:waypoint x="480" y="220" />
+        <di:waypoint x="502" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03wrs60_di" bpmnElement="Flow_03wrs60">
+        <di:waypoint x="460" y="158" />
+        <di:waypoint x="460" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_1jtahg7_di" bpmnElement="Activity_0t1dbw7">
+        <dc:Bounds x="380" y="180" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0utyh8l_di" bpmnElement="Flow_0utyh8l">
+        <di:waypoint x="350" y="100" />
+        <di:waypoint x="380" y="100" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

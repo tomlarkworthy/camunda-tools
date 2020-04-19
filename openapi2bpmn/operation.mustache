@@ -1,0 +1,194 @@
+{
+    "name": "{{method}} {{{path}}}",
+    "id": "{{{id}}}",
+    "appliesTo": [
+        "bpmn:CallActivity"
+    ],
+    "properties": [
+        {
+            "label": "Name",
+            "type": "Hidden",
+            "value": "{{method}} {{{path}}}",
+            "editable": false,
+            "binding": {
+                "type": "property",
+                "name": "name"
+            }
+        },
+        {
+            "label": "CalledElement",
+            "type": "Hidden",
+            "value": "{{calledElement}}",
+            "editable": false,
+            "binding": {
+                "type": "property",
+                "name": "calledElement"
+            }
+        },
+        {
+            "label": "Method",
+            "type": "Hidden",
+            "value": "{{method}}",
+            "editable": false,
+            "binding": {
+                "type": "camunda:in",
+                "target": "method",
+                "expression": true
+            }
+        },
+        {
+            "label": "url",
+            "type": "Hidden",
+            "value": "{{{urlExpression}}}",
+            "editable": false,
+            "binding": {
+                "type": "camunda:in",
+                "target": "url",
+                "expression": true
+            }
+        }
+        {{#pathParams}}
+        ,{
+            "label": "Path parameter: {{name}}",
+            "type": "String",
+            "description": {{{description}}},
+            "value": null,
+            "binding": {
+                "type": "camunda:inputParameter",
+                "name": "pp_{{name}}"
+            }
+        }
+        {{/pathParams}}{{#contentType}}
+        ,{
+            "label": "Content-Type",
+            "type": "Hidden",
+            "value": "{{{contentType}}}",
+            "binding": {
+                "type": "camunda:in",
+                "target": "hp_Content-Type",
+                "expression": true
+            }
+        }
+        {{/contentType}}{{#contentJson}}
+        ,{
+            "label": "JSON Content to merge",
+            "type": "String",
+            "description": {{{description}}},
+            "value": "{{{value}}}",
+            "binding": {
+                "type": "camunda:inputParameter",
+                "name": "content"
+            }
+        }
+        ,{
+            "label": "Content",
+            "type": "Hidden",
+            "value": "content",
+            "binding": {
+                "type": "camunda:in",
+                "target": "content"
+            }
+        }
+        {{/contentJson}}{{#contentParams}}
+        ,{
+            "label": "JSON Content field: {{name}}",
+            "type": "String",
+            "description": {{{description}}},
+            "value": null,
+            "binding": {
+                "type": "camunda:inputParameter",
+                "name": "cp_{{name}}"
+            }
+        }
+        ,{
+            "label": "Content",
+            "type": "Hidden",
+            "value": "cp_{{name}}",
+            "binding": {
+                "type": "camunda:in",
+                "target": "cp_{{name}}"
+            }
+        }
+        {{/contentParams}}{{#responseParams}}
+        ,{
+            "label": "JSON output binding: {{{name}}}",
+            "description": {{{description}}},
+            "type": "String",
+            "value": null,
+            "binding": {
+                "type": "camunda:outputParameter",
+                "source": "${ {{{name}}} }"
+            }
+        }
+        ,{
+            "label": "{{{name}}}",
+            "type": "Hidden",
+            "value": "{{{name}}}",
+            "binding": {
+                "type": "camunda:out",
+                "source": "{{{name}}}"
+            }
+        }
+        {{/responseParams}}{{#queryParams}}
+        ,{
+            "label": "Query parameter: {{name}}",
+            "type": "String",
+            "description": {{{description}}},
+            "value": null,
+            "binding": {
+                "type": "camunda:inputParameter",
+                "name": "qp_{{name}}"
+            }
+        }
+        ,{
+            "label": "{{name}}",
+            "type": "Hidden",
+            "value": "qp_{{name}}",
+            "binding": {
+                "type": "camunda:in",
+                "target": "qp_{{name}}"
+            }
+        }
+        {{/queryParams}}{{#formDataParams}}
+        ,{
+            "label": "FormData parameter: {{name}}",
+            "type": "String",
+            "description": {{{description}}},
+            "value": null,
+            "binding": {
+                "type": "camunda:inputParameter",
+                "name": "fp_{{name}}"
+            }
+        }
+        ,{
+            "label": "{{name}}",
+            "type": "Hidden",
+            "value": "fp_{{name}}",
+            "binding": {
+                "type": "camunda:in",
+                "target": "fp_{{name}}"
+            }
+        }
+        {{/formDataParams}}{{#headerParams}}
+        ,{
+            "label": "Header: {{name}}",
+            "type": "String",
+            "description": {{{description}}},
+            "value": null,
+            "binding": {
+                "type": "camunda:inputParameter",
+                "name": "hp_{{name}}"
+            }
+        }
+        ,{
+            "label": "{{name}}",
+            "type": "Hidden",
+            "value": "hp_{{name}}",
+            "binding": {
+                "type": "camunda:in",
+                "target": "hp_{{name}}"
+            }
+        }
+        {{/headerParams}}
+    ]
+}

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0p2sks3" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
+  <bpmn:process id="Http" name="Http" isExecutable="true">
+    <bpmn:startEvent id="HttpRequest">
+      <bpmn:outgoing>Flow_1b8ogdn</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1b8ogdn" sourceRef="HttpRequest" targetRef="HttpCall" />
+    <bpmn:serviceTask id="HttpCall" name="HttpCall">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">${url}</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:script scriptFormat="groovy">execution.hasVariable("headers") ?  execution.getVariable("headers"): []</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">
+              <camunda:script scriptFormat="groovy">execution.hasVariable("method") ? execution.getVariable("method") : "GET"</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="groovy">execution.hasVariable("payload") ? execution.getVariable("payload") : null</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="response">${response}</camunda:outputParameter>
+            <camunda:outputParameter name="statusCode">
+              <camunda:script scriptFormat="groovy">statusCode.toInteger()</camunda:script>
+            </camunda:outputParameter>
+            <camunda:outputParameter name="headers">
+              <camunda:map />
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1b8ogdn</bpmn:incoming>
+      <bpmn:outgoing>Flow_0emzhvb</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="HttpCallSuccess">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="response">${response}</camunda:inputParameter>
+          <camunda:inputParameter name="headers">
+            <camunda:map />
+          </camunda:inputParameter>
+          <camunda:inputParameter name="statusCode">${statusCode}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>happyPath</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="HandleStatusCode" name="&#10;&#10;StatusCode">
+      <bpmn:incoming>Flow_0emzhvb</bpmn:incoming>
+      <bpmn:outgoing>happyPath</bpmn:outgoing>
+      <bpmn:outgoing>errorPath</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="happyPath" name="&#60; 400&#10;&#10;" sourceRef="HandleStatusCode" targetRef="HttpCallSuccess">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${statusCode &lt; 400}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="errorPath" name="&#62;= 400&#10;&#10;" sourceRef="HandleStatusCode" targetRef="Activity_14q0vuf">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${statusCode &gt;= 400}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="Event_0ynz78o">
+      <bpmn:incoming>Flow_18s8q45</bpmn:incoming>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_0ana5hj" errorRef="Error_03ryv1t" />
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0emzhvb" sourceRef="HttpCall" targetRef="HandleStatusCode" />
+    <bpmn:sequenceFlow id="Flow_18s8q45" sourceRef="Activity_14q0vuf" targetRef="Event_0ynz78o" />
+    <bpmn:scriptTask id="Activity_14q0vuf" scriptFormat="groovy">
+      <bpmn:incoming>errorPath</bpmn:incoming>
+      <bpmn:outgoing>Flow_18s8q45</bpmn:outgoing>
+      <bpmn:script>println "Error in http"</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmn:error id="Error_03ryv1t" name="HttpError" errorCode="${statusCode}" camunda:errorMessage="${S(response).prop(&#39;error&#39;).prop(&#39;message&#39;).value()}" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Http">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="HttpRequest">
+        <dc:Bounds x="160" y="99" width="0" height="53" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="279" y="142" width="62" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1b8ogdn_di" bpmnElement="Flow_1b8ogdn">
+        <di:waypoint x="160" y="126" />
+        <di:waypoint x="190" y="126" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0c5df4n_di" bpmnElement="HttpCall">
+        <dc:Bounds x="190" y="86" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_17qzv6v_di" bpmnElement="HttpCallSuccess">
+        <dc:Bounds x="502" y="108" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0tipgat_di" bpmnElement="HandleStatusCode" isMarkerVisible="true">
+        <dc:Bounds x="305" y="101" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="301" y="60" width="58" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0tbsszj_di" bpmnElement="happyPath">
+        <di:waypoint x="355" y="126" />
+        <di:waypoint x="502" y="126" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="416" y="108" width="28" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0h9xh68_di" bpmnElement="errorPath">
+        <di:waypoint x="330" y="151" />
+        <di:waypoint x="330" y="220" />
+        <di:waypoint x="380" y="220" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="312" y="230" width="35" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0a1fxat_di" bpmnElement="Event_0ynz78o">
+        <dc:Bounds x="502" y="202" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0emzhvb_di" bpmnElement="Flow_0emzhvb">
+        <di:waypoint x="290" y="126" />
+        <di:waypoint x="305" y="126" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18s8q45_di" bpmnElement="Flow_18s8q45">
+        <di:waypoint x="480" y="220" />
+        <di:waypoint x="502" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_026djph_di" bpmnElement="Activity_14q0vuf">
+        <dc:Bounds x="380" y="180" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

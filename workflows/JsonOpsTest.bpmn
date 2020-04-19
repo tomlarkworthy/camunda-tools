@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_005s79q" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
+  <bpmn:process id="JsonOpsTest" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_03mdw71</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:scriptTask id="Activity_086j79f" scriptFormat="groovy">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="prefix">pre</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0k2owq9</bpmn:incoming>
+      <bpmn:outgoing>Flow_0zug94t</bpmn:outgoing>
+      <bpmn:script>import java.util.regex.Pattern
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Configuration;
+import static org.camunda.spin.Spin.*;
+
+
+/**
+* Looks for process variables of the form
+* &lt;PREFIX&gt;_&lt;COMMAND&gt;_&lt;TARGET&gt;_&lt;DATATYPE&gt;_&lt;JSONPATH&gt;
+* where prefix is supplied in a local variable
+*
+* E.g.
+* pre_SET_request_String_$['token']   : 'ksadklasdkhjasdkljashda'
+* post_EXTRACT_response_List_$.items  : 'taskList'
+*/
+
+// &lt;COMMAND&gt;_&lt;TARGET&gt;_&lt;DATATYPE&gt;_&lt;PATH&gt;
+def command_re = ~/^(\S+)_(\S+)_(\S+)_(.*)$/
+
+def prefix = execution.getVariableLocal("prefix") ? execution.getVariableLocal("prefix") + "_" : "_";
+
+def popPath(path) {
+    def parentkey_re = ~/^(?&lt;parent&gt;.*)\['(?&lt;key&gt;.*)'\]$/
+    fullPath = JsonPath.compile(path).getPath();
+    println ("fullPath " + fullPath);
+    def matcher = fullPath =~ parentkey_re
+    matcher.matches()
+    return [matcher.group('parent'), matcher.group('key')]
+}
+
+def exec(command, target, datatype, path, value) {
+    println command + " " + target + " " + datatype + " " + path + " " + value
+    
+    def configuration = Configuration.defaultConfiguration().jsonProvider();
+
+    if (command == "SET") {
+        // read current value for the output
+        def output = execution.getVariable(target);
+        if (output == null) output = "{}";
+        println ("Setting " + output.toString() + " path " + path + " value " + value);
+
+        (parentPath, key) = popPath(path)
+        Object result = JsonPath
+                .using(configuration)
+                .parse(output.toString())
+                .put(parentPath, key, value)
+                .json();
+
+        println ("Set " + target + " to " + result);
+        execution.setVariable(target, result);
+    } else if (command == "EXTRACT") {
+        // read current value for the target
+        def input = execution.getVariable(target)
+        if (input == null) input = "{}";
+        println("input " + input.toString())
+        Object data = JsonPath
+                .using(configuration)
+                .parse(input.toString())
+                .read(path);
+        // Set value
+        // todo, type
+        execution.setVariable(value, data);
+    } else {
+        System.err.println "Unrecognised command: " + command; 
+    }
+
+    println "Command processed"
+}
+
+execution.getVariables().findAll { 
+    it.key.startsWith(prefix)
+}.each { key, value -&gt; 
+    def cmd = key.substring(prefix.length());
+    def matcher = command_re.matcher(cmd)
+    if (!matcher.matches()) {
+        System.err.println "Cannot parse command line: " + cmd; 
+    } else {
+        def command = matcher.group(1);
+        def target = matcher.group(2);
+        def datatype = matcher.group(3);
+        def path = matcher.group(4);
+        exec(command, target, datatype, path, value)
+    }
+}</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_03mdw71" sourceRef="StartEvent_1" targetRef="Activity_0eii110" />
+    <bpmn:sequenceFlow id="Flow_0k2owq9" sourceRef="Activity_0eii110" targetRef="Activity_086j79f" />
+    <bpmn:scriptTask id="Activity_0eii110" scriptFormat="groovy">
+      <bpmn:incoming>Flow_03mdw71</bpmn:incoming>
+      <bpmn:outgoing>Flow_0k2owq9</bpmn:outgoing>
+      <bpmn:script>execution.setVariable("pre_SET_request_String_\$['token']", "foo")
+execution.setVariable("post_EXTRACT_response_List_\$.items", "tasks")</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_0zug94t" sourceRef="Activity_086j79f" targetRef="Activity_02gtm9e" />
+    <bpmn:scriptTask id="Activity_0k9r8pc" scriptFormat="groovy">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="prefix">post</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0g3s1sp</bpmn:incoming>
+      <bpmn:outgoing>Flow_00b373c</bpmn:outgoing>
+      <bpmn:script>    import java.util.regex.Pattern
+    import com.jayway.jsonpath.JsonPath;
+    import com.jayway.jsonpath.Configuration;
+    import static org.camunda.spin.Spin.*;
+
+
+    /**
+    * Looks for process variables of the form
+    * &lt;PREFIX&gt;_&lt;COMMAND&gt;_&lt;TARGET&gt;_&lt;DATATYPE&gt;_&lt;JSONPATH&gt;
+    * where prefix is supplied in a local variable
+    *
+    * E.g.
+    * pre_SET_request_String_$['token']   : 'ksadklasdkhjasdkljashda'
+    * post_EXTRACT_response_List_$.items  : 'taskList'
+    */
+
+    // &lt;COMMAND&gt;_&lt;TARGET&gt;_&lt;DATATYPE&gt;_&lt;PATH&gt;
+    def command_re = ~/^(\S+)_(\S+)_(\S+)_(.*)$/
+
+    def prefix = execution.getVariableLocal("prefix") ? execution.getVariableLocal("prefix") + "_" : "_";
+
+    def exec(command, target, datatype, path, value) {
+        println command + " " + target + " " + datatype + " " + path + " " + value
+        
+        def configuration = Configuration.defaultConfiguration().jsonProvider();
+
+        if (command == "SET") {
+            // read current value for the output
+            def output = execution.getVariable(target);
+            if (output == null) output = "{}";
+            println ("Setting " + output.toString());
+            Object result = JsonPath
+                    .using(configuration)
+                    .parse(output.toString())
+                    .set(path, value)
+                    .json();
+
+            execution.setVariable(target, result);
+        } else if (command == "EXTRACT") {
+            // read current value for the target
+            def input = execution.getVariable(target)
+            if (input == null) input = "{}";
+            println("input " + input.toString())
+            Object data = JsonPath
+                    .using(configuration)
+                    .parse(input.toString())
+                    .read(path);
+            // Set value
+            // todo, type
+            execution.setVariable(value, data);
+        } else {
+            System.err.println "Unrecognised command: " + command; 
+        }
+
+        println "Command processed"
+    }
+
+    execution.getVariables().findAll { 
+    it.key.startsWith(prefix)
+    }.each { key, value -&gt; 
+        def cmd = key.substring(prefix.length());
+        def matcher = command_re.matcher(cmd)
+        if (!matcher.matches()) {
+            System.err.println "Cannot parse command line: " + cmd; 
+        } else {
+            def command = matcher.group(1);
+            def target = matcher.group(2);
+            def datatype = matcher.group(3);
+            def path = matcher.group(4);
+            exec(command, target, datatype, path, value)
+        }
+    }</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_00b373c" sourceRef="Activity_0k9r8pc" targetRef="Activity_1besa0k" />
+    <bpmn:scriptTask id="Activity_1besa0k" scriptFormat="groovy">
+      <bpmn:incoming>Flow_00b373c</bpmn:incoming>
+      <bpmn:script>println "request: " + request
+println "response: " + response
+println "tasks: " + tasks
+</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:scriptTask id="Activity_02gtm9e" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0zug94t</bpmn:incoming>
+      <bpmn:outgoing>Flow_0g3s1sp</bpmn:outgoing>
+      <bpmn:script>import static org.camunda.spin.Spin.*;
+execution.setVariable("response", JSON("{\"items\": [\"Kermit\"]}"))</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_0g3s1sp" sourceRef="Activity_02gtm9e" targetRef="Activity_0k9r8pc" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="JsonOpsTest">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="122" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_05r3wz1_di" bpmnElement="Activity_086j79f">
+        <dc:Bounds x="330" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_03mdw71_di" bpmnElement="Flow_03mdw71">
+        <di:waypoint x="158" y="120" />
+        <di:waypoint x="180" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0k2owq9_di" bpmnElement="Flow_0k2owq9">
+        <di:waypoint x="280" y="120" />
+        <di:waypoint x="330" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_02gtvuk_di" bpmnElement="Activity_0eii110">
+        <dc:Bounds x="180" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0zug94t_di" bpmnElement="Flow_0zug94t">
+        <di:waypoint x="430" y="120" />
+        <di:waypoint x="480" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0k9r8pc_di" bpmnElement="Activity_0k9r8pc">
+        <dc:Bounds x="620" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_00b373c_di" bpmnElement="Flow_00b373c">
+        <di:waypoint x="720" y="120" />
+        <di:waypoint x="760" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0jt6pik_di" bpmnElement="Activity_1besa0k">
+        <dc:Bounds x="760" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0i2uv4k_di" bpmnElement="Activity_02gtm9e">
+        <dc:Bounds x="480" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0g3s1sp_di" bpmnElement="Flow_0g3s1sp">
+        <di:waypoint x="530" y="80" />
+        <di:waypoint x="530" y="60" />
+        <di:waypoint x="670" y="60" />
+        <di:waypoint x="670" y="80" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

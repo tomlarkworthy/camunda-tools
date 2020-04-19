@@ -1,0 +1,12 @@
+echo/node_modules/typescript/bin/tsc echo/index.ts
+gcloud functions deploy echo \
+    --project=larkworthy-tester \
+    --region europe-west1 \
+    --entry-point echo \
+    --source=echo \
+    --runtime=nodejs8 \
+    --trigger-topic=myTopic \
+    --memory=128MB \
+    --max-instances=2 \
+    --retry \
+    --set-env-vars=MESSAGE_URL=https://camunda-flxotk3pnq-ew.a.run.app/engine-rest/message/

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_16kg7ap" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
+  <bpmn:process id="TemplateTest" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_0y4lcbo</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:callActivity id="Activity_1a29bfy" name="GET /users/@me/lists" camunda:modelerTemplate="GET-/users/@me/lists" calledElement="ApiClient">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="qp_maxResults" />
+          <camunda:inputParameter name="qp_pageToken" />
+          <camunda:inputParameter name="qp_alt" />
+          <camunda:inputParameter name="qp_fields" />
+          <camunda:inputParameter name="qp_key" />
+          <camunda:inputParameter name="qp_oauth_token" />
+          <camunda:inputParameter name="qp_prettyPrint" />
+          <camunda:inputParameter name="qp_quotaUser" />
+          <camunda:inputParameter name="qp_userIp" />
+          <camunda:outputParameter>${ etag }</camunda:outputParameter>
+          <camunda:outputParameter>${ items }</camunda:outputParameter>
+          <camunda:outputParameter>${ kind }</camunda:outputParameter>
+          <camunda:outputParameter>${ nextPageToken }</camunda:outputParameter>
+        </camunda:inputOutput>
+        <camunda:in sourceExpression="GET" target="method" />
+        <camunda:in sourceExpression="https://www.googleapis.com/tasks/v1/users/@me/lists" target="url" />
+        <camunda:out source="etag" target="etag" />
+        <camunda:out source="items" target="items" />
+        <camunda:out source="kind" target="kind" />
+        <camunda:out source="nextPageToken" target="nextPageToken" />
+        <camunda:in source="qp_maxResults" target="qp_maxResults" />
+        <camunda:in source="qp_pageToken" target="qp_pageToken" />
+        <camunda:in source="qp_alt" target="qp_alt" />
+        <camunda:in source="qp_fields" target="qp_fields" />
+        <camunda:in source="qp_key" target="qp_key" />
+        <camunda:in source="qp_oauth_token" target="qp_oauth_token" />
+        <camunda:in source="qp_prettyPrint" target="qp_prettyPrint" />
+        <camunda:in source="qp_quotaUser" target="qp_quotaUser" />
+        <camunda:in source="qp_userIp" target="qp_userIp" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0y4lcbo</bpmn:incoming>
+      <bpmn:outgoing>Flow_0wy2nrc</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_0y4lcbo" sourceRef="StartEvent_1" targetRef="Activity_1a29bfy" />
+    <bpmn:endEvent id="Event_15c7zh6">
+      <bpmn:incoming>Flow_11v9oqv</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0wy2nrc" sourceRef="Activity_1a29bfy" targetRef="Activity_08num9v" />
+    <bpmn:sequenceFlow id="Flow_11v9oqv" sourceRef="Activity_08num9v" targetRef="Event_15c7zh6" />
+    <bpmn:scriptTask id="Activity_08num9v" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0wy2nrc</bpmn:incoming>
+      <bpmn:outgoing>Flow_11v9oqv</bpmn:outgoing>
+      <bpmn:script>println "statusCode: " + statusCode + " res: " + response</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:callActivity id="Activity_01ws57l" name="POST /users.setPhoto" camunda:modelerTemplate="POST-/users.setPhoto" calledElement="ApiClient">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="fp_image" />
+          <camunda:inputParameter name="fp_crop_w" />
+          <camunda:inputParameter name="fp_token" />
+          <camunda:inputParameter name="fp_crop_y" />
+          <camunda:inputParameter name="fp_crop_x" />
+          <camunda:outputParameter name="statusCode">${ statusCode }</camunda:outputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+        <camunda:in sourceExpression="POST" target="method" />
+        <camunda:in sourceExpression="https://slack.com/api/users.setPhoto" target="url" />
+        <camunda:in sourceExpression="application/x-www-form-urlencoded" target="hp_Content-Type" />
+        <camunda:in source="fp_image" target="fp_image" />
+        <camunda:in source="fp_crop_w" target="fp_crop_w" />
+        <camunda:in source="fp_token" target="fp_token" />
+        <camunda:in source="fp_crop_y" target="fp_crop_y" />
+        <camunda:in source="fp_crop_x" target="fp_crop_x" />
+        <camunda:out source="statusCode" target="statusCode" />
+        <camunda:out source="response" target="response" />
+      </bpmn:extensionElements>
+    </bpmn:callActivity>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="TemplateTest">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="122" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1dolfcd_di" bpmnElement="Activity_1a29bfy">
+        <dc:Bounds x="220" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0y4lcbo_di" bpmnElement="Flow_0y4lcbo">
+        <di:waypoint x="158" y="117" />
+        <di:waypoint x="220" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_15c7zh6_di" bpmnElement="Event_15c7zh6">
+        <dc:Bounds x="482" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0wy2nrc_di" bpmnElement="Flow_0wy2nrc">
+        <di:waypoint x="320" y="117" />
+        <di:waypoint x="350" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11v9oqv_di" bpmnElement="Flow_11v9oqv">
+        <di:waypoint x="450" y="117" />
+        <di:waypoint x="482" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_1afaf00_di" bpmnElement="Activity_08num9v">
+        <dc:Bounds x="350" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_01ws57l_di" bpmnElement="Activity_01ws57l">
+        <dc:Bounds x="180" y="230" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
