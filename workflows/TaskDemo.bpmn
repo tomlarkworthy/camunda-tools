@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_16kg7ap" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
-  <bpmn:process id="TemplateTest" isExecutable="true">
+  <bpmn:process id="TaskDemo" isExecutable="true">
     <bpmn:callActivity id="Activity_1a29bfy" name="GET /users/@me/lists" camunda:modelerTemplate="GET-/users/@me/lists" calledElement="ApiClient">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -44,10 +44,10 @@
       <bpmn:outgoing>Flow_0wy2nrc</bpmn:outgoing>
     </bpmn:callActivity>
     <bpmn:endEvent id="Event_15c7zh6">
-      <bpmn:incoming>Flow_1unk568</bpmn:incoming>
+      <bpmn:incoming>Flow_1qu1plj</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_0wy2nrc" sourceRef="Activity_1a29bfy" targetRef="Activity_0zqh3za" />
-    <bpmn:sequenceFlow id="Flow_1qu1plj" sourceRef="Activity_0zqh3za" targetRef="Activity_1ux4gk3" />
+    <bpmn:sequenceFlow id="Flow_1qu1plj" sourceRef="Activity_0zqh3za" targetRef="Event_15c7zh6" />
     <bpmn:callActivity id="Activity_0zqh3za" name="POST /lists/{tasklist}/tasks" camunda:modelerTemplate="POST-/lists/{tasklist}/tasks" calledElement="ApiClient">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -74,9 +74,9 @@
           <camunda:inputParameter name="qp_prettyPrint" />
           <camunda:inputParameter name="qp_quotaUser" />
           <camunda:inputParameter name="qp_userIp" />
-          <camunda:inputParameter name="cp_title">Futu1</camunda:inputParameter>
           <camunda:inputParameter name="qp_oauth_token">${token}</camunda:inputParameter>
           <camunda:inputParameter name="pp_tasklist">${items[0].id}</camunda:inputParameter>
+          <camunda:inputParameter name="cp_title">Futurice Camunda Task 1</camunda:inputParameter>
           <camunda:outputParameter name="completed">${ res_completed }</camunda:outputParameter>
           <camunda:outputParameter name="deleted">${ res_deleted }</camunda:outputParameter>
           <camunda:outputParameter name="due">${ res_due }</camunda:outputParameter>
@@ -157,12 +157,6 @@
       <bpmn:incoming>Flow_0wy2nrc</bpmn:incoming>
       <bpmn:outgoing>Flow_1qu1plj</bpmn:outgoing>
     </bpmn:callActivity>
-    <bpmn:sequenceFlow id="Flow_1unk568" sourceRef="Activity_1ux4gk3" targetRef="Event_15c7zh6" />
-    <bpmn:scriptTask id="Activity_1ux4gk3" scriptFormat="groovy">
-      <bpmn:incoming>Flow_1qu1plj</bpmn:incoming>
-      <bpmn:outgoing>Flow_1unk568</bpmn:outgoing>
-      <bpmn:script>println "Response: " + response;</bpmn:script>
-    </bpmn:scriptTask>
     <bpmn:sequenceFlow id="Flow_1eu9bmy" sourceRef="Event_0hzbpjb" targetRef="Activity_1a29bfy" />
     <bpmn:startEvent id="Event_0hzbpjb">
       <bpmn:outgoing>Flow_1eu9bmy</bpmn:outgoing>
@@ -183,19 +177,19 @@ SCOPE: https://www.googleapis.com/auth/tasks
 curl -X POST https://camunda-flxotk3pnq-ew.a.run.app/engine-rest/message/
    --header "Content-Type: application/json"
    --data '{"messageName":"add_task_test","processVariables":{
-       "token":{"type":"String", "value":""}
+       "token":{"type":"String", "value":"&lt;TOKEN&gt;"}
    }'</bpmn:text>
     </bpmn:textAnnotation>
     <bpmn:association id="Association_0t69w83" sourceRef="Event_0hzbpjb" targetRef="TextAnnotation_07wgrj1" />
   </bpmn:process>
   <bpmn:message id="Message_0wu81jw" name="add_task_test" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="TemplateTest">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="TaskDemo">
       <bpmndi:BPMNShape id="Activity_1dolfcd_di" bpmnElement="Activity_1a29bfy">
         <dc:Bounds x="250" y="167" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_15c7zh6_di" bpmnElement="Event_15c7zh6">
-        <dc:Bounds x="632" y="189" width="36" height="36" />
+        <dc:Bounds x="562" y="189" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0wy2nrc_di" bpmnElement="Flow_0wy2nrc">
         <di:waypoint x="350" y="207" />
@@ -203,7 +197,7 @@ curl -X POST https://camunda-flxotk3pnq-ew.a.run.app/engine-rest/message/
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1qu1plj_di" bpmnElement="Flow_1qu1plj">
         <di:waypoint x="480" y="207" />
-        <di:waypoint x="510" y="207" />
+        <di:waypoint x="562" y="207" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_00vm71u_di" bpmnElement="Activity_0zqh3za">
         <dc:Bounds x="380" y="167" width="100" height="80" />
@@ -222,13 +216,6 @@ curl -X POST https://camunda-flxotk3pnq-ew.a.run.app/engine-rest/message/
         <di:waypoint x="430" y="167" />
         <di:waypoint x="430" y="134" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1unk568_di" bpmnElement="Flow_1unk568">
-        <di:waypoint x="610" y="207" />
-        <di:waypoint x="632" y="207" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Activity_07h6fh3_di" bpmnElement="Activity_1ux4gk3">
-        <dc:Bounds x="510" y="167" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1eu9bmy_di" bpmnElement="Flow_1eu9bmy">
         <di:waypoint x="188" y="207" />
         <di:waypoint x="250" y="207" />
