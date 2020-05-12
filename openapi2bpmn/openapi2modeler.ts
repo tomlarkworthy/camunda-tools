@@ -1,8 +1,6 @@
 import * as openapi3 from 'openapi3-ts';
 import fs = require('fs');
 import * as mustache from 'mustache';
-import { ParameterObject } from 'openapi3-ts';
-import { stringify } from 'querystring';
 
 const operationTemplate = fs.readFileSync('operation.mustache').toString();
 
@@ -77,9 +75,9 @@ function writeOperations(api: openapi3.OpenAPIObject, out: fs.WriteStream) {
             } else if (consumes) {
                 if (consumes.find(entry => entry == 'application/json')) {
                     contentType = 'application/json'
-                } else if (consumes.find(entry => entry == 'application/x-www-form-urlencoded')) {
+                } /*else if (consumes.find(entry => entry == 'application/x-www-form-urlencoded')) {
                     contentType = 'application/x-www-form-urlencoded'
-                } else {
+                } */else {
                     console.log("Unsupported consumes content type:", consumes, method, path);
                 }
             }
@@ -94,7 +92,19 @@ function writeOperations(api: openapi3.OpenAPIObject, out: fs.WriteStream) {
                 .concat(baseParams)
                 .map(p => ({...p, description: p.description ? JSON.stringify(p.description): "null"}))
             
-            const contentParams: Parameter[] = contentJson ? extractContentFields(api, contentJson.schema): undefined;
+
+            const declaredFormDataParams: Parameter[] =
+                params.filter(p => <any>p.in == 'formData')
+                .map(p => ({...p, type: "String"}))
+                .map(p => ({...p, description: p.description ? JSON.stringify(p.description): "null"}))
+                ;
+        
+            const formDataParams = contentType == "application/json" ? [] // No Url encoded form params when using JSON (see Slack API)
+                                                                     : declaredFormDataParams
+
+            const contentParams: Parameter[] = contentJson ? extractContentFields(api, contentJson.schema).concat(declaredFormDataParams): undefined;
+
+
 
             const response: openapi3.ResponseObject = resolveRef<openapi3.ResponseObject>(api, (op.responses || {})["200"]);
             const responseMedia: openapi3.MediaTypeObject = (((response && response.content || {})['*/*']) || {}) 
@@ -109,7 +119,7 @@ function writeOperations(api: openapi3.OpenAPIObject, out: fs.WriteStream) {
                 queryParams: params.filter(p => p.in == 'query').map(p => ({...p, type: "String"})),
                 pathParams: params.filter(p => p.in == 'path').map(p => ({...p, type: "String"})),
                 headerParams: params.filter(p => p.in == 'header').map(p => ({...p, type: "String"})),
-                formDataParams: params.filter(p => <any>p.in == 'formData'), // Swagger 2.0 support
+                formDataParams: formDataParams,
                 contentParams: contentParams,
                 contentType: contentType,
                 contentJson: contentJson,
@@ -156,20 +166,19 @@ function extractContentFields(api: openapi3.OpenAPIObject, schema: openapi3.Sche
     return results;
 }
 
-
 {
     const api: openapi3.OpenAPIObject = require("./tasks_v1.json")
     const out = fs.createWriteStream("../.camunda/element-templates/tasks_v1.json");
     writeOperations(api, out);
     out.end();
 }
-/*
 {
     const api: openapi3.OpenAPIObject = require("./slack_web_openapi_v2.json")
     const out = fs.createWriteStream("../.camunda/element-templates/slack.json");
     writeOperations(api, out);
     out.end();    
 }
+/*
 {
     const api: openapi3.OpenAPIObject = require("./docs_v1.json")
     const out = fs.createWriteStream("../.camunda/element-templates/docs_v1.json");

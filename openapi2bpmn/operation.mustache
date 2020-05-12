@@ -219,5 +219,25 @@
             }
         }
         {{/headerParams}}
+        ,{
+            "label": "Authorization: Bearer",
+            "type": "String",
+            "description": "Standard header field",
+            "value": null,
+            "binding": {
+                "type": "camunda:inputParameter",
+                "name": "hp_Authorization"
+            }
+        }
+        ,{
+            "label": "Authorization: Bearer",
+            "type": "Hidden",
+            "value": "Bearer ${hp_Authorization}",
+            "binding": {
+                "type": "camunda:in",
+                "target": "pre SET headers String $['Authorization']",
+                "expression": true
+            }
+        }
     ]
 }

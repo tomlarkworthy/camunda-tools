@@ -69,10 +69,9 @@ function writeOperations(api, out) {
             else if (consumes) {
                 if (consumes.find(entry => entry == 'application/json')) {
                     contentType = 'application/json';
-                }
-                else if (consumes.find(entry => entry == 'application/x-www-form-urlencoded')) {
-                    contentType = 'application/x-www-form-urlencoded';
-                }
+                } /*else if (consumes.find(entry => entry == 'application/x-www-form-urlencoded')) {
+                    contentType = 'application/x-www-form-urlencoded'
+                } */
                 else {
                     console.log("Unsupported consumes content type:", consumes, method, path);
                 }
@@ -86,7 +85,12 @@ function writeOperations(api, out) {
                 .map(p => resolveRef(api, p))
                 .concat(baseParams)
                 .map(p => ({ ...p, description: p.description ? JSON.stringify(p.description) : "null" }));
-            const contentParams = contentJson ? extractContentFields(api, contentJson.schema) : undefined;
+            const declaredFormDataParams = params.filter(p => p.in == 'formData')
+                .map(p => ({ ...p, type: "String" }))
+                .map(p => ({ ...p, description: p.description ? JSON.stringify(p.description) : "null" }));
+            const formDataParams = contentType == "application/json" ? [] // No Url encoded form params when using JSON (see Slack API)
+                : declaredFormDataParams;
+            const contentParams = contentJson ? extractContentFields(api, contentJson.schema).concat(declaredFormDataParams) : undefined;
             const response = resolveRef(api, (op.responses || {})["200"]);
             const responseMedia = (((response && response.content || {})['*/*']) || {});
             const responseParams = responseMedia ? extractContentFields(api, resolveRef(api, responseMedia.schema)) : undefined;
@@ -99,7 +103,7 @@ function writeOperations(api, out) {
                 queryParams: params.filter(p => p.in == 'query').map(p => ({ ...p, type: "String" })),
                 pathParams: params.filter(p => p.in == 'path').map(p => ({ ...p, type: "String" })),
                 headerParams: params.filter(p => p.in == 'header').map(p => ({ ...p, type: "String" })),
-                formDataParams: params.filter(p => p.in == 'formData'),
+                formDataParams: formDataParams,
                 contentParams: contentParams,
                 contentType: contentType,
                 contentJson: contentJson,
@@ -150,13 +154,13 @@ function extractContentFields(api, schema) {
     writeOperations(api, out);
     out.end();
 }
-/*
 {
-    const api: openapi3.OpenAPIObject = require("./slack_web_openapi_v2.json")
+    const api = require("./slack_web_openapi_v2.json");
     const out = fs.createWriteStream("../.camunda/element-templates/slack.json");
     writeOperations(api, out);
     out.end();
 }
+/*
 {
     const api: openapi3.OpenAPIObject = require("./docs_v1.json")
     const out = fs.createWriteStream("../.camunda/element-templates/docs_v1.json");
