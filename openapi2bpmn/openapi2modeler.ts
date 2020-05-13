@@ -26,14 +26,16 @@ function resolveRef<T>(doc: openapi3.OpenAPIObject, ref: openapi3.ReferenceObjec
 interface Parameter {
     name: string,
     description: string,
-    type: string
+    type: string,
+    path: string
 }
 
 /**
  * Convert p1/{id}/p3/{id2} to p1/${pp_id}/p3/${pp_id2}
+ * And p1/{+p2}/p3 to p1/${pp_p2}
  */
 function pathTemplate2expression(template: string): string {
-    return template.replace(/(?<={)\s*[^{}]+\s*(?=})/g, match => 'pp_'+ match)
+    return template.replace(/(?<={)\s*[^{}]+\s*(?=})/g, match => 'pp_'+ match.replace("+", ""))
                    .replace(/{\s*[^{}]+\s*}/g, match => '$'+ match);
 }
 
@@ -95,7 +97,7 @@ function writeOperations(api: openapi3.OpenAPIObject, out: fs.WriteStream) {
 
             const declaredFormDataParams: Parameter[] =
                 params.filter(p => <any>p.in == 'formData')
-                .map(p => ({...p, type: "String"}))
+                .map(p => ({...p, type: "String", path: `['${p.name}']`}))
                 .map(p => ({...p, description: p.description ? JSON.stringify(p.description): "null"}))
                 ;
         
@@ -138,28 +140,42 @@ function extractContentFields(api: openapi3.OpenAPIObject, schema: openapi3.Sche
         
         switch (subschema.type) {
             case "string":
-                results.push({
-                    name: name,
-                    type: "String",
-                    description: subschema.description ? JSON.stringify(subschema.description): "null"
-                })
-                break;
             case "boolean":
+            case "integer":
                 results.push({
                     name: name,
-                    type: "Boolean",
+                    type: subschema.type,
+                    path: `['${name}']`,
                     description: subschema.description ? JSON.stringify(subschema.description): "null"
                 })
                 break;
+
             case "array":
                 results.push({
                     name: name,
-                    type: "List",
+                    type: "array",
+                    path: `['${name}']`,
                     description: subschema.description ? JSON.stringify(subschema.description): "null"
                 })
                 break;
+            
+            case "object":
+                results.push({
+                    name: name,
+                    type: "object",
+                    path: `['${name}']`,
+                    description: subschema.description ? JSON.stringify(subschema.description): "null"
+                })
+                const children = extractContentFields(api, subschema);
+                results.push(...children.map (child => ({
+                        name: name + "_" + child.name,
+                        type: child.type,
+                        path: `['${name}']` + child.name,
+                        description: child.description
+                })));
+                break;
             default:
-                console.error("Cannot content_field type", subschema.type)
+                console.error("Unknown content_field type", subschema.type)
                 break;
         }
     }
@@ -175,6 +191,12 @@ function extractContentFields(api: openapi3.OpenAPIObject, schema: openapi3.Sche
 {
     const api: openapi3.OpenAPIObject = require("./slack_web_openapi_v2.json")
     const out = fs.createWriteStream("../.camunda/element-templates/slack.json");
+    writeOperations(api, out);
+    out.end();    
+}
+{
+    const api: openapi3.OpenAPIObject = require("./secretsmanager_v1.json")
+    const out = fs.createWriteStream("../.camunda/element-templates/secretsmanager.json");
     writeOperations(api, out);
     out.end();    
 }

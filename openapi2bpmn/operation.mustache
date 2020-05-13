@@ -91,7 +91,7 @@
         }
         {{/contentJson}}{{#contentParams}}
         ,{
-            "label": "JSON Content field: {{name}}",
+            "label": "JSON Content field: {{name}} ({{type}})",
             "type": "String",
             "description": {{{description}}},
             "value": null,
@@ -106,12 +106,12 @@
             "value": "cp_{{name}}",
             "binding": {
                 "type": "camunda:in",
-                "target": "pre SET request {{type}} $['{{{name}}}']"
+                "target": "pre SET request {{type}} ${{{path}}}"
             }
         }
         {{/contentParams}}{{#responseParams}}
         ,{
-            "label": "JSON response binding: {{{name}}}",
+            "label": "JSON response binding: {{{name}}} ({{type}})",
             "type": "String",
             "description": {{{description}}},
             "value": "{{{name}}}",
@@ -126,7 +126,7 @@
             "value": "res_{{name}}",
             "binding": {
                 "type": "camunda:in",
-                "target": "post EXTRACT response {{type}} $['{{{name}}}']",
+                "target": "post EXTRACT response {{type}} ${{{path}}}",
                 "expression": true
             }
         }

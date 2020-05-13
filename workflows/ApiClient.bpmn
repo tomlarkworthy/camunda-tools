@@ -107,6 +107,7 @@ def exec(command, target, datatype, path, value) {
         // read current value for the output
         def output = execution.getVariable(target);
         if (output == null) output = "{}";
+        println("output " + output.toString());
         // println ("Setting " + output.toString() + " path " + path + " value " + value);
 
         // JsonPath.set will not create a key, so we have to go one level up and put 
@@ -124,6 +125,7 @@ def exec(command, target, datatype, path, value) {
         // read current value for the target
         def input = execution.getVariable(target)
         if (input == null) input = "{}";
+        println("input " + input.toString());
         try {
             Object data = JsonPath
                     .using(configuration)
@@ -202,6 +204,7 @@ def exec(command, target, datatype, path, value) {
         // read current value for the output
         def output = execution.getVariable(target);
         if (output == null) output = "{}";
+        println("output " + output.toString());
         // println ("Setting " + output.toString() + " path " + path + " value " + value);
 
         // JsonPath.set will not create a key, so we have to go one level up and put 
@@ -219,6 +222,7 @@ def exec(command, target, datatype, path, value) {
         // read current value for the target
         def input = execution.getVariable(target)
         if (input == null) input = "{}";
+        println("input " + input.toString());
         try {
             Object data = JsonPath
                     .using(configuration)

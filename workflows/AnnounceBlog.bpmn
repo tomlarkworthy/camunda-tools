@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_0y9xeu1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
   <bpmn:process id="AnnounceBlog" name="AnnounceBlog" isExecutable="true">
-    <bpmn:sequenceFlow id="Flow_1qe105u" sourceRef="StartEvent_1" targetRef="Activity_1ss2y0t" />
+    <bpmn:sequenceFlow id="Flow_1qe105u" sourceRef="StartEvent_1" targetRef="Activity_060b7s2" />
     <bpmn:callActivity id="Activity_1ss2y0t" name="POST /chat.postMessage" camunda:modelerTemplate="POST-/chat.postMessage" calledElement="ApiClient">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -20,9 +20,9 @@
           <camunda:inputParameter name="cp_thread_ts" />
           <camunda:inputParameter name="cp_icon_url" />
           <camunda:inputParameter name="hp_token" />
-          <camunda:inputParameter name="hp_Authorization">xoxb-2886377502-1113946935682-dM2zpa49uzlkqkorvBRJI5nJ</camunda:inputParameter>
           <camunda:inputParameter name="cp_channel">larktest</camunda:inputParameter>
           <camunda:inputParameter name="cp_text">Hot off the press -- &lt;${link}|${title}&gt;</camunda:inputParameter>
+          <camunda:inputParameter name="hp_Authorization">${secret}</camunda:inputParameter>
           <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
         <camunda:in sourceExpression="POST" target="method" />
@@ -48,7 +48,7 @@
         <camunda:in source="hp_token" target="pre SET headers String $[&#39;token&#39;]" />
         <camunda:in sourceExpression="Bearer ${hp_Authorization}" target="pre SET headers String $[&#39;Authorization&#39;]" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1qe105u</bpmn:incoming>
+      <bpmn:incoming>Flow_1i0j3d1</bpmn:incoming>
       <bpmn:outgoing>Flow_03esea5</bpmn:outgoing>
     </bpmn:callActivity>
     <bpmn:startEvent id="StartEvent_1">
@@ -59,13 +59,22 @@
       <bpmn:incoming>Flow_03esea5</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_03esea5" sourceRef="Activity_1ss2y0t" targetRef="Event_1qq1fzw" />
+    <bpmn:sequenceFlow id="Flow_1i0j3d1" sourceRef="Activity_060b7s2" targetRef="Activity_1ss2y0t" />
+    <bpmn:callActivity id="Activity_060b7s2" name="Get Secret" calledElement="GetSecret">
+      <bpmn:extensionElements>
+        <camunda:in sourceExpression="ZuperGlueSlack" target="name" />
+        <camunda:out source="secret" target="secret" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1qe105u</bpmn:incoming>
+      <bpmn:outgoing>Flow_1i0j3d1</bpmn:outgoing>
+    </bpmn:callActivity>
   </bpmn:process>
   <bpmn:signal id="Signal_0pln7bz" name="NewBlogPost" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="AnnounceBlog">
       <bpmndi:BPMNEdge id="Flow_1qe105u_di" bpmnElement="Flow_1qe105u">
         <di:waypoint x="188" y="117" />
-        <di:waypoint x="410" y="117" />
+        <di:waypoint x="260" y="117" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_0ak5kdk_di" bpmnElement="Activity_1ss2y0t">
         <dc:Bounds x="410" y="77" width="100" height="80" />
@@ -80,6 +89,13 @@
         <di:waypoint x="510" y="117" />
         <di:waypoint x="602" y="117" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1i0j3d1_di" bpmnElement="Flow_1i0j3d1">
+        <di:waypoint x="360" y="117" />
+        <di:waypoint x="410" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_1ok00v4_di" bpmnElement="Activity_060b7s2">
+        <dc:Bounds x="260" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>
