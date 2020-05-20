@@ -72,6 +72,7 @@ request</camunda:script>
       <bpmn:script>import java.util.regex.Pattern
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.PathNotFoundException;
 import static org.camunda.spin.Spin.*;
 
@@ -100,25 +101,45 @@ def popPath(path) { // This is bullshit that we need
 def exec(command, target, datatype, path, value) {
     println command + " " + target + " " + datatype + " " + path + " " + value
     
-    def configuration = Configuration.defaultConfiguration().jsonProvider();
+    def configuration = Configuration
+        .defaultConfiguration()
+        .addOptions(Option.SUPPRESS_EXCEPTIONS)
+        .jsonProvider();
 
     if (command == "SET") {
         if (value == null) return;
         // read current value for the output
         def output = execution.getVariable(target);
         if (output == null) output = "{}";
-        println("output " + output.toString());
-        // println ("Setting " + output.toString() + " path " + path + " value " + value);
-
-        // JsonPath.set will not create a key, so we have to go one level up and put 
-        // the key. Which is an annoyance
+        println ("Set " + output.toString() + " path " + path + " value " + value);
         (parentPath, key) = popPath(path)
-        
-        Object result = JsonPath
-                .using(configuration)
-                .parse(output.toString())
-                .put(parentPath, key, value) // see https://github.com/json-path/JsonPath/issues/570
-                .jsonString(); // TODO we should probably stay in Spin
+
+        Object document = JsonPath
+            .using(configuration)
+            .parse(output.toString())
+
+        def (ancestor, akey) = popPath(path)
+        def emptyNodes = []
+
+        while (true) {
+            try {
+                // No idea why Option.SUPPRESS_EXCEPTIONS is not fireing
+                document.read(ancestor) // PathNotFoundException
+                // OK its not null so we founda full one can can break while
+                break;
+            } catch (e) {
+                emptyNodes.push(ancestor)
+                (ancestor, akey) = popPath(ancestor)
+            }
+        }
+        while (emptyNodes.size() &gt; 0) {
+            (holder, akey) = popPath(emptyNodes.pop())
+            document.put(holder, akey, [:]);
+        }
+
+        result = document
+            .put(parentPath, key, value) // see https://github.com/json-path/JsonPath/issues/570
+            .jsonString(); // TODO we should probably stay in Spin
         println("Result " + result.toString());
         execution.setVariable(target, result);
     } else if (command == "EXTRACT") {
@@ -169,6 +190,7 @@ execution.getVariables().findAll {
       <bpmn:script>import java.util.regex.Pattern
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.PathNotFoundException;
 import static org.camunda.spin.Spin.*;
 
@@ -197,25 +219,45 @@ def popPath(path) { // This is bullshit that we need
 def exec(command, target, datatype, path, value) {
     println command + " " + target + " " + datatype + " " + path + " " + value
     
-    def configuration = Configuration.defaultConfiguration().jsonProvider();
+    def configuration = Configuration
+        .defaultConfiguration()
+        .addOptions(Option.SUPPRESS_EXCEPTIONS)
+        .jsonProvider();
 
     if (command == "SET") {
         if (value == null) return;
         // read current value for the output
         def output = execution.getVariable(target);
         if (output == null) output = "{}";
-        println("output " + output.toString());
-        // println ("Setting " + output.toString() + " path " + path + " value " + value);
-
-        // JsonPath.set will not create a key, so we have to go one level up and put 
-        // the key. Which is an annoyance
+        println ("Set " + output.toString() + " path " + path + " value " + value);
         (parentPath, key) = popPath(path)
-        
-        Object result = JsonPath
-                .using(configuration)
-                .parse(output.toString())
-                .put(parentPath, key, value) // see https://github.com/json-path/JsonPath/issues/570
-                .jsonString(); // TODO we should probably stay in Spin
+
+        Object document = JsonPath
+            .using(configuration)
+            .parse(output.toString())
+
+        def (ancestor, akey) = popPath(path)
+        def emptyNodes = []
+
+        while (true) {
+            try {
+                // No idea why Option.SUPPRESS_EXCEPTIONS is not fireing
+                document.read(ancestor) // PathNotFoundException
+                // OK its not null so we founda full one can can break while
+                break;
+            } catch (e) {
+                emptyNodes.push(ancestor)
+                (ancestor, akey) = popPath(ancestor)
+            }
+        }
+        while (emptyNodes.size() &gt; 0) {
+            (holder, akey) = popPath(emptyNodes.pop())
+            document.put(holder, akey, [:]);
+        }
+
+        result = document
+            .put(parentPath, key, value) // see https://github.com/json-path/JsonPath/issues/570
+            .jsonString(); // TODO we should probably stay in Spin
         println("Result " + result.toString());
         execution.setVariable(target, result);
     } else if (command == "EXTRACT") {
@@ -259,14 +301,14 @@ execution.getVariables().findAll {
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ApiClient">
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
-        <dc:Bounds x="152" y="99" width="36" height="36" />
+        <dc:Bounds x="162" y="99" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0nut88c_di" bpmnElement="HtttCall">
         <dc:Bounds x="360" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_088fktg_di" bpmnElement="Flow_088fktg">
-        <di:waypoint x="188" y="117" />
-        <di:waypoint x="220" y="117" />
+        <di:waypoint x="198" y="117" />
+        <di:waypoint x="230" y="117" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_1xx666m_di" bpmnElement="Event_1xx666m">
         <dc:Bounds x="632" y="99" width="36" height="36" />
@@ -276,10 +318,10 @@ execution.getVariables().findAll {
         <di:waypoint x="490" y="117" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_0cb9vmr_di" bpmnElement="Activity_0cb9vmr">
-        <dc:Bounds x="220" y="77" width="100" height="80" />
+        <dc:Bounds x="230" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0kebagn_di" bpmnElement="Flow_0kebagn">
-        <di:waypoint x="320" y="117" />
+        <di:waypoint x="330" y="117" />
         <di:waypoint x="360" y="117" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_06rnj4a_di" bpmnElement="Activity_06rnj4a">

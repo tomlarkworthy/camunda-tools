@@ -1,0 +1,73 @@
+{
+    "openapi": "3.0.0",
+    "servers": [
+        {
+            "url": "https://api.rebrandly.com"
+        }
+    ],
+    "paths": {
+        "/v1/links": {
+            "post": {
+                "description": "Create link",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "apikey"
+                    },
+                    {
+                        "in": "header",
+                        "name": "workspace"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "destination": {
+                                        "type": "string"
+                                    },
+                                    "domain": {
+                                        "type": "object",
+                                        "properties": {
+                                            "fullName": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "slashtag": {
+                                        "type": "string"
+                                    },
+                                    "title": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "destination": {
+                                            "type": "string"
+                                        },
+                                        "shortUrl": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Successful response"
+                    }
+                }
+            }
+        }
+    }
+}

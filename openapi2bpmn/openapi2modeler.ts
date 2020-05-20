@@ -200,6 +200,12 @@ function extractContentFields(api: openapi3.OpenAPIObject, schema: openapi3.Sche
     writeOperations(api, out);
     out.end();    
 }
+{
+    const api: openapi3.OpenAPIObject = require("./rebrandly.json")
+    const out = fs.createWriteStream("../.camunda/element-templates/rebrandly.json");
+    writeOperations(api, out);
+    out.end();    
+}
 /*
 {
     const api: openapi3.OpenAPIObject = require("./docs_v1.json")

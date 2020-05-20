@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0ty9pix" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
+  <bpmn:process id="Process_14vrtt5" isExecutable="true">
+    <bpmn:startEvent id="Event_162fxlo">
+      <bpmn:outgoing>Flow_0vuft95</bpmn:outgoing>
+      <bpmn:signalEventDefinition id="SignalEventDefinition_1xryywh" signalRef="Signal_0tdap4u" />
+    </bpmn:startEvent>
+    <bpmn:scriptTask id="Activity_0qmru1t" name="Tokenize to&#10;&#34;tokens&#34;" scriptFormat="groovy" camunda:resultVariable="tokens">
+      <bpmn:incoming>Flow_0vuft95</bpmn:incoming>
+      <bpmn:outgoing>Flow_0b1dsmu</bpmn:outgoing>
+      <bpmn:script>def tokens = execution.getVariable("text").replaceAll(/\h/, " ").tokenize()
+println(tokens[0])
+println(tokens[1])
+println(tokens[2])
+tokens</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_0vuft95" sourceRef="Event_162fxlo" targetRef="Activity_0qmru1t" />
+    <bpmn:exclusiveGateway id="Gateway_0y85zbq" default="help">
+      <bpmn:incoming>Flow_0b1dsmu</bpmn:incoming>
+      <bpmn:outgoing>help</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1mbfdpf</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="help" name="default help" sourceRef="Gateway_0y85zbq" targetRef="Activity_0htrkly" />
+    <bpmn:serviceTask id="Activity_0htrkly" name="POST response_url">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">${response_url}</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="groovy">import groovy.json.*
+JsonOutput.toJson([
+  response_type: "in_channel",
+  replace_original: "true",
+  text: "/zuperglue golink &lt;PATH&gt; &lt;TARGET&gt;"
+])</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="debug">true</camunda:inputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>help</bpmn:incoming>
+    </bpmn:serviceTask>
+    <bpmn:callActivity id="Activity_1nuj491" name="Get Secret&#10;Rebrandly_API_key" calledElement="GetSecret">
+      <bpmn:extensionElements>
+        <camunda:in sourceExpression="Rebrandly_API_key" target="name" />
+        <camunda:out source="secret" target="secret" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1mbfdpf</bpmn:incoming>
+      <bpmn:outgoing>Flow_1u2obdx</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_1mbfdpf" name="tokens[0] == &#34;golink&#34;" sourceRef="Gateway_0y85zbq" targetRef="Activity_1nuj491">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${tokens[0] == 'golink'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1u2obdx" sourceRef="Activity_1nuj491" targetRef="Activity_1fe4jzy" />
+    <bpmn:callActivity id="Activity_05xe9gg" name="POST /v1/links" camunda:modelerTemplate="POST-/v1/links" calledElement="ApiClient">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="content">{}</camunda:inputParameter>
+          <camunda:inputParameter name="cp_domain" />
+          <camunda:inputParameter name="cp_title" />
+          <camunda:inputParameter name="hp_workspace" />
+          <camunda:inputParameter name="hp_Authorization" />
+          <camunda:inputParameter name="hp_apikey">${secret}</camunda:inputParameter>
+          <camunda:inputParameter name="cp_domain_fullName">go.futurice.com</camunda:inputParameter>
+          <camunda:inputParameter name="cp_destination">${parsed_destination}</camunda:inputParameter>
+          <camunda:inputParameter name="cp_slashtag">${tokens[1]}</camunda:inputParameter>
+          <camunda:outputParameter name="destination">${ res_destination }</camunda:outputParameter>
+          <camunda:outputParameter name="shortUrl">${ res_shortUrl }</camunda:outputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+        <camunda:in sourceExpression="POST" target="method" />
+        <camunda:in sourceExpression="https://api.rebrandly.com/v1/links" target="url" />
+        <camunda:in sourceExpression="application/json" target="pre SET headers String $[&#39;Content-Type&#39;]" />
+        <camunda:in source="content" target="request" />
+        <camunda:in source="cp_destination" target="pre SET request string $[&#39;destination&#39;]" />
+        <camunda:in source="cp_domain" target="pre SET request object $[&#39;domain&#39;]" />
+        <camunda:in source="cp_domain_fullName" target="pre SET request string $[&#39;domain&#39;][&#39;fullName&#39;]" />
+        <camunda:in source="cp_slashtag" target="pre SET request string $[&#39;slashtag&#39;]" />
+        <camunda:in source="cp_title" target="pre SET request string $[&#39;title&#39;]" />
+        <camunda:in sourceExpression="res_destination" target="post EXTRACT response string $[&#39;destination&#39;]" />
+        <camunda:out source="res_destination" target="res_destination" />
+        <camunda:in sourceExpression="res_shortUrl" target="post EXTRACT response string $[&#39;shortUrl&#39;]" />
+        <camunda:out source="res_shortUrl" target="res_shortUrl" />
+        <camunda:out source="response" target="response" />
+        <camunda:in source="hp_apikey" target="pre SET headers String $[&#39;apikey&#39;]" />
+        <camunda:in source="hp_workspace" target="pre SET headers String $[&#39;workspace&#39;]" />
+        <camunda:in sourceExpression="Bearer ${hp_Authorization}" target="pre SET headers String $[&#39;Authorization&#39;]" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1p01fig</bpmn:incoming>
+      <bpmn:outgoing>Flow_1i2xsi3</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:serviceTask id="Activity_0i0hrn2" name="POST response_url">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">${response_url}</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Content-type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="groovy">import groovy.json.*
+JsonOutput.toJson([
+  response_type: "in_channel",
+  replace_original: "true",
+  text: "Check it out " + execution.getVariable("shortUrl")
+])</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="debug">true</camunda:inputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1i2xsi3</bpmn:incoming>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1i2xsi3" sourceRef="Activity_05xe9gg" targetRef="Activity_0i0hrn2" />
+    <bpmn:sequenceFlow id="Flow_0b1dsmu" sourceRef="Activity_0qmru1t" targetRef="Gateway_0y85zbq" />
+    <bpmn:sequenceFlow id="Flow_1p01fig" sourceRef="Activity_1fe4jzy" targetRef="Activity_05xe9gg" />
+    <bpmn:scriptTask id="Activity_1fe4jzy" name="Parse slack link" scriptFormat="groovy" camunda:resultVariable="parsed_destination">
+      <bpmn:incoming>Flow_1u2obdx</bpmn:incoming>
+      <bpmn:outgoing>Flow_1p01fig</bpmn:outgoing>
+      <bpmn:script>// &lt;http://www.google.com|www.google.com&gt;
+println(execution.getVariable("tokens")[0])
+println(execution.getVariable("tokens")[1])
+println(execution.getVariable("tokens")[2])
+
+
+def raw = execution.getVariable("tokens")[2] 
+raw.tokenize("&lt;|&gt;")[0]</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:textAnnotation id="TextAnnotation_0sruefs">
+      <bpmn:text>{
+   "variables":{
+      "team_domain":{
+         "value":"futurice",
+         "type":"String"
+      },
+      "user_name":{
+         "value":"tom.larkworthy",
+         "type":"String"
+      },
+      "user_id":{
+         "value":"UJCDK32TU",
+         "type":"String"
+      },
+      "text":{
+         "value":"dsdasdsdsds",
+         "type":"String"
+      },
+      "response_url":{
+         "value":"https:\/\/hooks.slack.com\/commands\/T02S2B3ES\/1131849998419\/5hwwz9VV2sm724juCxqBgcBE",
+         "type":"String"
+      },
+      "trigger_id":{
+         "value":"1130261773509.2886377502.fa57b504eb274f6ac9aa126ecb9db0d2",
+         "type":"String"
+      },
+      "team_id":{
+         "value":"T02S2B3ES",
+         "type":"String"
+      },
+      "token":{
+         "value":"OHaw4iaWIvb2RQwn8CCm5MGH",
+         "type":"String"
+      },
+      "channel_id":{
+         "value":"G0101G418MP",
+         "type":"String"
+      },
+      "channel_name":{
+         "value":"privategroup",
+         "type":"String"
+      },
+      "command":{
+         "value":"\/zuperglue",
+         "type":"String"
+      }
+   },
+   "name":"slackCommand"
+}</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_0xtdtmg" sourceRef="Event_162fxlo" targetRef="TextAnnotation_0sruefs" />
+  </bpmn:process>
+  <bpmn:signal id="Signal_0tdap4u" name="slackCommand" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_14vrtt5">
+      <bpmndi:BPMNShape id="Event_061tg80_di" bpmnElement="Event_162fxlo">
+        <dc:Bounds x="152" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0sruefs_di" bpmnElement="TextAnnotation_0sruefs">
+        <dc:Bounds x="230" y="170" width="460" height="740" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_0xtdtmg_di" bpmnElement="Association_0xtdtmg">
+        <di:waypoint x="180" y="135" />
+        <di:waypoint x="230" y="207" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_19apn8y_di" bpmnElement="Activity_0qmru1t">
+        <dc:Bounds x="220" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0vuft95_di" bpmnElement="Flow_0vuft95">
+        <di:waypoint x="188" y="120" />
+        <di:waypoint x="220" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Gateway_0y85zbq_di" bpmnElement="Gateway_0y85zbq" isMarkerVisible="true">
+        <dc:Bounds x="395" y="95" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0i1xjgx_di" bpmnElement="help">
+        <di:waypoint x="445" y="120" />
+        <di:waypoint x="600" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="483" y="93" width="57" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0htrkly_di" bpmnElement="Activity_0htrkly">
+        <dc:Bounds x="600" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1nuj491_di" bpmnElement="Activity_1nuj491">
+        <dc:Bounds x="600" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1mbfdpf_di" bpmnElement="Flow_1mbfdpf">
+        <di:waypoint x="420" y="145" />
+        <di:waypoint x="420" y="230" />
+        <di:waypoint x="600" y="230" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="479" y="196" width="61" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1u2obdx_di" bpmnElement="Flow_1u2obdx">
+        <di:waypoint x="700" y="230" />
+        <di:waypoint x="730" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_106mv9c_di" bpmnElement="Activity_05xe9gg">
+        <dc:Bounds x="860" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0i0hrn2_di" bpmnElement="Activity_0i0hrn2">
+        <dc:Bounds x="990" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1i2xsi3_di" bpmnElement="Flow_1i2xsi3">
+        <di:waypoint x="960" y="230" />
+        <di:waypoint x="990" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0b1dsmu_di" bpmnElement="Flow_0b1dsmu">
+        <di:waypoint x="320" y="120" />
+        <di:waypoint x="320" y="120" />
+        <di:waypoint x="395" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1p01fig_di" bpmnElement="Flow_1p01fig">
+        <di:waypoint x="830" y="230" />
+        <di:waypoint x="860" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_15zue58_di" bpmnElement="Activity_1fe4jzy">
+        <dc:Bounds x="730" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

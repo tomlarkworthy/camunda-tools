@@ -1,6 +1,7 @@
 import java.util.regex.Pattern
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.PathNotFoundException;
 import static org.camunda.spin.Spin.*;
 
@@ -29,25 +30,45 @@ def popPath(path) { // This is bullshit that we need
 def exec(command, target, datatype, path, value) {
     println command + " " + target + " " + datatype + " " + path + " " + value
     
-    def configuration = Configuration.defaultConfiguration().jsonProvider();
+    def configuration = Configuration
+        .defaultConfiguration()
+        .addOptions(Option.SUPPRESS_EXCEPTIONS)
+        .jsonProvider();
 
     if (command == "SET") {
         if (value == null) return;
         // read current value for the output
         def output = execution.getVariable(target);
         if (output == null) output = "{}";
-        println("output " + output.toString());
-        // println ("Setting " + output.toString() + " path " + path + " value " + value);
-
-        // JsonPath.set will not create a key, so we have to go one level up and put 
-        // the key. Which is an annoyance
+        println ("Set " + output.toString() + " path " + path + " value " + value);
         (parentPath, key) = popPath(path)
-        
-        Object result = JsonPath
-                .using(configuration)
-                .parse(output.toString())
-                .put(parentPath, key, value) // see https://github.com/json-path/JsonPath/issues/570
-                .jsonString(); // TODO we should probably stay in Spin
+
+        Object document = JsonPath
+            .using(configuration)
+            .parse(output.toString())
+
+        def (ancestor, akey) = popPath(path)
+        def emptyNodes = []
+
+        while (true) {
+            try {
+                // No idea why Option.SUPPRESS_EXCEPTIONS is not fireing
+                document.read(ancestor) // PathNotFoundException
+                // OK its not null so we founda full one can can break while
+                break;
+            } catch (e) {
+                emptyNodes.push(ancestor)
+                (ancestor, akey) = popPath(ancestor)
+            }
+        }
+        while (emptyNodes.size() > 0) {
+            (holder, akey) = popPath(emptyNodes.pop())
+            document.put(holder, akey, [:]);
+        }
+
+        result = document
+            .put(parentPath, key, value) // see https://github.com/json-path/JsonPath/issues/570
+            .jsonString(); // TODO we should probably stay in Spin
         println("Result " + result.toString());
         execution.setVariable(target, result);
     } else if (command == "EXTRACT") {

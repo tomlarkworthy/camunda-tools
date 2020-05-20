@@ -150,7 +150,7 @@ function extractContentFields(api, schema) {
                 results.push(...children.map(child => ({
                     name: name + "_" + child.name,
                     type: child.type,
-                    path: `['${name}']` + child.name,
+                    path: `['${name}']` + child.path,
                     description: child.description
                 })));
                 break;
@@ -176,6 +176,12 @@ function extractContentFields(api, schema) {
 {
     const api = require("./secretsmanager_v1.json");
     const out = fs.createWriteStream("../.camunda/element-templates/secretsmanager.json");
+    writeOperations(api, out);
+    out.end();
+}
+{
+    const api = require("./rebrandly.json");
+    const out = fs.createWriteStream("../.camunda/element-templates/rebrandly.json");
     writeOperations(api, out);
     out.end();
 }
