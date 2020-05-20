@@ -109,8 +109,9 @@ function writeOperations(api: openapi3.OpenAPIObject, out: fs.WriteStream) {
 
 
             const response: openapi3.ResponseObject = resolveRef<openapi3.ResponseObject>(api, (op.responses || {})["200"]);
-            const responseMedia: openapi3.MediaTypeObject = (((response && response.content || {})['*/*']) || {}) 
-            const responseParams: Parameter[] = responseMedia ? extractContentFields(api, resolveRef(api, responseMedia.schema)): undefined;
+            var schemaHolder: openapi3.MediaTypeObject = (((response && response.content || {})['*/*']) || {}) 
+            if (!schemaHolder.schema && response.schema) schemaHolder = response;
+            const responseParams: Parameter[] = schemaHolder ? extractContentFields(api, resolveRef(api, schemaHolder.schema)): undefined;
 
             out.write(mustache.render(operationTemplate, {
                 calledElement: "ApiClient",

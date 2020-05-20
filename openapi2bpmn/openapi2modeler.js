@@ -93,8 +93,10 @@ function writeOperations(api, out) {
                 : declaredFormDataParams;
             const contentParams = contentJson ? extractContentFields(api, contentJson.schema).concat(declaredFormDataParams) : undefined;
             const response = resolveRef(api, (op.responses || {})["200"]);
-            const responseMedia = (((response && response.content || {})['*/*']) || {});
-            const responseParams = responseMedia ? extractContentFields(api, resolveRef(api, responseMedia.schema)) : undefined;
+            var schemaHolder = (((response && response.content || {})['*/*']) || {});
+            if (!schemaHolder.schema && response.schema)
+                schemaHolder = response;
+            const responseParams = schemaHolder ? extractContentFields(api, resolveRef(api, schemaHolder.schema)) : undefined;
             out.write(mustache.render(operationTemplate, {
                 calledElement: "ApiClient",
                 id: `${method.toUpperCase()}-${path}`,
@@ -150,7 +152,7 @@ function extractContentFields(api, schema) {
                 results.push(...children.map(child => ({
                     name: name + "_" + child.name,
                     type: child.type,
-                    path: `['${name}']` + child.path,
+                    path: `['${name}']` + child.name,
                     description: child.description
                 })));
                 break;
