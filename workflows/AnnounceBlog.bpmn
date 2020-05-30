@@ -94,7 +94,7 @@
           <camunda:inputParameter name="hp_Authorization">${secret}</camunda:inputParameter>
           <camunda:inputParameter name="cp_channel">content-creators</camunda:inputParameter>
           <camunda:inputParameter name="cp_text">One day later</camunda:inputParameter>
-          <camunda:inputParameter name="cp_thread_ts">${ts}</camunda:inputParameter>
+          <camunda:inputParameter name="cp_thread_ts">${message_ts}</camunda:inputParameter>
           <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
         <camunda:in sourceExpression="POST" target="method" />
@@ -150,8 +150,8 @@
           <camunda:inputParameter name="hp_token" />
           <camunda:inputParameter name="hp_Authorization">${secret}</camunda:inputParameter>
           <camunda:inputParameter name="cp_channel">content-creators</camunda:inputParameter>
-          <camunda:inputParameter name="cp_thread_ts">${ts}</camunda:inputParameter>
           <camunda:inputParameter name="cp_text">Its a good time to import to Medium with a &lt;https://help.medium.com/hc/en-us/articles/360033930293-Set-a-canonical-link|canonical link&gt;.</camunda:inputParameter>
+          <camunda:inputParameter name="cp_thread_ts">${message_ts}</camunda:inputParameter>
           <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
         <camunda:in sourceExpression="POST" target="method" />

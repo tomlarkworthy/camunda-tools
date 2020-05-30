@@ -11,12 +11,11 @@ REST API access
 
 Modler supports bearer token deployment
 
-Problem: Repeat deliverys loop indefinately
-Problem: Sequential flows often the delivery fails first
-Problem: Parrallel flows sometimes the receive starts first (async before publish)
-Problem: Async jobs are not starting (Spin serialization issue)
-TODO turn on jobExecutorDeploymentAware?
+# Delete all process instances
 
-Problem: Preformance was terrible, 3 seconds to print to console -> switch to groovy
-Problem: double sneding (wrong type of gateway)
-Problem: Lots of repear deliveries (asyncAfter) optimist locking exceptions 
+curl https://openresty-flxotk3pnq-ew.a.run.app/engine-rest/process-definition -H "Authorization: Bearer ${TOKEN}" | jq . > process.json
+
+cat process.json | jq '.[].id' | grep Process_14vrtt5 - > todelete.txt
+
+cat todelete.txt | xargs -L1 -I {} curl -X DELETE https://openresty-flxotk3pnq-ew.a.run.app/engine-rest/process-definition/{} -H "Authorization: Bearer ${TOKEN}"
+

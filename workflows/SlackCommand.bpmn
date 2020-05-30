@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0ty9pix" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
-  <bpmn:process id="Process_14vrtt5" isExecutable="true">
+  <bpmn:process id="SlackCommandProcessor" name="SlackCommandProcessor" isExecutable="true">
     <bpmn:startEvent id="Event_162fxlo" name="slackCommand&#10;&#10;">
       <bpmn:outgoing>Flow_0vuft95</bpmn:outgoing>
       <bpmn:signalEventDefinition id="SignalEventDefinition_1xryywh" signalRef="Signal_0tdap4u" />
     </bpmn:startEvent>
-    <bpmn:scriptTask id="Activity_0qmru1t" name="Tokenize to&#10;&#34;tokens&#34;" scriptFormat="groovy" camunda:resultVariable="tokens">
+    <bpmn:scriptTask id="Tokenize" name="Tokenize to&#10;&#34;tokens&#34;" scriptFormat="groovy" camunda:resultVariable="tokens">
       <bpmn:incoming>Flow_0vuft95</bpmn:incoming>
       <bpmn:outgoing>Flow_0b1dsmu</bpmn:outgoing>
-      <bpmn:script>def tokens = execution.getVariable("text").replaceAll(/\h/, " ").tokenize()
-println(tokens)
-tokens</bpmn:script>
+      <bpmn:script>def raw = execution.getVariable("text")
+if (raw == null) return []
+raw.replaceAll(/\h/, " ").tokenize()</bpmn:script>
     </bpmn:scriptTask>
-    <bpmn:sequenceFlow id="Flow_0vuft95" sourceRef="Event_162fxlo" targetRef="Activity_0qmru1t" />
+    <bpmn:sequenceFlow id="Flow_0vuft95" sourceRef="Event_162fxlo" targetRef="Tokenize" />
     <bpmn:exclusiveGateway id="Gateway_0y85zbq" default="help">
       <bpmn:incoming>Flow_0b1dsmu</bpmn:incoming>
       <bpmn:outgoing>help</bpmn:outgoing>
       <bpmn:outgoing>Flow_1mbfdpf</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0zajnrt</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="help" name="default help" sourceRef="Gateway_0y85zbq" targetRef="Activity_0htrkly" />
     <bpmn:serviceTask id="Activity_0htrkly" name="POST response_url">
@@ -35,7 +36,11 @@ tokens</bpmn:script>
 JsonOutput.toJson([
   response_type: "in_channel",
   replace_original: "true",
-  text: "/zuperglue golink &lt;PATH&gt; &lt;TARGET&gt;"
+  text: """\
+/zuperglue help\n
+/zuperglue golink &lt;PATH&gt; &lt;TARGET&gt;\n
+Guide at &lt;https://go.futurice.com/zuperglue|go.futurice.com/zuperglue&gt;\n
+"""
 ])</camunda:script>
             </camunda:inputParameter>
             <camunda:inputParameter name="debug">true</camunda:inputParameter>
@@ -54,9 +59,9 @@ JsonOutput.toJson([
       <bpmn:outgoing>Flow_1u2obdx</bpmn:outgoing>
     </bpmn:callActivity>
     <bpmn:sequenceFlow id="Flow_1mbfdpf" name="tokens[0] == &#34;golink&#34;" sourceRef="Gateway_0y85zbq" targetRef="Activity_1nuj491">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${tokens[0] == 'golink'}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${tokens[0] == 'golink' &amp;&amp; tokens[1] != null &amp;&amp; tokens[2] != null}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1u2obdx" sourceRef="Activity_1nuj491" targetRef="Activity_1fe4jzy" />
+    <bpmn:sequenceFlow id="Flow_1u2obdx" sourceRef="Activity_1nuj491" targetRef="ParseSlackLink" />
     <bpmn:callActivity id="Activity_05xe9gg" name="POST /v1/links" camunda:modelerTemplate="POST-/v1/links" calledElement="ApiClient">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -121,9 +126,9 @@ JsonOutput.toJson([
       <bpmn:incoming>Flow_1i2xsi3</bpmn:incoming>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_1i2xsi3" sourceRef="Activity_05xe9gg" targetRef="Activity_0i0hrn2" />
-    <bpmn:sequenceFlow id="Flow_0b1dsmu" sourceRef="Activity_0qmru1t" targetRef="Gateway_0y85zbq" />
-    <bpmn:sequenceFlow id="Flow_1p01fig" sourceRef="Activity_1fe4jzy" targetRef="Activity_05xe9gg" />
-    <bpmn:scriptTask id="Activity_1fe4jzy" name="Parse slack link" scriptFormat="groovy" camunda:resultVariable="parsed_destination">
+    <bpmn:sequenceFlow id="Flow_0b1dsmu" sourceRef="Tokenize" targetRef="Gateway_0y85zbq" />
+    <bpmn:sequenceFlow id="Flow_1p01fig" sourceRef="ParseSlackLink" targetRef="Activity_05xe9gg" />
+    <bpmn:scriptTask id="ParseSlackLink" name="Parse slack link" scriptFormat="groovy" camunda:resultVariable="parsed_destination">
       <bpmn:incoming>Flow_1u2obdx</bpmn:incoming>
       <bpmn:outgoing>Flow_1p01fig</bpmn:outgoing>
       <bpmn:script>// &lt;http://www.google.com|www.google.com&gt;
@@ -135,6 +140,12 @@ println(execution.getVariable("tokens")[2])
 def raw = execution.getVariable("tokens")[2] 
 raw.tokenize("&lt;|&gt;")[0]</bpmn:script>
     </bpmn:scriptTask>
+    <bpmn:endEvent id="Event_1yfzcj8">
+      <bpmn:incoming>Flow_0zajnrt</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0zajnrt" name="execution.getVariable(&#39;response_url&#39;) == null" sourceRef="Gateway_0y85zbq" targetRef="Event_1yfzcj8">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('response_url') == null}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
     <bpmn:textAnnotation id="TextAnnotation_0sruefs">
       <bpmn:text>team_domain
 user_name
@@ -152,76 +163,87 @@ command</bpmn:text>
   </bpmn:process>
   <bpmn:signal id="Signal_0tdap4u" name="slackCommand" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_14vrtt5">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="SlackCommandProcessor">
       <bpmndi:BPMNShape id="Event_061tg80_di" bpmnElement="Event_162fxlo">
-        <dc:Bounds x="152" y="102" width="36" height="36" />
+        <dc:Bounds x="152" y="212" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="132" y="80" width="76" height="40" />
+          <dc:Bounds x="132" y="190" width="76" height="40" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="TextAnnotation_0sruefs_di" bpmnElement="TextAnnotation_0sruefs">
-        <dc:Bounds x="125" y="170" width="90" height="169" />
+        <dc:Bounds x="125" y="280" width="90" height="169" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Association_0xtdtmg_di" bpmnElement="Association_0xtdtmg">
-        <di:waypoint x="170" y="138" />
-        <di:waypoint x="170" y="170" />
+        <di:waypoint x="170" y="248" />
+        <di:waypoint x="170" y="280" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Activity_19apn8y_di" bpmnElement="Activity_0qmru1t">
-        <dc:Bounds x="220" y="80" width="100" height="80" />
+      <bpmndi:BPMNShape id="Activity_19apn8y_di" bpmnElement="Tokenize">
+        <dc:Bounds x="220" y="190" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0vuft95_di" bpmnElement="Flow_0vuft95">
-        <di:waypoint x="188" y="120" />
-        <di:waypoint x="220" y="120" />
+        <di:waypoint x="188" y="230" />
+        <di:waypoint x="220" y="230" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Gateway_0y85zbq_di" bpmnElement="Gateway_0y85zbq" isMarkerVisible="true">
-        <dc:Bounds x="355" y="95" width="50" height="50" />
+        <dc:Bounds x="355" y="205" width="50" height="50" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0i1xjgx_di" bpmnElement="help">
-        <di:waypoint x="405" y="120" />
-        <di:waypoint x="500" y="120" />
+        <di:waypoint x="405" y="230" />
+        <di:waypoint x="500" y="230" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="417" y="93" width="57" height="14" />
+          <dc:Bounds x="417" y="203" width="57" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_0htrkly_di" bpmnElement="Activity_0htrkly">
-        <dc:Bounds x="500" y="80" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1nuj491_di" bpmnElement="Activity_1nuj491">
         <dc:Bounds x="500" y="190" width="100" height="80" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1nuj491_di" bpmnElement="Activity_1nuj491">
+        <dc:Bounds x="500" y="300" width="100" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1mbfdpf_di" bpmnElement="Flow_1mbfdpf">
-        <di:waypoint x="380" y="145" />
-        <di:waypoint x="380" y="230" />
-        <di:waypoint x="500" y="230" />
+        <di:waypoint x="380" y="255" />
+        <di:waypoint x="380" y="340" />
+        <di:waypoint x="500" y="340" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="409" y="196" width="61" height="27" />
+          <dc:Bounds x="409" y="306" width="61" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1u2obdx_di" bpmnElement="Flow_1u2obdx">
-        <di:waypoint x="600" y="230" />
-        <di:waypoint x="630" y="230" />
+        <di:waypoint x="600" y="340" />
+        <di:waypoint x="630" y="340" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_106mv9c_di" bpmnElement="Activity_05xe9gg">
-        <dc:Bounds x="760" y="190" width="100" height="80" />
+        <dc:Bounds x="760" y="300" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0i0hrn2_di" bpmnElement="Activity_0i0hrn2">
-        <dc:Bounds x="890" y="190" width="100" height="80" />
+        <dc:Bounds x="890" y="300" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1i2xsi3_di" bpmnElement="Flow_1i2xsi3">
-        <di:waypoint x="860" y="230" />
-        <di:waypoint x="890" y="230" />
+        <di:waypoint x="860" y="340" />
+        <di:waypoint x="890" y="340" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0b1dsmu_di" bpmnElement="Flow_0b1dsmu">
-        <di:waypoint x="320" y="120" />
-        <di:waypoint x="355" y="120" />
+        <di:waypoint x="320" y="230" />
+        <di:waypoint x="355" y="230" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1p01fig_di" bpmnElement="Flow_1p01fig">
-        <di:waypoint x="730" y="230" />
-        <di:waypoint x="760" y="230" />
+        <di:waypoint x="730" y="340" />
+        <di:waypoint x="760" y="340" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Activity_15zue58_di" bpmnElement="Activity_1fe4jzy">
-        <dc:Bounds x="630" y="190" width="100" height="80" />
+      <bpmndi:BPMNShape id="Activity_15zue58_di" bpmnElement="ParseSlackLink">
+        <dc:Bounds x="630" y="300" width="100" height="80" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1yfzcj8_di" bpmnElement="Event_1yfzcj8">
+        <dc:Bounds x="502" y="82" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0zajnrt_di" bpmnElement="Flow_0zajnrt">
+        <di:waypoint x="380" y="205" />
+        <di:waypoint x="380" y="100" />
+        <di:waypoint x="502" y="100" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="396" y="50" width="88" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>
