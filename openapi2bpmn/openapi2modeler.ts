@@ -171,7 +171,7 @@ function extractContentFields(api: openapi3.OpenAPIObject, schema: openapi3.Sche
                 results.push(...children.map (child => ({
                         name: name + "_" + child.name,
                         type: child.type,
-                        path: `['${name}']` + child.name,
+                        path: `['${name}']` + child.path,
                         description: child.description
                 })));
                 break;

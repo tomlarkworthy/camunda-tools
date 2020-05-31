@@ -152,7 +152,7 @@ function extractContentFields(api, schema) {
                 results.push(...children.map(child => ({
                     name: name + "_" + child.name,
                     type: child.type,
-                    path: `['${name}']` + child.name,
+                    path: `['${name}']` + child.path,
                     description: child.description
                 })));
                 break;
