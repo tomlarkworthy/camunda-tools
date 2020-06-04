@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0tbnrjl" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0tbnrjl" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
   <bpmn:process id="ApiClient" isExecutable="true">
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>Flow_088fktg</bpmn:outgoing>
@@ -60,7 +60,7 @@ request</camunda:script>
     <bpmn:endEvent id="Event_1xx666m">
       <bpmn:incoming>Flow_046k02p</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_1o4gipc" sourceRef="HtttCall" targetRef="Activity_06rnj4a" />
+    <bpmn:sequenceFlow id="Flow_1o4gipc" sourceRef="HtttCall" targetRef="statusChoice" />
     <bpmn:scriptTask id="Activity_0cb9vmr" scriptFormat="groovy">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -156,6 +156,10 @@ def exec(command, target, datatype, path, value) {
             execution.setVariable(value, data);
         } catch (PathNotFoundException e) {
             System.err.println(e.getMessage()); 
+            execution.setVariable(value, null);
+        } catch (NullPointerException e) {
+            System.err.println(e.getMessage()); 
+            execution.setVariable(value, null);
         }
     } else {
         System.err.println "Unrecognised command: " + command; 
@@ -185,7 +189,7 @@ execution.getVariables().findAll {
           <camunda:inputParameter name="prefix">post</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1o4gipc</bpmn:incoming>
+      <bpmn:incoming>default</bpmn:incoming>
       <bpmn:outgoing>Flow_046k02p</bpmn:outgoing>
       <bpmn:script>import java.util.regex.Pattern
 import com.jayway.jsonpath.JsonPath;
@@ -274,6 +278,10 @@ def exec(command, target, datatype, path, value) {
             execution.setVariable(value, data);
         } catch (PathNotFoundException e) {
             System.err.println(e.getMessage()); 
+            execution.setVariable(value, null);
+        } catch (NullPointerException e) {
+            System.err.println(e.getMessage()); 
+            execution.setVariable(value, null);
         }
     } else {
         System.err.println "Unrecognised command: " + command; 
@@ -297,40 +305,83 @@ execution.getVariables().findAll {
 }</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:sequenceFlow id="Flow_046k02p" sourceRef="Activity_06rnj4a" targetRef="Event_1xx666m" />
+    <bpmn:exclusiveGateway id="statusChoice" default="default">
+      <bpmn:incoming>Flow_1o4gipc</bpmn:incoming>
+      <bpmn:outgoing>default</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1x6ma8n</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="default" sourceRef="statusChoice" targetRef="Activity_06rnj4a" />
+    <bpmn:sequenceFlow id="Flow_1x6ma8n" sourceRef="statusChoice" targetRef="Activity_0ryk9tu">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${statusCode &gt;= 300}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:scriptTask id="Activity_0ryk9tu">
+      <bpmn:incoming>Flow_1x6ma8n</bpmn:incoming>
+      <bpmn:outgoing>Flow_0z770yh</bpmn:outgoing>
+      <bpmn:script>println (execution.getVariable("statusCode"))
+println (execution.getVariable("response"))</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_0z770yh" sourceRef="Activity_0ryk9tu" targetRef="Event_0qbycmm" />
+    <bpmn:endEvent id="Event_0qbycmm">
+      <bpmn:incoming>Flow_0z770yh</bpmn:incoming>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_0jw7trp" errorRef="Error_1sbhrsv" />
+    </bpmn:endEvent>
   </bpmn:process>
+  <bpmn:error id="Error_1sbhrsv" name="HttpError" errorCode="${statusCode}" camunda:errorMessage="${response}" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ApiClient">
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
-        <dc:Bounds x="162" y="99" width="36" height="36" />
+        <dc:Bounds x="152" y="99" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0nut88c_di" bpmnElement="HtttCall">
-        <dc:Bounds x="360" y="77" width="100" height="80" />
+        <dc:Bounds x="340" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_088fktg_di" bpmnElement="Flow_088fktg">
-        <di:waypoint x="198" y="117" />
-        <di:waypoint x="230" y="117" />
+        <di:waypoint x="188" y="117" />
+        <di:waypoint x="210" y="117" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_1xx666m_di" bpmnElement="Event_1xx666m">
-        <dc:Bounds x="632" y="99" width="36" height="36" />
+        <dc:Bounds x="692" y="99" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1o4gipc_di" bpmnElement="Flow_1o4gipc">
-        <di:waypoint x="460" y="117" />
-        <di:waypoint x="490" y="117" />
+        <di:waypoint x="440" y="117" />
+        <di:waypoint x="475" y="117" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_0cb9vmr_di" bpmnElement="Activity_0cb9vmr">
-        <dc:Bounds x="230" y="77" width="100" height="80" />
+        <dc:Bounds x="210" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0kebagn_di" bpmnElement="Flow_0kebagn">
-        <di:waypoint x="330" y="117" />
-        <di:waypoint x="360" y="117" />
+        <di:waypoint x="310" y="117" />
+        <di:waypoint x="340" y="117" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_06rnj4a_di" bpmnElement="Activity_06rnj4a">
-        <dc:Bounds x="490" y="77" width="100" height="80" />
+        <dc:Bounds x="550" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_046k02p_di" bpmnElement="Flow_046k02p">
-        <di:waypoint x="590" y="117" />
-        <di:waypoint x="632" y="117" />
+        <di:waypoint x="650" y="117" />
+        <di:waypoint x="692" y="117" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Gateway_07543lj_di" bpmnElement="statusChoice" isMarkerVisible="true">
+        <dc:Bounds x="475" y="92" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0avc86r_di" bpmnElement="default">
+        <di:waypoint x="525" y="117" />
+        <di:waypoint x="550" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1x6ma8n_di" bpmnElement="Flow_1x6ma8n">
+        <di:waypoint x="500" y="142" />
+        <di:waypoint x="500" y="230" />
+        <di:waypoint x="550" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_00c3zq9_di" bpmnElement="Activity_0ryk9tu">
+        <dc:Bounds x="550" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0z770yh_di" bpmnElement="Flow_0z770yh">
+        <di:waypoint x="650" y="230" />
+        <di:waypoint x="692" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0nxz22t_di" bpmnElement="Event_0qbycmm">
+        <dc:Bounds x="692" y="212" width="36" height="36" />
+      </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>

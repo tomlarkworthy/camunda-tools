@@ -1,151 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0y9xeu1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
-  <bpmn:process id="AnnounceBlogTest" name="AnnounceBlogTest" isExecutable="true">
-    <bpmn:sequenceFlow id="Flow_1qe105u" sourceRef="StartEvent_1" targetRef="Activity_060b7s2" />
-    <bpmn:startEvent id="StartEvent_1" name="NewBlogPost&#10;(Zapier)">
-      <bpmn:outgoing>Flow_1qe105u</bpmn:outgoing>
-      <bpmn:signalEventDefinition id="SignalEventDefinition_1vpigf9" signalRef="Signal_0pln7bz" />
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1py5dgp" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
+  <bpmn:process id="TweetRouter" name="TweetRouter" isExecutable="true">
+    <bpmn:startEvent id="consumeSignal" name="NewTweet&#10;(Zapier)">
+      <bpmn:outgoing>Flow_00533no</bpmn:outgoing>
+      <bpmn:signalEventDefinition id="SignalEventDefinition_0g4vpyr" signalRef="Signal_16wtb4z" />
     </bpmn:startEvent>
-    <bpmn:callActivity id="Activity_060b7s2" name="Get Secret" calledElement="GetSecret">
-      <bpmn:extensionElements>
-        <camunda:in sourceExpression="ZuperGlueSlack" target="name" />
-        <camunda:out source="secret" target="secret" />
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1qe105u</bpmn:incoming>
-      <bpmn:incoming>Flow_1vxlyae</bpmn:incoming>
-      <bpmn:outgoing>Flow_1fr77tx</bpmn:outgoing>
-    </bpmn:callActivity>
-    <bpmn:intermediateCatchEvent id="Event_1jo831c">
-      <bpmn:incoming>Flow_1xl2wi3</bpmn:incoming>
-      <bpmn:outgoing>Flow_1hbhfs5</bpmn:outgoing>
-      <bpmn:timerEventDefinition id="TimerEventDefinition_12vlm1a">
-        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P1D</bpmn:timeDuration>
-      </bpmn:timerEventDefinition>
-    </bpmn:intermediateCatchEvent>
-    <bpmn:callActivity id="Activity_0cepof8" name="POST /chat.postMessage" camunda:modelerTemplate="POST-/chat.postMessage" calledElement="ApiClient">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="content">{}</camunda:inputParameter>
-          <camunda:inputParameter name="cp_attachments" />
-          <camunda:inputParameter name="cp_unfurl_links" />
-          <camunda:inputParameter name="cp_unfurl_media" />
-          <camunda:inputParameter name="cp_parse" />
-          <camunda:inputParameter name="cp_as_user" />
-          <camunda:inputParameter name="cp_mrkdwn" />
-          <camunda:inputParameter name="cp_username" />
-          <camunda:inputParameter name="cp_blocks" />
-          <camunda:inputParameter name="cp_icon_emoji" />
-          <camunda:inputParameter name="cp_link_names" />
-          <camunda:inputParameter name="cp_reply_broadcast" />
-          <camunda:inputParameter name="cp_icon_url" />
-          <camunda:inputParameter name="hp_token" />
-          <camunda:inputParameter name="hp_Authorization">${secret}</camunda:inputParameter>
-          <camunda:inputParameter name="cp_channel">content-creators</camunda:inputParameter>
-          <camunda:inputParameter name="cp_text">One day later</camunda:inputParameter>
-          <camunda:inputParameter name="cp_thread_ts">${message_ts}</camunda:inputParameter>
-          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
-        </camunda:inputOutput>
-        <camunda:in sourceExpression="POST" target="method" />
-        <camunda:in sourceExpression="https://slack.com/api/chat.postMessage" target="url" />
-        <camunda:in sourceExpression="application/json" target="pre SET headers String $[&#39;Content-Type&#39;]" />
-        <camunda:in source="content" target="request" />
-        <camunda:in source="cp_attachments" target="pre SET request String $[&#39;attachments&#39;]" />
-        <camunda:in source="cp_unfurl_links" target="pre SET request String $[&#39;unfurl_links&#39;]" />
-        <camunda:in source="cp_text" target="pre SET request String $[&#39;text&#39;]" />
-        <camunda:in source="cp_unfurl_media" target="pre SET request String $[&#39;unfurl_media&#39;]" />
-        <camunda:in source="cp_parse" target="pre SET request String $[&#39;parse&#39;]" />
-        <camunda:in source="cp_as_user" target="pre SET request String $[&#39;as_user&#39;]" />
-        <camunda:in source="cp_mrkdwn" target="pre SET request String $[&#39;mrkdwn&#39;]" />
-        <camunda:in source="cp_channel" target="pre SET request String $[&#39;channel&#39;]" />
-        <camunda:in source="cp_username" target="pre SET request String $[&#39;username&#39;]" />
-        <camunda:in source="cp_blocks" target="pre SET request String $[&#39;blocks&#39;]" />
-        <camunda:in source="cp_icon_emoji" target="pre SET request String $[&#39;icon_emoji&#39;]" />
-        <camunda:in source="cp_link_names" target="pre SET request String $[&#39;link_names&#39;]" />
-        <camunda:in source="cp_reply_broadcast" target="pre SET request String $[&#39;reply_broadcast&#39;]" />
-        <camunda:in source="cp_thread_ts" target="pre SET request String $[&#39;thread_ts&#39;]" />
-        <camunda:in source="cp_icon_url" target="pre SET request String $[&#39;icon_url&#39;]" />
-        <camunda:out source="response" target="response" />
-        <camunda:in source="hp_token" target="pre SET headers String $[&#39;token&#39;]" />
-        <camunda:in sourceExpression="Bearer ${hp_Authorization}" target="pre SET headers String $[&#39;Authorization&#39;]" />
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1hbhfs5</bpmn:incoming>
-    </bpmn:callActivity>
-    <bpmn:sequenceFlow id="Flow_1hbhfs5" sourceRef="Event_1jo831c" targetRef="Activity_0cepof8" />
-    <bpmn:intermediateCatchEvent id="Event_1ctc4mw">
-      <bpmn:outgoing>Flow_1bo0iy8</bpmn:outgoing>
-      <bpmn:timerEventDefinition id="TimerEventDefinition_1bmjatn">
-        <bpmn:timeDate xsi:type="bpmn:tFormalExpression">P3W</bpmn:timeDate>
-      </bpmn:timerEventDefinition>
-    </bpmn:intermediateCatchEvent>
-    <bpmn:callActivity id="Activity_0i3et24" name="POST /chat.postMessage" camunda:modelerTemplate="POST-/chat.postMessage" calledElement="ApiClient">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="content">{}</camunda:inputParameter>
-          <camunda:inputParameter name="cp_attachments" />
-          <camunda:inputParameter name="cp_unfurl_links" />
-          <camunda:inputParameter name="cp_unfurl_media" />
-          <camunda:inputParameter name="cp_parse" />
-          <camunda:inputParameter name="cp_as_user" />
-          <camunda:inputParameter name="cp_mrkdwn" />
-          <camunda:inputParameter name="cp_username" />
-          <camunda:inputParameter name="cp_blocks" />
-          <camunda:inputParameter name="cp_icon_emoji" />
-          <camunda:inputParameter name="cp_link_names" />
-          <camunda:inputParameter name="cp_reply_broadcast" />
-          <camunda:inputParameter name="cp_icon_url" />
-          <camunda:inputParameter name="hp_token" />
-          <camunda:inputParameter name="hp_Authorization">${secret}</camunda:inputParameter>
-          <camunda:inputParameter name="cp_channel">content-creators</camunda:inputParameter>
-          <camunda:inputParameter name="cp_text">Its a good time to import to Medium with a &lt;https://help.medium.com/hc/en-us/articles/360033930293-Set-a-canonical-link|canonical link&gt;.</camunda:inputParameter>
-          <camunda:inputParameter name="cp_thread_ts">${message_ts}</camunda:inputParameter>
-          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
-        </camunda:inputOutput>
-        <camunda:in sourceExpression="POST" target="method" />
-        <camunda:in sourceExpression="https://slack.com/api/chat.postMessage" target="url" />
-        <camunda:in sourceExpression="application/json" target="pre SET headers String $[&#39;Content-Type&#39;]" />
-        <camunda:in source="content" target="request" />
-        <camunda:in source="cp_attachments" target="pre SET request String $[&#39;attachments&#39;]" />
-        <camunda:in source="cp_unfurl_links" target="pre SET request String $[&#39;unfurl_links&#39;]" />
-        <camunda:in source="cp_text" target="pre SET request String $[&#39;text&#39;]" />
-        <camunda:in source="cp_unfurl_media" target="pre SET request String $[&#39;unfurl_media&#39;]" />
-        <camunda:in source="cp_parse" target="pre SET request String $[&#39;parse&#39;]" />
-        <camunda:in source="cp_as_user" target="pre SET request String $[&#39;as_user&#39;]" />
-        <camunda:in source="cp_mrkdwn" target="pre SET request String $[&#39;mrkdwn&#39;]" />
-        <camunda:in source="cp_channel" target="pre SET request String $[&#39;channel&#39;]" />
-        <camunda:in source="cp_username" target="pre SET request String $[&#39;username&#39;]" />
-        <camunda:in source="cp_blocks" target="pre SET request String $[&#39;blocks&#39;]" />
-        <camunda:in source="cp_icon_emoji" target="pre SET request String $[&#39;icon_emoji&#39;]" />
-        <camunda:in source="cp_link_names" target="pre SET request String $[&#39;link_names&#39;]" />
-        <camunda:in source="cp_reply_broadcast" target="pre SET request String $[&#39;reply_broadcast&#39;]" />
-        <camunda:in source="cp_thread_ts" target="pre SET request String $[&#39;thread_ts&#39;]" />
-        <camunda:in source="cp_icon_url" target="pre SET request String $[&#39;icon_url&#39;]" />
-        <camunda:out source="response" target="response" />
-        <camunda:in source="hp_token" target="pre SET headers String $[&#39;token&#39;]" />
-        <camunda:in sourceExpression="Bearer ${hp_Authorization}" target="pre SET headers String $[&#39;Authorization&#39;]" />
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1bo0iy8</bpmn:incoming>
-    </bpmn:callActivity>
-    <bpmn:sequenceFlow id="Flow_1bo0iy8" sourceRef="Event_1ctc4mw" targetRef="Activity_0i3et24" />
-    <bpmn:startEvent id="Event_1tvhgdi">
-      <bpmn:outgoing>Flow_0ihoszi</bpmn:outgoing>
-    </bpmn:startEvent>
-    <bpmn:scriptTask id="Activity_0fzdxhy" name="Hardcode trigger" scriptFormat="groovy">
-      <bpmn:incoming>Flow_0ihoszi</bpmn:incoming>
-      <bpmn:outgoing>Flow_1vxlyae</bpmn:outgoing>
-      <bpmn:script>execution.setVariable("title", 
-"Case Corosim - Operationalising a Data-Driven Management System"
-)
-execution.setVariable("link", 
-"https://www.futurice.com/blog/case-corosim-operationalising-a-data-driven-management-system"
-)
-execution.setVariable("description", 
-"The story behind Corosim, an epidemic calculator for Finland."
-)</bpmn:script>
-    </bpmn:scriptTask>
-    <bpmn:sequenceFlow id="Flow_0ihoszi" sourceRef="Event_1tvhgdi" targetRef="Activity_0fzdxhy" />
-    <bpmn:sequenceFlow id="Flow_1vxlyae" sourceRef="Activity_0fzdxhy" targetRef="Activity_060b7s2" />
-    <bpmn:sequenceFlow id="Flow_1fr77tx" sourceRef="Activity_060b7s2" targetRef="Activity_10al9q3" />
-    <bpmn:callActivity id="Activity_10al9q3" name="POST /chat.postMessage" camunda:modelerTemplate="POST-/chat.postMessage" calledElement="ApiClient">
+    <bpmn:sequenceFlow id="Flow_00533no" sourceRef="consumeSignal" targetRef="Activity_1bww18q" />
+    <bpmn:exclusiveGateway id="router" default="default">
+      <bpmn:incoming>Flow_0tqdkv8</bpmn:incoming>
+      <bpmn:outgoing>default</bpmn:outgoing>
+      <bpmn:outgoing>topicThreadExists</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0tqdkv8" sourceRef="decode" targetRef="router" />
+    <bpmn:sequenceFlow id="default" name="default" sourceRef="router" targetRef="Activity_146dy49" />
+    <bpmn:callActivity id="Activity_0bien1m" name="POST /chat.postMessage" camunda:modelerTemplate="POST-/chat.postMessage" calledElement="ApiClient">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="content">{}</camunda:inputParameter>
@@ -164,8 +32,8 @@ execution.setVariable("description",
           <camunda:inputParameter name="cp_icon_url" />
           <camunda:inputParameter name="hp_token" />
           <camunda:inputParameter name="hp_Authorization">${secret}</camunda:inputParameter>
-          <camunda:inputParameter name="cp_channel">larktest2</camunda:inputParameter>
-          <camunda:inputParameter name="cp_text">Just in: &lt;${link}|${title}&gt;</camunda:inputParameter>
+          <camunda:inputParameter name="cp_text">&lt;${url}&gt; mentions &lt;${entity_url}&gt;</camunda:inputParameter>
+          <camunda:inputParameter name="cp_channel">${channel}</camunda:inputParameter>
           <camunda:outputParameter name="channel">${ res_channel }</camunda:outputParameter>
           <camunda:outputParameter name="message">${ res_message }</camunda:outputParameter>
           <camunda:outputParameter name="message_attachments">${ res_message_attachments }</camunda:outputParameter>
@@ -584,71 +452,185 @@ execution.setVariable("description",
         <camunda:in source="hp_token" target="pre SET headers String $[&#39;token&#39;]" />
         <camunda:in sourceExpression="Bearer ${hp_Authorization}" target="pre SET headers String $[&#39;Authorization&#39;]" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1fr77tx</bpmn:incoming>
-      <bpmn:outgoing>Flow_1xl2wi3</bpmn:outgoing>
+      <bpmn:incoming>Flow_1q4dl6s</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ee9y9p</bpmn:outgoing>
     </bpmn:callActivity>
-    <bpmn:sequenceFlow id="Flow_1xl2wi3" sourceRef="Activity_10al9q3" targetRef="Event_1jo831c" />
+    <bpmn:callActivity id="Activity_146dy49" name="Get Secret" calledElement="GetSecret">
+      <bpmn:extensionElements>
+        <camunda:in sourceExpression="ZuperGlueSlack" target="name" />
+        <camunda:out source="secret" target="secret" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>default</bpmn:incoming>
+      <bpmn:outgoing>Flow_1q4dl6s</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_1q4dl6s" sourceRef="Activity_146dy49" targetRef="Activity_0bien1m" />
+    <bpmn:scriptTask id="decode" name="Decode URL" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1shlmq8</bpmn:incoming>
+      <bpmn:incoming>Flow_07xifhr</bpmn:incoming>
+      <bpmn:outgoing>Flow_0tqdkv8</bpmn:outgoing>
+      <bpmn:script>// convert twitter shortened links to normal links
+// https://t.co/oY11NYxDLj
+while (execution.getVariable("entity_url")  != null &amp;&amp; execution.getVariable("entity_url").contains("://t.co"))
+{
+  println ("follow redirect: " + execution.getVariable("entity_url"))
+  def get = new URL(execution.getVariable("entity_url")).openConnection();
+  println("headers: " + get.getHeaderFields())
+  if (get.getHeaderFields()["Location"] != null) {
+    def redirect = get.getHeaderFields()["Location"][0]
+    println ("redirect: " + redirect)
+    execution.setVariable("entity_url", redirect)
+  } else {
+    break
+  }
+  
+}
+
+entity_url = execution.getVariable("entity_url");
+if (entity_url != null) {
+  url = new java.net.URL(entity_url);
+  execution.setVariable("entity_path", url.getPath())
+} else {
+  execution.setVariable("entity_path", null)
+  execution.setVariable("entity_url", null)
+}
+
+println ("Tweet: " + execution.getVariable("url") + " " + execution.getVariable("entity_path"))</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:startEvent id="Event_1c485g0">
+      <bpmn:outgoing>Flow_1eo4kmt</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1eo4kmt" sourceRef="Event_1c485g0" targetRef="test" />
+    <bpmn:sequenceFlow id="Flow_1shlmq8" sourceRef="test" targetRef="decode" />
+    <bpmn:scriptTask id="test" name="Test" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1eo4kmt</bpmn:incoming>
+      <bpmn:outgoing>Flow_1shlmq8</bpmn:outgoing>
+      <bpmn:script>execution.setVariable("channel", "larktest2")
+execution.setVariable("text", "Some tweet text")
+execution.setVariable("username", "Futurice")
+execution.setVariable("entity_url", "https://www.futurice.com/blog/case-corosim-operationalising-a-data-driven-management-system")
+execution.setVariable("url", "https://twitter.com/futurice/status/1267790509545861120")</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="Event_0v80r5n">
+      <bpmn:incoming>Flow_0ee9y9p</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0ee9y9p" sourceRef="Activity_0bien1m" targetRef="Event_0v80r5n" />
+    <bpmn:sequenceFlow id="topicThreadExists" name="topicThreadExists" sourceRef="router" targetRef="sendTweetToBlogTopic">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="groovy">println ("Check for process with BK: " + execution.getVariable("entity_path"))
+return execution.getProcessEngineServices().getRuntimeService().createProcessInstanceQuery()
+  .processInstanceBusinessKey(execution.getVariable("entity_path"))
+  .singleResult() != null</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:scriptTask id="sendTweetToBlogTopic" name="Correlate Message" scriptFormat="groovy">
+      <bpmn:incoming>topicThreadExists</bpmn:incoming>
+      <bpmn:outgoing>Flow_0illrx4</bpmn:outgoing>
+      <bpmn:script>execution
+  .getProcessEngineServices()
+  .getRuntimeService()
+  .correlateMessage("TweetBlog",
+    execution.getVariable("entity_path"), 
+    [
+      "url" : execution.getVariable("url")
+    ]
+)</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="Event_0x22lvy">
+      <bpmn:incoming>Flow_0illrx4</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0illrx4" sourceRef="sendTweetToBlogTopic" targetRef="Event_0x22lvy" />
+    <bpmn:scriptTask id="Activity_1bww18q" name="Prod" scriptFormat="groovy">
+      <bpmn:incoming>Flow_00533no</bpmn:incoming>
+      <bpmn:outgoing>Flow_07xifhr</bpmn:outgoing>
+      <bpmn:script>execution.setVariable("channel", "content-creators")</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_07xifhr" sourceRef="Activity_1bww18q" targetRef="decode" />
   </bpmn:process>
-  <bpmn:signal id="Signal_0pln7bz" name="NewBlogPost" />
+  <bpmn:signal id="Signal_16wtb4z" name="Tweet" />
+  <bpmn:signal id="Signal_1l77c36" name="NewBlogPostKey" />
+  <bpmn:message id="Message_1r279ed" name="TweetBlog" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="AnnounceBlogTest">
-      <bpmndi:BPMNEdge id="Flow_1qe105u_di" bpmnElement="Flow_1qe105u">
-        <di:waypoint x="188" y="227" />
-        <di:waypoint x="260" y="227" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Event_17zctm4_di" bpmnElement="StartEvent_1">
-        <dc:Bounds x="152" y="209" width="36" height="36" />
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="TweetRouter">
+      <bpmndi:BPMNShape id="Event_1kexrmr_di" bpmnElement="consumeSignal">
+        <dc:Bounds x="162" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="138" y="252" width="67" height="27" />
+          <dc:Bounds x="156" y="145" width="52" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1ok00v4_di" bpmnElement="Activity_060b7s2">
-        <dc:Bounds x="260" y="187" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0ssxtcm_di" bpmnElement="Event_1jo831c">
-        <dc:Bounds x="552" y="209" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0cepof8_di" bpmnElement="Activity_0cepof8">
-        <dc:Bounds x="620" y="184" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_1hbhfs5_di" bpmnElement="Flow_1hbhfs5">
-        <di:waypoint x="588" y="227" />
-        <di:waypoint x="620" y="227" />
+      <bpmndi:BPMNEdge id="Flow_00533no_di" bpmnElement="Flow_00533no">
+        <di:waypoint x="198" y="120" />
+        <di:waypoint x="270" y="120" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Event_0tw23ox_di" bpmnElement="Event_1ctc4mw">
-        <dc:Bounds x="552" y="322" width="36" height="36" />
+      <bpmndi:BPMNShape id="Gateway_1o80gaq_di" bpmnElement="router" isMarkerVisible="true">
+        <dc:Bounds x="415" y="225" width="50" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0i3et24_di" bpmnElement="Activity_0i3et24">
-        <dc:Bounds x="620" y="300" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_1bo0iy8_di" bpmnElement="Flow_1bo0iy8">
-        <di:waypoint x="588" y="340" />
-        <di:waypoint x="620" y="340" />
+      <bpmndi:BPMNEdge id="Flow_0tqdkv8_di" bpmnElement="Flow_0tqdkv8">
+        <di:waypoint x="370" y="250" />
+        <di:waypoint x="415" y="250" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Event_1tvhgdi_di" bpmnElement="Event_1tvhgdi">
-        <dc:Bounds x="152" y="102" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0tkuiev_di" bpmnElement="Activity_0fzdxhy">
-        <dc:Bounds x="260" y="80" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_0ihoszi_di" bpmnElement="Flow_0ihoszi">
-        <di:waypoint x="188" y="120" />
-        <di:waypoint x="260" y="120" />
+      <bpmndi:BPMNEdge id="Flow_15yp42l_di" bpmnElement="default">
+        <di:waypoint x="465" y="250" />
+        <di:waypoint x="520" y="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="476" y="232" width="34" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1vxlyae_di" bpmnElement="Flow_1vxlyae">
-        <di:waypoint x="310" y="160" />
-        <di:waypoint x="310" y="187" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1fr77tx_di" bpmnElement="Flow_1fr77tx">
-        <di:waypoint x="360" y="227" />
-        <di:waypoint x="400" y="227" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Activity_0cp29jy_di" bpmnElement="Activity_10al9q3">
-        <dc:Bounds x="400" y="187" width="100" height="80" />
+      <bpmndi:BPMNShape id="Activity_10y4iw0_di" bpmnElement="Activity_0bien1m">
+        <dc:Bounds x="680" y="210" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_1xl2wi3_di" bpmnElement="Flow_1xl2wi3">
-        <di:waypoint x="500" y="227" />
-        <di:waypoint x="552" y="227" />
+      <bpmndi:BPMNShape id="Activity_146dy49_di" bpmnElement="Activity_146dy49">
+        <dc:Bounds x="520" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1q4dl6s_di" bpmnElement="Flow_1q4dl6s">
+        <di:waypoint x="620" y="250" />
+        <di:waypoint x="680" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0bnlf8j_di" bpmnElement="decode">
+        <dc:Bounds x="270" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1c485g0_di" bpmnElement="Event_1c485g0">
+        <dc:Bounds x="162" y="372" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1eo4kmt_di" bpmnElement="Flow_1eo4kmt">
+        <di:waypoint x="198" y="390" />
+        <di:waypoint x="270" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1shlmq8_di" bpmnElement="Flow_1shlmq8">
+        <di:waypoint x="320" y="350" />
+        <di:waypoint x="320" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_006rd1l_di" bpmnElement="test">
+        <dc:Bounds x="270" y="350" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0v80r5n_di" bpmnElement="Event_0v80r5n">
+        <dc:Bounds x="832" y="232" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0ee9y9p_di" bpmnElement="Flow_0ee9y9p">
+        <di:waypoint x="780" y="250" />
+        <di:waypoint x="832" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ta4q3l_di" bpmnElement="topicThreadExists">
+        <di:waypoint x="440" y="275" />
+        <di:waypoint x="440" y="360" />
+        <di:waypoint x="520" y="360" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="417" y="373" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0tw559a_di" bpmnElement="sendTweetToBlogTopic">
+        <dc:Bounds x="520" y="320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0x22lvy_di" bpmnElement="Event_0x22lvy">
+        <dc:Bounds x="682" y="342" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0illrx4_di" bpmnElement="Flow_0illrx4">
+        <di:waypoint x="620" y="360" />
+        <di:waypoint x="682" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_1bww18q_di" bpmnElement="Activity_1bww18q">
+        <dc:Bounds x="270" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_07xifhr_di" bpmnElement="Flow_07xifhr">
+        <di:waypoint x="320" y="160" />
+        <di:waypoint x="320" y="210" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

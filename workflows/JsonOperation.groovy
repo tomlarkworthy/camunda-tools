@@ -85,6 +85,10 @@ def exec(command, target, datatype, path, value) {
             execution.setVariable(value, data);
         } catch (PathNotFoundException e) {
             System.err.println(e.getMessage()); 
+            execution.setVariable(value, null);
+        } catch (NullPointerException e) {
+            System.err.println(e.getMessage()); 
+            execution.setVariable(value, null);
         }
     } else {
         System.err.println "Unrecognised command: " + command; 

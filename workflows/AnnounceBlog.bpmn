@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0y9xeu1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
   <bpmn:process id="AnnounceBlog" name="AnnounceBlog" isExecutable="true">
-    <bpmn:sequenceFlow id="Flow_1qe105u" sourceRef="StartEvent_1" targetRef="Activity_060b7s2" />
-    <bpmn:startEvent id="StartEvent_1" name="NewBlogPost&#10;(Zapier)">
+    <bpmn:sequenceFlow id="Flow_1qe105u" sourceRef="StartEvent_1" targetRef="SetupProd" />
+    <bpmn:startEvent id="StartEvent_1" name="NewBlogPostKey">
       <bpmn:outgoing>Flow_1qe105u</bpmn:outgoing>
       <bpmn:signalEventDefinition id="SignalEventDefinition_1vpigf9" signalRef="Signal_0pln7bz" />
     </bpmn:startEvent>
@@ -11,8 +11,8 @@
         <camunda:in sourceExpression="ZuperGlueSlack" target="name" />
         <camunda:out source="secret" target="secret" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1qe105u</bpmn:incoming>
       <bpmn:incoming>Flow_1vxlyae</bpmn:incoming>
+      <bpmn:incoming>Flow_0qisv08</bpmn:incoming>
       <bpmn:outgoing>Flow_19ll0af</bpmn:outgoing>
     </bpmn:callActivity>
     <bpmn:intermediateCatchEvent id="Event_1jo831c">
@@ -40,9 +40,9 @@
           <camunda:inputParameter name="cp_icon_url" />
           <camunda:inputParameter name="hp_token" />
           <camunda:inputParameter name="hp_Authorization">${secret}</camunda:inputParameter>
-          <camunda:inputParameter name="cp_channel">content-creators</camunda:inputParameter>
           <camunda:inputParameter name="cp_text">One day later</camunda:inputParameter>
           <camunda:inputParameter name="cp_thread_ts">${ts}</camunda:inputParameter>
+          <camunda:inputParameter name="cp_channel">${channel}</camunda:inputParameter>
           <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
         <camunda:in sourceExpression="POST" target="method" />
@@ -69,10 +69,11 @@
         <camunda:in sourceExpression="Bearer ${hp_Authorization}" target="pre SET headers String $[&#39;Authorization&#39;]" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1hbhfs5</bpmn:incoming>
+      <bpmn:outgoing>Flow_1qtq87i</bpmn:outgoing>
     </bpmn:callActivity>
     <bpmn:sequenceFlow id="Flow_1hbhfs5" sourceRef="Event_1jo831c" targetRef="Activity_0cepof8" />
     <bpmn:intermediateCatchEvent id="Event_1ctc4mw">
-      <bpmn:incoming>Flow_1o1bfc1</bpmn:incoming>
+      <bpmn:incoming>Flow_1pd0dya</bpmn:incoming>
       <bpmn:outgoing>Flow_1bo0iy8</bpmn:outgoing>
       <bpmn:timerEventDefinition id="TimerEventDefinition_1bmjatn">
         <bpmn:timeDate xsi:type="bpmn:tFormalExpression">P3W</bpmn:timeDate>
@@ -96,9 +97,9 @@
           <camunda:inputParameter name="cp_icon_url" />
           <camunda:inputParameter name="hp_token" />
           <camunda:inputParameter name="hp_Authorization">${secret}</camunda:inputParameter>
-          <camunda:inputParameter name="cp_channel">content-creators</camunda:inputParameter>
           <camunda:inputParameter name="cp_text">Its a good time to import to Medium with a &lt;https://help.medium.com/hc/en-us/articles/360033930293-Set-a-canonical-link|canonical link&gt;.</camunda:inputParameter>
           <camunda:inputParameter name="cp_thread_ts">${ts}</camunda:inputParameter>
+          <camunda:inputParameter name="cp_channel">${channel}</camunda:inputParameter>
           <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
         </camunda:inputOutput>
         <camunda:in sourceExpression="POST" target="method" />
@@ -125,12 +126,13 @@
         <camunda:in sourceExpression="Bearer ${hp_Authorization}" target="pre SET headers String $[&#39;Authorization&#39;]" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1bo0iy8</bpmn:incoming>
+      <bpmn:outgoing>Flow_1pqx0gq</bpmn:outgoing>
     </bpmn:callActivity>
     <bpmn:sequenceFlow id="Flow_1bo0iy8" sourceRef="Event_1ctc4mw" targetRef="Activity_0i3et24" />
     <bpmn:startEvent id="Event_1tvhgdi">
       <bpmn:outgoing>Flow_0ihoszi</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:scriptTask id="Activity_0fzdxhy" name="Hardcode trigger" scriptFormat="groovy">
+    <bpmn:scriptTask id="Activity_0fzdxhy" name="Test" scriptFormat="groovy">
       <bpmn:incoming>Flow_0ihoszi</bpmn:incoming>
       <bpmn:outgoing>Flow_1vxlyae</bpmn:outgoing>
       <bpmn:script>execution.setVariable("title", 
@@ -141,6 +143,9 @@ execution.setVariable("link",
 )
 execution.setVariable("description", 
 "The story behind Corosim, an epidemic calculator for Finland."
+)
+execution.setVariable("channel", 
+"larktest2"
 )</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:sequenceFlow id="Flow_0ihoszi" sourceRef="Event_1tvhgdi" targetRef="Activity_0fzdxhy" />
@@ -165,8 +170,8 @@ execution.setVariable("description",
           <camunda:inputParameter name="cp_icon_url" />
           <camunda:inputParameter name="hp_token" />
           <camunda:inputParameter name="cp_text">Just in: &lt;${link}|${title}&gt;</camunda:inputParameter>
-          <camunda:inputParameter name="cp_channel">content-creators</camunda:inputParameter>
           <camunda:inputParameter name="hp_Authorization">${secret}</camunda:inputParameter>
+          <camunda:inputParameter name="cp_channel">${channel}</camunda:inputParameter>
           <camunda:outputParameter name="channel">${ res_channel }</camunda:outputParameter>
           <camunda:outputParameter name="message">${ res_message }</camunda:outputParameter>
           <camunda:outputParameter name="message_attachments">${ res_message_attachments }</camunda:outputParameter>
@@ -586,78 +591,641 @@ execution.setVariable("description",
         <camunda:in sourceExpression="Bearer ${hp_Authorization}" target="pre SET headers String $[&#39;Authorization&#39;]" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_19ll0af</bpmn:incoming>
-      <bpmn:outgoing>Flow_0ghf8cm</bpmn:outgoing>
       <bpmn:outgoing>Flow_1o1bfc1</bpmn:outgoing>
     </bpmn:callActivity>
-    <bpmn:sequenceFlow id="Flow_0ghf8cm" sourceRef="Activity_1jw5ixt" targetRef="Event_1jo831c" />
-    <bpmn:sequenceFlow id="Flow_1o1bfc1" sourceRef="Activity_1jw5ixt" targetRef="Event_1ctc4mw" />
+    <bpmn:sequenceFlow id="Flow_0ghf8cm" sourceRef="Gateway_0kubl9d" targetRef="Event_1jo831c" />
+    <bpmn:sequenceFlow id="Flow_1o1bfc1" sourceRef="Activity_1jw5ixt" targetRef="Gateway_0kubl9d" />
+    <bpmn:callActivity id="Activity_06ul8ex" name="POST /chat.postMessage" camunda:modelerTemplate="POST-/chat.postMessage" calledElement="ApiClient">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="content">{}</camunda:inputParameter>
+          <camunda:inputParameter name="cp_attachments" />
+          <camunda:inputParameter name="cp_unfurl_links" />
+          <camunda:inputParameter name="cp_unfurl_media" />
+          <camunda:inputParameter name="cp_parse" />
+          <camunda:inputParameter name="cp_as_user" />
+          <camunda:inputParameter name="cp_mrkdwn" />
+          <camunda:inputParameter name="cp_username" />
+          <camunda:inputParameter name="cp_blocks" />
+          <camunda:inputParameter name="cp_icon_emoji" />
+          <camunda:inputParameter name="cp_link_names" />
+          <camunda:inputParameter name="cp_reply_broadcast" />
+          <camunda:inputParameter name="cp_icon_url" />
+          <camunda:inputParameter name="hp_token" />
+          <camunda:inputParameter name="cp_text">${url}</camunda:inputParameter>
+          <camunda:inputParameter name="cp_thread_ts">${ts}</camunda:inputParameter>
+          <camunda:inputParameter name="hp_Authorization">${secret}</camunda:inputParameter>
+          <camunda:inputParameter name="cp_channel">${channel}</camunda:inputParameter>
+          <camunda:outputParameter name="channel">${ res_channel }</camunda:outputParameter>
+          <camunda:outputParameter name="message">${ res_message }</camunda:outputParameter>
+          <camunda:outputParameter name="message_attachments">${ res_message_attachments }</camunda:outputParameter>
+          <camunda:outputParameter name="message_blocks">${ res_message_blocks }</camunda:outputParameter>
+          <camunda:outputParameter name="message_client_msg_id">${ res_message_client_msg_id }</camunda:outputParameter>
+          <camunda:outputParameter name="message_comment">${ res_message_comment }</camunda:outputParameter>
+          <camunda:outputParameter name="message_comment_comment">${ res_message_comment_comment }</camunda:outputParameter>
+          <camunda:outputParameter name="message_comment_created">${ res_message_comment_created }</camunda:outputParameter>
+          <camunda:outputParameter name="message_comment_id">${ res_message_comment_id }</camunda:outputParameter>
+          <camunda:outputParameter name="message_comment_is_intro">${ res_message_comment_is_intro }</camunda:outputParameter>
+          <camunda:outputParameter name="message_comment_is_starred">${ res_message_comment_is_starred }</camunda:outputParameter>
+          <camunda:outputParameter name="message_comment_num_stars">${ res_message_comment_num_stars }</camunda:outputParameter>
+          <camunda:outputParameter name="message_comment_pinned_info">${ res_message_comment_pinned_info }</camunda:outputParameter>
+          <camunda:outputParameter name="message_comment_pinned_to">${ res_message_comment_pinned_to }</camunda:outputParameter>
+          <camunda:outputParameter name="message_comment_reactions">${ res_message_comment_reactions }</camunda:outputParameter>
+          <camunda:outputParameter name="message_comment_timestamp">${ res_message_comment_timestamp }</camunda:outputParameter>
+          <camunda:outputParameter name="message_comment_user">${ res_message_comment_user }</camunda:outputParameter>
+          <camunda:outputParameter name="message_display_as_bot">${ res_message_display_as_bot }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file">${ res_message_file }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_channels">${ res_message_file_channels }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_comments_count">${ res_message_file_comments_count }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_created">${ res_message_file_created }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_display_as_bot">${ res_message_file_display_as_bot }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_editable">${ res_message_file_editable }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_editor">${ res_message_file_editor }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_external_id">${ res_message_file_external_id }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_external_type">${ res_message_file_external_type }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_external_url">${ res_message_file_external_url }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_filetype">${ res_message_file_filetype }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_groups">${ res_message_file_groups }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_has_rich_preview">${ res_message_file_has_rich_preview }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_id">${ res_message_file_id }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_image_exif_rotation">${ res_message_file_image_exif_rotation }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_ims">${ res_message_file_ims }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_is_external">${ res_message_file_is_external }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_is_public">${ res_message_file_is_public }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_is_starred">${ res_message_file_is_starred }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_is_tombstoned">${ res_message_file_is_tombstoned }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_last_editor">${ res_message_file_last_editor }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_mimetype">${ res_message_file_mimetype }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_mode">${ res_message_file_mode }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_name">${ res_message_file_name }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_num_stars">${ res_message_file_num_stars }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_original_h">${ res_message_file_original_h }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_original_w">${ res_message_file_original_w }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_permalink">${ res_message_file_permalink }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_permalink_public">${ res_message_file_permalink_public }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_pinned_info">${ res_message_file_pinned_info }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_pinned_to">${ res_message_file_pinned_to }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_pretty_type">${ res_message_file_pretty_type }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_public_url_shared">${ res_message_file_public_url_shared }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_reactions">${ res_message_file_reactions }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_shares">${ res_message_file_shares }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_size">${ res_message_file_size }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_source_team">${ res_message_file_source_team }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_state">${ res_message_file_state }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_1024">${ res_message_file_thumb_1024 }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_1024_h">${ res_message_file_thumb_1024_h }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_1024_w">${ res_message_file_thumb_1024_w }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_160">${ res_message_file_thumb_160 }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_360">${ res_message_file_thumb_360 }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_360_h">${ res_message_file_thumb_360_h }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_360_w">${ res_message_file_thumb_360_w }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_480">${ res_message_file_thumb_480 }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_480_h">${ res_message_file_thumb_480_h }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_480_w">${ res_message_file_thumb_480_w }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_64">${ res_message_file_thumb_64 }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_720">${ res_message_file_thumb_720 }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_720_h">${ res_message_file_thumb_720_h }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_720_w">${ res_message_file_thumb_720_w }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_80">${ res_message_file_thumb_80 }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_800">${ res_message_file_thumb_800 }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_800_h">${ res_message_file_thumb_800_h }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_800_w">${ res_message_file_thumb_800_w }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_960">${ res_message_file_thumb_960 }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_960_h">${ res_message_file_thumb_960_h }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_thumb_960_w">${ res_message_file_thumb_960_w }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_timestamp">${ res_message_file_timestamp }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_title">${ res_message_file_title }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_updated">${ res_message_file_updated }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_url_private">${ res_message_file_url_private }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_url_private_download">${ res_message_file_url_private_download }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_user">${ res_message_file_user }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_user_team">${ res_message_file_user_team }</camunda:outputParameter>
+          <camunda:outputParameter name="message_file_username">${ res_message_file_username }</camunda:outputParameter>
+          <camunda:outputParameter name="message_files">${ res_message_files }</camunda:outputParameter>
+          <camunda:outputParameter name="message_icons">${ res_message_icons }</camunda:outputParameter>
+          <camunda:outputParameter name="message_icons_emoji">${ res_message_icons_emoji }</camunda:outputParameter>
+          <camunda:outputParameter name="message_inviter">${ res_message_inviter }</camunda:outputParameter>
+          <camunda:outputParameter name="message_is_delayed_message">${ res_message_is_delayed_message }</camunda:outputParameter>
+          <camunda:outputParameter name="message_is_intro">${ res_message_is_intro }</camunda:outputParameter>
+          <camunda:outputParameter name="message_is_starred">${ res_message_is_starred }</camunda:outputParameter>
+          <camunda:outputParameter name="message_last_read">${ res_message_last_read }</camunda:outputParameter>
+          <camunda:outputParameter name="message_latest_reply">${ res_message_latest_reply }</camunda:outputParameter>
+          <camunda:outputParameter name="message_name">${ res_message_name }</camunda:outputParameter>
+          <camunda:outputParameter name="message_old_name">${ res_message_old_name }</camunda:outputParameter>
+          <camunda:outputParameter name="message_parent_user_id">${ res_message_parent_user_id }</camunda:outputParameter>
+          <camunda:outputParameter name="message_permalink">${ res_message_permalink }</camunda:outputParameter>
+          <camunda:outputParameter name="message_pinned_to">${ res_message_pinned_to }</camunda:outputParameter>
+          <camunda:outputParameter name="message_purpose">${ res_message_purpose }</camunda:outputParameter>
+          <camunda:outputParameter name="message_reactions">${ res_message_reactions }</camunda:outputParameter>
+          <camunda:outputParameter name="message_replies">${ res_message_replies }</camunda:outputParameter>
+          <camunda:outputParameter name="message_reply_count">${ res_message_reply_count }</camunda:outputParameter>
+          <camunda:outputParameter name="message_reply_users">${ res_message_reply_users }</camunda:outputParameter>
+          <camunda:outputParameter name="message_reply_users_count">${ res_message_reply_users_count }</camunda:outputParameter>
+          <camunda:outputParameter name="message_source_team">${ res_message_source_team }</camunda:outputParameter>
+          <camunda:outputParameter name="message_subscribed">${ res_message_subscribed }</camunda:outputParameter>
+          <camunda:outputParameter name="message_subtype">${ res_message_subtype }</camunda:outputParameter>
+          <camunda:outputParameter name="message_team">${ res_message_team }</camunda:outputParameter>
+          <camunda:outputParameter name="message_text">${ res_message_text }</camunda:outputParameter>
+          <camunda:outputParameter name="message_thread_ts">${ res_message_thread_ts }</camunda:outputParameter>
+          <camunda:outputParameter name="message_topic">${ res_message_topic }</camunda:outputParameter>
+          <camunda:outputParameter name="message_ts">${ res_message_ts }</camunda:outputParameter>
+          <camunda:outputParameter name="message_type">${ res_message_type }</camunda:outputParameter>
+          <camunda:outputParameter name="message_unread_count">${ res_message_unread_count }</camunda:outputParameter>
+          <camunda:outputParameter name="message_upload">${ res_message_upload }</camunda:outputParameter>
+          <camunda:outputParameter name="message_user">${ res_message_user }</camunda:outputParameter>
+          <camunda:outputParameter name="message_user_profile">${ res_message_user_profile }</camunda:outputParameter>
+          <camunda:outputParameter name="message_user_profile_avatar_hash">${ res_message_user_profile_avatar_hash }</camunda:outputParameter>
+          <camunda:outputParameter name="message_user_profile_display_name">${ res_message_user_profile_display_name }</camunda:outputParameter>
+          <camunda:outputParameter name="message_user_profile_first_name">${ res_message_user_profile_first_name }</camunda:outputParameter>
+          <camunda:outputParameter name="message_user_profile_image_72">${ res_message_user_profile_image_72 }</camunda:outputParameter>
+          <camunda:outputParameter name="message_user_profile_is_restricted">${ res_message_user_profile_is_restricted }</camunda:outputParameter>
+          <camunda:outputParameter name="message_user_profile_is_ultra_restricted">${ res_message_user_profile_is_ultra_restricted }</camunda:outputParameter>
+          <camunda:outputParameter name="message_user_profile_name">${ res_message_user_profile_name }</camunda:outputParameter>
+          <camunda:outputParameter name="message_user_profile_real_name">${ res_message_user_profile_real_name }</camunda:outputParameter>
+          <camunda:outputParameter name="message_user_profile_team">${ res_message_user_profile_team }</camunda:outputParameter>
+          <camunda:outputParameter name="message_user_team">${ res_message_user_team }</camunda:outputParameter>
+          <camunda:outputParameter name="message_username">${ res_message_username }</camunda:outputParameter>
+          <camunda:outputParameter name="ok">${ res_ok }</camunda:outputParameter>
+          <camunda:outputParameter name="ts">${ res_ts }</camunda:outputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+        <camunda:in sourceExpression="POST" target="method" />
+        <camunda:in sourceExpression="https://slack.com/api/chat.postMessage" target="url" />
+        <camunda:in sourceExpression="application/json" target="pre SET headers String $[&#39;Content-Type&#39;]" />
+        <camunda:in source="content" target="request" />
+        <camunda:in source="cp_attachments" target="pre SET request String $[&#39;attachments&#39;]" />
+        <camunda:in source="cp_unfurl_links" target="pre SET request String $[&#39;unfurl_links&#39;]" />
+        <camunda:in source="cp_text" target="pre SET request String $[&#39;text&#39;]" />
+        <camunda:in source="cp_unfurl_media" target="pre SET request String $[&#39;unfurl_media&#39;]" />
+        <camunda:in source="cp_parse" target="pre SET request String $[&#39;parse&#39;]" />
+        <camunda:in source="cp_as_user" target="pre SET request String $[&#39;as_user&#39;]" />
+        <camunda:in source="cp_mrkdwn" target="pre SET request String $[&#39;mrkdwn&#39;]" />
+        <camunda:in source="cp_channel" target="pre SET request String $[&#39;channel&#39;]" />
+        <camunda:in source="cp_username" target="pre SET request String $[&#39;username&#39;]" />
+        <camunda:in source="cp_blocks" target="pre SET request String $[&#39;blocks&#39;]" />
+        <camunda:in source="cp_icon_emoji" target="pre SET request String $[&#39;icon_emoji&#39;]" />
+        <camunda:in source="cp_link_names" target="pre SET request String $[&#39;link_names&#39;]" />
+        <camunda:in source="cp_reply_broadcast" target="pre SET request String $[&#39;reply_broadcast&#39;]" />
+        <camunda:in source="cp_thread_ts" target="pre SET request String $[&#39;thread_ts&#39;]" />
+        <camunda:in source="cp_icon_url" target="pre SET request String $[&#39;icon_url&#39;]" />
+        <camunda:in sourceExpression="res_channel" target="post EXTRACT response string $[&#39;channel&#39;]" />
+        <camunda:out source="res_channel" target="res_channel" />
+        <camunda:in sourceExpression="res_message" target="post EXTRACT response object $[&#39;message&#39;]" />
+        <camunda:out source="res_message" target="res_message" />
+        <camunda:in sourceExpression="res_message_attachments" target="post EXTRACT response array $[&#39;message&#39;][&#39;attachments&#39;]" />
+        <camunda:out source="res_message_attachments" target="res_message_attachments" />
+        <camunda:in sourceExpression="res_message_blocks" target="post EXTRACT response array $[&#39;message&#39;][&#39;blocks&#39;]" />
+        <camunda:out source="res_message_blocks" target="res_message_blocks" />
+        <camunda:in sourceExpression="res_message_client_msg_id" target="post EXTRACT response string $[&#39;message&#39;][&#39;client_msg_id&#39;]" />
+        <camunda:out source="res_message_client_msg_id" target="res_message_client_msg_id" />
+        <camunda:in sourceExpression="res_message_comment" target="post EXTRACT response object $[&#39;message&#39;][&#39;comment&#39;]" />
+        <camunda:out source="res_message_comment" target="res_message_comment" />
+        <camunda:in sourceExpression="res_message_comment_comment" target="post EXTRACT response string $[&#39;message&#39;][&#39;comment&#39;][&#39;comment&#39;]" />
+        <camunda:out source="res_message_comment_comment" target="res_message_comment_comment" />
+        <camunda:in sourceExpression="res_message_comment_created" target="post EXTRACT response integer $[&#39;message&#39;][&#39;comment&#39;][&#39;created&#39;]" />
+        <camunda:out source="res_message_comment_created" target="res_message_comment_created" />
+        <camunda:in sourceExpression="res_message_comment_id" target="post EXTRACT response string $[&#39;message&#39;][&#39;comment&#39;][&#39;id&#39;]" />
+        <camunda:out source="res_message_comment_id" target="res_message_comment_id" />
+        <camunda:in sourceExpression="res_message_comment_is_intro" target="post EXTRACT response boolean $[&#39;message&#39;][&#39;comment&#39;][&#39;is_intro&#39;]" />
+        <camunda:out source="res_message_comment_is_intro" target="res_message_comment_is_intro" />
+        <camunda:in sourceExpression="res_message_comment_is_starred" target="post EXTRACT response boolean $[&#39;message&#39;][&#39;comment&#39;][&#39;is_starred&#39;]" />
+        <camunda:out source="res_message_comment_is_starred" target="res_message_comment_is_starred" />
+        <camunda:in sourceExpression="res_message_comment_num_stars" target="post EXTRACT response integer $[&#39;message&#39;][&#39;comment&#39;][&#39;num_stars&#39;]" />
+        <camunda:out source="res_message_comment_num_stars" target="res_message_comment_num_stars" />
+        <camunda:in sourceExpression="res_message_comment_pinned_info" target="post EXTRACT response object $[&#39;message&#39;][&#39;comment&#39;][&#39;pinned_info&#39;]" />
+        <camunda:out source="res_message_comment_pinned_info" target="res_message_comment_pinned_info" />
+        <camunda:in sourceExpression="res_message_comment_pinned_to" target="post EXTRACT response array $[&#39;message&#39;][&#39;comment&#39;][&#39;pinned_to&#39;]" />
+        <camunda:out source="res_message_comment_pinned_to" target="res_message_comment_pinned_to" />
+        <camunda:in sourceExpression="res_message_comment_reactions" target="post EXTRACT response array $[&#39;message&#39;][&#39;comment&#39;][&#39;reactions&#39;]" />
+        <camunda:out source="res_message_comment_reactions" target="res_message_comment_reactions" />
+        <camunda:in sourceExpression="res_message_comment_timestamp" target="post EXTRACT response integer $[&#39;message&#39;][&#39;comment&#39;][&#39;timestamp&#39;]" />
+        <camunda:out source="res_message_comment_timestamp" target="res_message_comment_timestamp" />
+        <camunda:in sourceExpression="res_message_comment_user" target="post EXTRACT response string $[&#39;message&#39;][&#39;comment&#39;][&#39;user&#39;]" />
+        <camunda:out source="res_message_comment_user" target="res_message_comment_user" />
+        <camunda:in sourceExpression="res_message_display_as_bot" target="post EXTRACT response boolean $[&#39;message&#39;][&#39;display_as_bot&#39;]" />
+        <camunda:out source="res_message_display_as_bot" target="res_message_display_as_bot" />
+        <camunda:in sourceExpression="res_message_file" target="post EXTRACT response object $[&#39;message&#39;][&#39;file&#39;]" />
+        <camunda:out source="res_message_file" target="res_message_file" />
+        <camunda:in sourceExpression="res_message_file_channels" target="post EXTRACT response array $[&#39;message&#39;][&#39;file&#39;][&#39;channels&#39;]" />
+        <camunda:out source="res_message_file_channels" target="res_message_file_channels" />
+        <camunda:in sourceExpression="res_message_file_comments_count" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;comments_count&#39;]" />
+        <camunda:out source="res_message_file_comments_count" target="res_message_file_comments_count" />
+        <camunda:in sourceExpression="res_message_file_created" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;created&#39;]" />
+        <camunda:out source="res_message_file_created" target="res_message_file_created" />
+        <camunda:in sourceExpression="res_message_file_display_as_bot" target="post EXTRACT response boolean $[&#39;message&#39;][&#39;file&#39;][&#39;display_as_bot&#39;]" />
+        <camunda:out source="res_message_file_display_as_bot" target="res_message_file_display_as_bot" />
+        <camunda:in sourceExpression="res_message_file_editable" target="post EXTRACT response boolean $[&#39;message&#39;][&#39;file&#39;][&#39;editable&#39;]" />
+        <camunda:out source="res_message_file_editable" target="res_message_file_editable" />
+        <camunda:in sourceExpression="res_message_file_editor" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;editor&#39;]" />
+        <camunda:out source="res_message_file_editor" target="res_message_file_editor" />
+        <camunda:in sourceExpression="res_message_file_external_id" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;external_id&#39;]" />
+        <camunda:out source="res_message_file_external_id" target="res_message_file_external_id" />
+        <camunda:in sourceExpression="res_message_file_external_type" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;external_type&#39;]" />
+        <camunda:out source="res_message_file_external_type" target="res_message_file_external_type" />
+        <camunda:in sourceExpression="res_message_file_external_url" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;external_url&#39;]" />
+        <camunda:out source="res_message_file_external_url" target="res_message_file_external_url" />
+        <camunda:in sourceExpression="res_message_file_filetype" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;filetype&#39;]" />
+        <camunda:out source="res_message_file_filetype" target="res_message_file_filetype" />
+        <camunda:in sourceExpression="res_message_file_groups" target="post EXTRACT response array $[&#39;message&#39;][&#39;file&#39;][&#39;groups&#39;]" />
+        <camunda:out source="res_message_file_groups" target="res_message_file_groups" />
+        <camunda:in sourceExpression="res_message_file_has_rich_preview" target="post EXTRACT response boolean $[&#39;message&#39;][&#39;file&#39;][&#39;has_rich_preview&#39;]" />
+        <camunda:out source="res_message_file_has_rich_preview" target="res_message_file_has_rich_preview" />
+        <camunda:in sourceExpression="res_message_file_id" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;id&#39;]" />
+        <camunda:out source="res_message_file_id" target="res_message_file_id" />
+        <camunda:in sourceExpression="res_message_file_image_exif_rotation" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;image_exif_rotation&#39;]" />
+        <camunda:out source="res_message_file_image_exif_rotation" target="res_message_file_image_exif_rotation" />
+        <camunda:in sourceExpression="res_message_file_ims" target="post EXTRACT response array $[&#39;message&#39;][&#39;file&#39;][&#39;ims&#39;]" />
+        <camunda:out source="res_message_file_ims" target="res_message_file_ims" />
+        <camunda:in sourceExpression="res_message_file_is_external" target="post EXTRACT response boolean $[&#39;message&#39;][&#39;file&#39;][&#39;is_external&#39;]" />
+        <camunda:out source="res_message_file_is_external" target="res_message_file_is_external" />
+        <camunda:in sourceExpression="res_message_file_is_public" target="post EXTRACT response boolean $[&#39;message&#39;][&#39;file&#39;][&#39;is_public&#39;]" />
+        <camunda:out source="res_message_file_is_public" target="res_message_file_is_public" />
+        <camunda:in sourceExpression="res_message_file_is_starred" target="post EXTRACT response boolean $[&#39;message&#39;][&#39;file&#39;][&#39;is_starred&#39;]" />
+        <camunda:out source="res_message_file_is_starred" target="res_message_file_is_starred" />
+        <camunda:in sourceExpression="res_message_file_is_tombstoned" target="post EXTRACT response boolean $[&#39;message&#39;][&#39;file&#39;][&#39;is_tombstoned&#39;]" />
+        <camunda:out source="res_message_file_is_tombstoned" target="res_message_file_is_tombstoned" />
+        <camunda:in sourceExpression="res_message_file_last_editor" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;last_editor&#39;]" />
+        <camunda:out source="res_message_file_last_editor" target="res_message_file_last_editor" />
+        <camunda:in sourceExpression="res_message_file_mimetype" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;mimetype&#39;]" />
+        <camunda:out source="res_message_file_mimetype" target="res_message_file_mimetype" />
+        <camunda:in sourceExpression="res_message_file_mode" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;mode&#39;]" />
+        <camunda:out source="res_message_file_mode" target="res_message_file_mode" />
+        <camunda:in sourceExpression="res_message_file_name" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;name&#39;]" />
+        <camunda:out source="res_message_file_name" target="res_message_file_name" />
+        <camunda:in sourceExpression="res_message_file_num_stars" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;num_stars&#39;]" />
+        <camunda:out source="res_message_file_num_stars" target="res_message_file_num_stars" />
+        <camunda:in sourceExpression="res_message_file_original_h" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;original_h&#39;]" />
+        <camunda:out source="res_message_file_original_h" target="res_message_file_original_h" />
+        <camunda:in sourceExpression="res_message_file_original_w" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;original_w&#39;]" />
+        <camunda:out source="res_message_file_original_w" target="res_message_file_original_w" />
+        <camunda:in sourceExpression="res_message_file_permalink" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;permalink&#39;]" />
+        <camunda:out source="res_message_file_permalink" target="res_message_file_permalink" />
+        <camunda:in sourceExpression="res_message_file_permalink_public" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;permalink_public&#39;]" />
+        <camunda:out source="res_message_file_permalink_public" target="res_message_file_permalink_public" />
+        <camunda:in sourceExpression="res_message_file_pinned_info" target="post EXTRACT response object $[&#39;message&#39;][&#39;file&#39;][&#39;pinned_info&#39;]" />
+        <camunda:out source="res_message_file_pinned_info" target="res_message_file_pinned_info" />
+        <camunda:in sourceExpression="res_message_file_pinned_to" target="post EXTRACT response array $[&#39;message&#39;][&#39;file&#39;][&#39;pinned_to&#39;]" />
+        <camunda:out source="res_message_file_pinned_to" target="res_message_file_pinned_to" />
+        <camunda:in sourceExpression="res_message_file_pretty_type" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;pretty_type&#39;]" />
+        <camunda:out source="res_message_file_pretty_type" target="res_message_file_pretty_type" />
+        <camunda:in sourceExpression="res_message_file_public_url_shared" target="post EXTRACT response boolean $[&#39;message&#39;][&#39;file&#39;][&#39;public_url_shared&#39;]" />
+        <camunda:out source="res_message_file_public_url_shared" target="res_message_file_public_url_shared" />
+        <camunda:in sourceExpression="res_message_file_reactions" target="post EXTRACT response array $[&#39;message&#39;][&#39;file&#39;][&#39;reactions&#39;]" />
+        <camunda:out source="res_message_file_reactions" target="res_message_file_reactions" />
+        <camunda:in sourceExpression="res_message_file_shares" target="post EXTRACT response object $[&#39;message&#39;][&#39;file&#39;][&#39;shares&#39;]" />
+        <camunda:out source="res_message_file_shares" target="res_message_file_shares" />
+        <camunda:in sourceExpression="res_message_file_size" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;size&#39;]" />
+        <camunda:out source="res_message_file_size" target="res_message_file_size" />
+        <camunda:in sourceExpression="res_message_file_source_team" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;source_team&#39;]" />
+        <camunda:out source="res_message_file_source_team" target="res_message_file_source_team" />
+        <camunda:in sourceExpression="res_message_file_state" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;state&#39;]" />
+        <camunda:out source="res_message_file_state" target="res_message_file_state" />
+        <camunda:in sourceExpression="res_message_file_thumb_1024" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_1024&#39;]" />
+        <camunda:out source="res_message_file_thumb_1024" target="res_message_file_thumb_1024" />
+        <camunda:in sourceExpression="res_message_file_thumb_1024_h" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_1024_h&#39;]" />
+        <camunda:out source="res_message_file_thumb_1024_h" target="res_message_file_thumb_1024_h" />
+        <camunda:in sourceExpression="res_message_file_thumb_1024_w" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_1024_w&#39;]" />
+        <camunda:out source="res_message_file_thumb_1024_w" target="res_message_file_thumb_1024_w" />
+        <camunda:in sourceExpression="res_message_file_thumb_160" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_160&#39;]" />
+        <camunda:out source="res_message_file_thumb_160" target="res_message_file_thumb_160" />
+        <camunda:in sourceExpression="res_message_file_thumb_360" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_360&#39;]" />
+        <camunda:out source="res_message_file_thumb_360" target="res_message_file_thumb_360" />
+        <camunda:in sourceExpression="res_message_file_thumb_360_h" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_360_h&#39;]" />
+        <camunda:out source="res_message_file_thumb_360_h" target="res_message_file_thumb_360_h" />
+        <camunda:in sourceExpression="res_message_file_thumb_360_w" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_360_w&#39;]" />
+        <camunda:out source="res_message_file_thumb_360_w" target="res_message_file_thumb_360_w" />
+        <camunda:in sourceExpression="res_message_file_thumb_480" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_480&#39;]" />
+        <camunda:out source="res_message_file_thumb_480" target="res_message_file_thumb_480" />
+        <camunda:in sourceExpression="res_message_file_thumb_480_h" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_480_h&#39;]" />
+        <camunda:out source="res_message_file_thumb_480_h" target="res_message_file_thumb_480_h" />
+        <camunda:in sourceExpression="res_message_file_thumb_480_w" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_480_w&#39;]" />
+        <camunda:out source="res_message_file_thumb_480_w" target="res_message_file_thumb_480_w" />
+        <camunda:in sourceExpression="res_message_file_thumb_64" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_64&#39;]" />
+        <camunda:out source="res_message_file_thumb_64" target="res_message_file_thumb_64" />
+        <camunda:in sourceExpression="res_message_file_thumb_720" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_720&#39;]" />
+        <camunda:out source="res_message_file_thumb_720" target="res_message_file_thumb_720" />
+        <camunda:in sourceExpression="res_message_file_thumb_720_h" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_720_h&#39;]" />
+        <camunda:out source="res_message_file_thumb_720_h" target="res_message_file_thumb_720_h" />
+        <camunda:in sourceExpression="res_message_file_thumb_720_w" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_720_w&#39;]" />
+        <camunda:out source="res_message_file_thumb_720_w" target="res_message_file_thumb_720_w" />
+        <camunda:in sourceExpression="res_message_file_thumb_80" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_80&#39;]" />
+        <camunda:out source="res_message_file_thumb_80" target="res_message_file_thumb_80" />
+        <camunda:in sourceExpression="res_message_file_thumb_800" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_800&#39;]" />
+        <camunda:out source="res_message_file_thumb_800" target="res_message_file_thumb_800" />
+        <camunda:in sourceExpression="res_message_file_thumb_800_h" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_800_h&#39;]" />
+        <camunda:out source="res_message_file_thumb_800_h" target="res_message_file_thumb_800_h" />
+        <camunda:in sourceExpression="res_message_file_thumb_800_w" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_800_w&#39;]" />
+        <camunda:out source="res_message_file_thumb_800_w" target="res_message_file_thumb_800_w" />
+        <camunda:in sourceExpression="res_message_file_thumb_960" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_960&#39;]" />
+        <camunda:out source="res_message_file_thumb_960" target="res_message_file_thumb_960" />
+        <camunda:in sourceExpression="res_message_file_thumb_960_h" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_960_h&#39;]" />
+        <camunda:out source="res_message_file_thumb_960_h" target="res_message_file_thumb_960_h" />
+        <camunda:in sourceExpression="res_message_file_thumb_960_w" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;thumb_960_w&#39;]" />
+        <camunda:out source="res_message_file_thumb_960_w" target="res_message_file_thumb_960_w" />
+        <camunda:in sourceExpression="res_message_file_timestamp" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;timestamp&#39;]" />
+        <camunda:out source="res_message_file_timestamp" target="res_message_file_timestamp" />
+        <camunda:in sourceExpression="res_message_file_title" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;title&#39;]" />
+        <camunda:out source="res_message_file_title" target="res_message_file_title" />
+        <camunda:in sourceExpression="res_message_file_updated" target="post EXTRACT response integer $[&#39;message&#39;][&#39;file&#39;][&#39;updated&#39;]" />
+        <camunda:out source="res_message_file_updated" target="res_message_file_updated" />
+        <camunda:in sourceExpression="res_message_file_url_private" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;url_private&#39;]" />
+        <camunda:out source="res_message_file_url_private" target="res_message_file_url_private" />
+        <camunda:in sourceExpression="res_message_file_url_private_download" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;url_private_download&#39;]" />
+        <camunda:out source="res_message_file_url_private_download" target="res_message_file_url_private_download" />
+        <camunda:in sourceExpression="res_message_file_user" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;user&#39;]" />
+        <camunda:out source="res_message_file_user" target="res_message_file_user" />
+        <camunda:in sourceExpression="res_message_file_user_team" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;user_team&#39;]" />
+        <camunda:out source="res_message_file_user_team" target="res_message_file_user_team" />
+        <camunda:in sourceExpression="res_message_file_username" target="post EXTRACT response string $[&#39;message&#39;][&#39;file&#39;][&#39;username&#39;]" />
+        <camunda:out source="res_message_file_username" target="res_message_file_username" />
+        <camunda:in sourceExpression="res_message_files" target="post EXTRACT response array $[&#39;message&#39;][&#39;files&#39;]" />
+        <camunda:out source="res_message_files" target="res_message_files" />
+        <camunda:in sourceExpression="res_message_icons" target="post EXTRACT response object $[&#39;message&#39;][&#39;icons&#39;]" />
+        <camunda:out source="res_message_icons" target="res_message_icons" />
+        <camunda:in sourceExpression="res_message_icons_emoji" target="post EXTRACT response string $[&#39;message&#39;][&#39;icons&#39;][&#39;emoji&#39;]" />
+        <camunda:out source="res_message_icons_emoji" target="res_message_icons_emoji" />
+        <camunda:in sourceExpression="res_message_inviter" target="post EXTRACT response string $[&#39;message&#39;][&#39;inviter&#39;]" />
+        <camunda:out source="res_message_inviter" target="res_message_inviter" />
+        <camunda:in sourceExpression="res_message_is_delayed_message" target="post EXTRACT response boolean $[&#39;message&#39;][&#39;is_delayed_message&#39;]" />
+        <camunda:out source="res_message_is_delayed_message" target="res_message_is_delayed_message" />
+        <camunda:in sourceExpression="res_message_is_intro" target="post EXTRACT response boolean $[&#39;message&#39;][&#39;is_intro&#39;]" />
+        <camunda:out source="res_message_is_intro" target="res_message_is_intro" />
+        <camunda:in sourceExpression="res_message_is_starred" target="post EXTRACT response boolean $[&#39;message&#39;][&#39;is_starred&#39;]" />
+        <camunda:out source="res_message_is_starred" target="res_message_is_starred" />
+        <camunda:in sourceExpression="res_message_last_read" target="post EXTRACT response string $[&#39;message&#39;][&#39;last_read&#39;]" />
+        <camunda:out source="res_message_last_read" target="res_message_last_read" />
+        <camunda:in sourceExpression="res_message_latest_reply" target="post EXTRACT response string $[&#39;message&#39;][&#39;latest_reply&#39;]" />
+        <camunda:out source="res_message_latest_reply" target="res_message_latest_reply" />
+        <camunda:in sourceExpression="res_message_name" target="post EXTRACT response string $[&#39;message&#39;][&#39;name&#39;]" />
+        <camunda:out source="res_message_name" target="res_message_name" />
+        <camunda:in sourceExpression="res_message_old_name" target="post EXTRACT response string $[&#39;message&#39;][&#39;old_name&#39;]" />
+        <camunda:out source="res_message_old_name" target="res_message_old_name" />
+        <camunda:in sourceExpression="res_message_parent_user_id" target="post EXTRACT response string $[&#39;message&#39;][&#39;parent_user_id&#39;]" />
+        <camunda:out source="res_message_parent_user_id" target="res_message_parent_user_id" />
+        <camunda:in sourceExpression="res_message_permalink" target="post EXTRACT response string $[&#39;message&#39;][&#39;permalink&#39;]" />
+        <camunda:out source="res_message_permalink" target="res_message_permalink" />
+        <camunda:in sourceExpression="res_message_pinned_to" target="post EXTRACT response array $[&#39;message&#39;][&#39;pinned_to&#39;]" />
+        <camunda:out source="res_message_pinned_to" target="res_message_pinned_to" />
+        <camunda:in sourceExpression="res_message_purpose" target="post EXTRACT response string $[&#39;message&#39;][&#39;purpose&#39;]" />
+        <camunda:out source="res_message_purpose" target="res_message_purpose" />
+        <camunda:in sourceExpression="res_message_reactions" target="post EXTRACT response array $[&#39;message&#39;][&#39;reactions&#39;]" />
+        <camunda:out source="res_message_reactions" target="res_message_reactions" />
+        <camunda:in sourceExpression="res_message_replies" target="post EXTRACT response array $[&#39;message&#39;][&#39;replies&#39;]" />
+        <camunda:out source="res_message_replies" target="res_message_replies" />
+        <camunda:in sourceExpression="res_message_reply_count" target="post EXTRACT response integer $[&#39;message&#39;][&#39;reply_count&#39;]" />
+        <camunda:out source="res_message_reply_count" target="res_message_reply_count" />
+        <camunda:in sourceExpression="res_message_reply_users" target="post EXTRACT response array $[&#39;message&#39;][&#39;reply_users&#39;]" />
+        <camunda:out source="res_message_reply_users" target="res_message_reply_users" />
+        <camunda:in sourceExpression="res_message_reply_users_count" target="post EXTRACT response integer $[&#39;message&#39;][&#39;reply_users_count&#39;]" />
+        <camunda:out source="res_message_reply_users_count" target="res_message_reply_users_count" />
+        <camunda:in sourceExpression="res_message_source_team" target="post EXTRACT response string $[&#39;message&#39;][&#39;source_team&#39;]" />
+        <camunda:out source="res_message_source_team" target="res_message_source_team" />
+        <camunda:in sourceExpression="res_message_subscribed" target="post EXTRACT response boolean $[&#39;message&#39;][&#39;subscribed&#39;]" />
+        <camunda:out source="res_message_subscribed" target="res_message_subscribed" />
+        <camunda:in sourceExpression="res_message_subtype" target="post EXTRACT response string $[&#39;message&#39;][&#39;subtype&#39;]" />
+        <camunda:out source="res_message_subtype" target="res_message_subtype" />
+        <camunda:in sourceExpression="res_message_team" target="post EXTRACT response string $[&#39;message&#39;][&#39;team&#39;]" />
+        <camunda:out source="res_message_team" target="res_message_team" />
+        <camunda:in sourceExpression="res_message_text" target="post EXTRACT response string $[&#39;message&#39;][&#39;text&#39;]" />
+        <camunda:out source="res_message_text" target="res_message_text" />
+        <camunda:in sourceExpression="res_message_thread_ts" target="post EXTRACT response string $[&#39;message&#39;][&#39;thread_ts&#39;]" />
+        <camunda:out source="res_message_thread_ts" target="res_message_thread_ts" />
+        <camunda:in sourceExpression="res_message_topic" target="post EXTRACT response string $[&#39;message&#39;][&#39;topic&#39;]" />
+        <camunda:out source="res_message_topic" target="res_message_topic" />
+        <camunda:in sourceExpression="res_message_ts" target="post EXTRACT response string $[&#39;message&#39;][&#39;ts&#39;]" />
+        <camunda:out source="res_message_ts" target="res_message_ts" />
+        <camunda:in sourceExpression="res_message_type" target="post EXTRACT response string $[&#39;message&#39;][&#39;type&#39;]" />
+        <camunda:out source="res_message_type" target="res_message_type" />
+        <camunda:in sourceExpression="res_message_unread_count" target="post EXTRACT response integer $[&#39;message&#39;][&#39;unread_count&#39;]" />
+        <camunda:out source="res_message_unread_count" target="res_message_unread_count" />
+        <camunda:in sourceExpression="res_message_upload" target="post EXTRACT response boolean $[&#39;message&#39;][&#39;upload&#39;]" />
+        <camunda:out source="res_message_upload" target="res_message_upload" />
+        <camunda:in sourceExpression="res_message_user" target="post EXTRACT response string $[&#39;message&#39;][&#39;user&#39;]" />
+        <camunda:out source="res_message_user" target="res_message_user" />
+        <camunda:in sourceExpression="res_message_user_profile" target="post EXTRACT response object $[&#39;message&#39;][&#39;user_profile&#39;]" />
+        <camunda:out source="res_message_user_profile" target="res_message_user_profile" />
+        <camunda:in sourceExpression="res_message_user_profile_avatar_hash" target="post EXTRACT response string $[&#39;message&#39;][&#39;user_profile&#39;][&#39;avatar_hash&#39;]" />
+        <camunda:out source="res_message_user_profile_avatar_hash" target="res_message_user_profile_avatar_hash" />
+        <camunda:in sourceExpression="res_message_user_profile_display_name" target="post EXTRACT response string $[&#39;message&#39;][&#39;user_profile&#39;][&#39;display_name&#39;]" />
+        <camunda:out source="res_message_user_profile_display_name" target="res_message_user_profile_display_name" />
+        <camunda:in sourceExpression="res_message_user_profile_first_name" target="post EXTRACT response string $[&#39;message&#39;][&#39;user_profile&#39;][&#39;first_name&#39;]" />
+        <camunda:out source="res_message_user_profile_first_name" target="res_message_user_profile_first_name" />
+        <camunda:in sourceExpression="res_message_user_profile_image_72" target="post EXTRACT response string $[&#39;message&#39;][&#39;user_profile&#39;][&#39;image_72&#39;]" />
+        <camunda:out source="res_message_user_profile_image_72" target="res_message_user_profile_image_72" />
+        <camunda:in sourceExpression="res_message_user_profile_is_restricted" target="post EXTRACT response boolean $[&#39;message&#39;][&#39;user_profile&#39;][&#39;is_restricted&#39;]" />
+        <camunda:out source="res_message_user_profile_is_restricted" target="res_message_user_profile_is_restricted" />
+        <camunda:in sourceExpression="res_message_user_profile_is_ultra_restricted" target="post EXTRACT response boolean $[&#39;message&#39;][&#39;user_profile&#39;][&#39;is_ultra_restricted&#39;]" />
+        <camunda:out source="res_message_user_profile_is_ultra_restricted" target="res_message_user_profile_is_ultra_restricted" />
+        <camunda:in sourceExpression="res_message_user_profile_name" target="post EXTRACT response string $[&#39;message&#39;][&#39;user_profile&#39;][&#39;name&#39;]" />
+        <camunda:out source="res_message_user_profile_name" target="res_message_user_profile_name" />
+        <camunda:in sourceExpression="res_message_user_profile_real_name" target="post EXTRACT response string $[&#39;message&#39;][&#39;user_profile&#39;][&#39;real_name&#39;]" />
+        <camunda:out source="res_message_user_profile_real_name" target="res_message_user_profile_real_name" />
+        <camunda:in sourceExpression="res_message_user_profile_team" target="post EXTRACT response string $[&#39;message&#39;][&#39;user_profile&#39;][&#39;team&#39;]" />
+        <camunda:out source="res_message_user_profile_team" target="res_message_user_profile_team" />
+        <camunda:in sourceExpression="res_message_user_team" target="post EXTRACT response string $[&#39;message&#39;][&#39;user_team&#39;]" />
+        <camunda:out source="res_message_user_team" target="res_message_user_team" />
+        <camunda:in sourceExpression="res_message_username" target="post EXTRACT response string $[&#39;message&#39;][&#39;username&#39;]" />
+        <camunda:out source="res_message_username" target="res_message_username" />
+        <camunda:in sourceExpression="res_ok" target="post EXTRACT response boolean $[&#39;ok&#39;]" />
+        <camunda:out source="res_ok" target="res_ok" />
+        <camunda:in sourceExpression="res_ts" target="post EXTRACT response string $[&#39;ts&#39;]" />
+        <camunda:out source="res_ts" target="res_ts" />
+        <camunda:out source="response" target="response" />
+        <camunda:in source="hp_token" target="pre SET headers String $[&#39;token&#39;]" />
+        <camunda:in sourceExpression="Bearer ${hp_Authorization}" target="pre SET headers String $[&#39;Authorization&#39;]" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0cibk96</bpmn:incoming>
+      <bpmn:outgoing>Flow_0cbmk9k</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_0qisv08" sourceRef="SetupProd" targetRef="Activity_060b7s2" />
+    <bpmn:scriptTask id="SetupProd" name="Prod" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1qe105u</bpmn:incoming>
+      <bpmn:outgoing>Flow_0qisv08</bpmn:outgoing>
+      <bpmn:script>if (execution.getVariable("channel") == null) {
+    execution.setVariable("channel",  "content-creators")
+}
+</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:eventBasedGateway id="Gateway_0kubl9d">
+      <bpmn:incoming>Flow_1o1bfc1</bpmn:incoming>
+      <bpmn:incoming>Flow_1rz7pv8</bpmn:incoming>
+      <bpmn:outgoing>Flow_1pd0dya</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0ghf8cm</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0b9wc10</bpmn:outgoing>
+    </bpmn:eventBasedGateway>
+    <bpmn:sequenceFlow id="Flow_1pd0dya" sourceRef="Gateway_0kubl9d" targetRef="Event_1ctc4mw" />
+    <bpmn:intermediateCatchEvent id="Event_022nq3s">
+      <bpmn:incoming>Flow_0b9wc10</bpmn:incoming>
+      <bpmn:outgoing>Flow_0cibk96</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0538qlr" messageRef="Message_01rsxkx" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_0b9wc10" sourceRef="Gateway_0kubl9d" targetRef="Event_022nq3s" />
+    <bpmn:sequenceFlow id="Flow_0cibk96" sourceRef="Event_022nq3s" targetRef="Activity_06ul8ex" />
+    <bpmn:sequenceFlow id="Flow_0cbmk9k" sourceRef="Activity_06ul8ex" targetRef="Gateway_1kvfyci" />
+    <bpmn:parallelGateway id="Gateway_1kvfyci">
+      <bpmn:incoming>Flow_0cbmk9k</bpmn:incoming>
+      <bpmn:incoming>Flow_1pqx0gq</bpmn:incoming>
+      <bpmn:incoming>Flow_1qtq87i</bpmn:incoming>
+      <bpmn:outgoing>Flow_1rz7pv8</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_1pqx0gq" sourceRef="Activity_0i3et24" targetRef="Gateway_1kvfyci" />
+    <bpmn:sequenceFlow id="Flow_1qtq87i" sourceRef="Activity_0cepof8" targetRef="Gateway_1kvfyci" />
+    <bpmn:sequenceFlow id="Flow_1rz7pv8" sourceRef="Gateway_1kvfyci" targetRef="Gateway_0kubl9d" />
+    <bpmn:textAnnotation id="TextAnnotation_0fphrm0">
+      <bpmn:text>Start chat thread</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1ch8lle" sourceRef="Activity_1jw5ixt" targetRef="TextAnnotation_0fphrm0" />
+    <bpmn:textAnnotation id="TextAnnotation_1x44i9y">
+      <bpmn:text>Related Tweet</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_07xck3d" sourceRef="Event_022nq3s" targetRef="TextAnnotation_1x44i9y" />
+    <bpmn:textAnnotation id="TextAnnotation_1o8xdp1">
+      <bpmn:text>Syndication Reminder</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_0annguq" sourceRef="Event_1ctc4mw" targetRef="TextAnnotation_1o8xdp1" />
   </bpmn:process>
-  <bpmn:signal id="Signal_0pln7bz" name="NewBlogPost" />
+  <bpmn:signal id="Signal_0pln7bz" name="NewBlogPostKey" />
+  <bpmn:message id="Message_01rsxkx" name="TweetBlog" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="AnnounceBlog">
       <bpmndi:BPMNEdge id="Flow_1qe105u_di" bpmnElement="Flow_1qe105u">
-        <di:waypoint x="188" y="227" />
-        <di:waypoint x="260" y="227" />
+        <di:waypoint x="218" y="120" />
+        <di:waypoint x="260" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_17zctm4_di" bpmnElement="StartEvent_1">
-        <dc:Bounds x="152" y="209" width="36" height="36" />
+        <dc:Bounds x="182" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="138" y="252" width="67" height="27" />
+          <dc:Bounds x="159" y="145" width="85" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1ok00v4_di" bpmnElement="Activity_060b7s2">
         <dc:Bounds x="260" y="187" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0ssxtcm_di" bpmnElement="Event_1jo831c">
-        <dc:Bounds x="552" y="209" width="36" height="36" />
+        <dc:Bounds x="622" y="108" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0cepof8_di" bpmnElement="Activity_0cepof8">
-        <dc:Bounds x="620" y="184" width="100" height="80" />
+        <dc:Bounds x="700" y="83" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1hbhfs5_di" bpmnElement="Flow_1hbhfs5">
-        <di:waypoint x="588" y="227" />
-        <di:waypoint x="620" y="227" />
+        <di:waypoint x="658" y="126" />
+        <di:waypoint x="700" y="126" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_0tw23ox_di" bpmnElement="Event_1ctc4mw">
-        <dc:Bounds x="552" y="322" width="36" height="36" />
+        <dc:Bounds x="622" y="209" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0i3et24_di" bpmnElement="Activity_0i3et24">
-        <dc:Bounds x="620" y="300" width="100" height="80" />
+        <dc:Bounds x="700" y="187" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1bo0iy8_di" bpmnElement="Flow_1bo0iy8">
-        <di:waypoint x="588" y="340" />
-        <di:waypoint x="620" y="340" />
+        <di:waypoint x="658" y="227" />
+        <di:waypoint x="700" y="227" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_1tvhgdi_di" bpmnElement="Event_1tvhgdi">
-        <dc:Bounds x="152" y="102" width="36" height="36" />
+        <dc:Bounds x="182" y="312" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0tkuiev_di" bpmnElement="Activity_0fzdxhy">
-        <dc:Bounds x="260" y="80" width="100" height="80" />
+        <dc:Bounds x="260" y="290" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0ihoszi_di" bpmnElement="Flow_0ihoszi">
-        <di:waypoint x="188" y="120" />
-        <di:waypoint x="260" y="120" />
+        <di:waypoint x="218" y="330" />
+        <di:waypoint x="260" y="330" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1vxlyae_di" bpmnElement="Flow_1vxlyae">
-        <di:waypoint x="310" y="160" />
-        <di:waypoint x="310" y="187" />
+        <di:waypoint x="310" y="290" />
+        <di:waypoint x="310" y="267" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_19ll0af_di" bpmnElement="Flow_19ll0af">
         <di:waypoint x="360" y="227" />
-        <di:waypoint x="420" y="227" />
+        <di:waypoint x="400" y="227" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_1xbki0c_di" bpmnElement="Activity_1jw5ixt">
-        <dc:Bounds x="420" y="187" width="100" height="80" />
+        <dc:Bounds x="400" y="187" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0ghf8cm_di" bpmnElement="Flow_0ghf8cm">
-        <di:waypoint x="520" y="227" />
-        <di:waypoint x="552" y="227" />
+        <di:waypoint x="561" y="202" />
+        <di:waypoint x="561" y="126" />
+        <di:waypoint x="622" y="126" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1o1bfc1_di" bpmnElement="Flow_1o1bfc1">
-        <di:waypoint x="520" y="227" />
+        <di:waypoint x="500" y="227" />
         <di:waypoint x="536" y="227" />
-        <di:waypoint x="536" y="340" />
-        <di:waypoint x="552" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_06ul8ex_di" bpmnElement="Activity_06ul8ex">
+        <dc:Bounds x="700" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0qisv08_di" bpmnElement="Flow_0qisv08">
+        <di:waypoint x="310" y="160" />
+        <di:waypoint x="310" y="187" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_04nrckl_di" bpmnElement="SetupProd">
+        <dc:Bounds x="260" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1fp36e5_di" bpmnElement="Gateway_0kubl9d">
+        <dc:Bounds x="536" y="202" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1pd0dya_di" bpmnElement="Flow_1pd0dya">
+        <di:waypoint x="586" y="227" />
+        <di:waypoint x="622" y="227" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_022nq3s_di" bpmnElement="Event_022nq3s">
+        <dc:Bounds x="622" y="302" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0b9wc10_di" bpmnElement="Flow_0b9wc10">
+        <di:waypoint x="561" y="252" />
+        <di:waypoint x="561" y="320" />
+        <di:waypoint x="622" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_0fphrm0_di" bpmnElement="TextAnnotation_0fphrm0">
+        <dc:Bounds x="400" y="120" width="100" height="30" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1ch8lle_di" bpmnElement="Association_1ch8lle">
+        <di:waypoint x="450" y="187" />
+        <di:waypoint x="450" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_1x44i9y_di" bpmnElement="TextAnnotation_1x44i9y">
+        <dc:Bounds x="590" y="260" width="100" height="30" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_07xck3d_di" bpmnElement="Association_07xck3d">
+        <di:waypoint x="640" y="302" />
+        <di:waypoint x="640" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_1o8xdp1_di" bpmnElement="TextAnnotation_1o8xdp1">
+        <dc:Bounds x="590" y="155" width="100" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_0annguq_di" bpmnElement="Association_0annguq">
+        <di:waypoint x="640" y="209" />
+        <di:waypoint x="640" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0cibk96_di" bpmnElement="Flow_0cibk96">
+        <di:waypoint x="658" y="320" />
+        <di:waypoint x="679" y="320" />
+        <di:waypoint x="679" y="330" />
+        <di:waypoint x="700" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0cbmk9k_di" bpmnElement="Flow_0cbmk9k">
+        <di:waypoint x="800" y="330" />
+        <di:waypoint x="910" y="330" />
+        <di:waypoint x="910" y="252" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Gateway_02rx0uf_di" bpmnElement="Gateway_1kvfyci">
+        <dc:Bounds x="885" y="202" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1pqx0gq_di" bpmnElement="Flow_1pqx0gq">
+        <di:waypoint x="800" y="227" />
+        <di:waypoint x="885" y="227" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1qtq87i_di" bpmnElement="Flow_1qtq87i">
+        <di:waypoint x="800" y="123" />
+        <di:waypoint x="910" y="123" />
+        <di:waypoint x="910" y="202" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1rz7pv8_di" bpmnElement="Flow_1rz7pv8">
+        <di:waypoint x="935" y="227" />
+        <di:waypoint x="950" y="227" />
+        <di:waypoint x="950" y="50" />
+        <di:waypoint x="550" y="50" />
+        <di:waypoint x="550" y="213" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
