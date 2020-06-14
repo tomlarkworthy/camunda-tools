@@ -33,7 +33,7 @@
           <camunda:inputParameter name="hp_token" />
           <camunda:inputParameter name="hp_Authorization">${secret}</camunda:inputParameter>
           <camunda:inputParameter name="cp_text">&lt;${url}&gt; mentions &lt;${entity_url}&gt;</camunda:inputParameter>
-          <camunda:inputParameter name="cp_channel">${channel}</camunda:inputParameter>
+          <camunda:inputParameter name="cp_channel">larktest2</camunda:inputParameter>
           <camunda:outputParameter name="channel">${ res_channel }</camunda:outputParameter>
           <camunda:outputParameter name="message">${ res_message }</camunda:outputParameter>
           <camunda:outputParameter name="message_attachments">${ res_message_attachments }</camunda:outputParameter>
@@ -473,10 +473,18 @@
 while (execution.getVariable("entity_url")  != null &amp;&amp; execution.getVariable("entity_url").contains("://t.co"))
 {
   println ("follow redirect: " + execution.getVariable("entity_url"))
+  println( "Open connection")
   def get = new URL(execution.getVariable("entity_url")).openConnection();
+  get.setInstanceFollowRedirects(false)
+  println( "Open headers")
   println("headers: " + get.getHeaderFields())
+  println( "Has Location?")
   if (get.getHeaderFields()["Location"] != null) {
     def redirect = get.getHeaderFields()["Location"][0]
+    println ("redirect: " + redirect)
+    execution.setVariable("entity_url", redirect)
+  } else if (get.getHeaderFields()["location"] != null) {
+    def redirect = get.getHeaderFields()["location"][0]
     println ("redirect: " + redirect)
     execution.setVariable("entity_url", redirect)
   } else {
@@ -507,7 +515,7 @@ println ("Tweet: " + execution.getVariable("url") + " " + execution.getVariable(
       <bpmn:script>execution.setVariable("channel", "larktest2")
 execution.setVariable("text", "Some tweet text")
 execution.setVariable("username", "Futurice")
-execution.setVariable("entity_url", "https://www.futurice.com/blog/case-corosim-operationalising-a-data-driven-management-system")
+execution.setVariable("entity_url", "https://t.co/xxQFp8b6cl")
 execution.setVariable("url", "https://twitter.com/futurice/status/1267790509545861120")</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:endEvent id="Event_0v80r5n">
@@ -516,9 +524,10 @@ execution.setVariable("url", "https://twitter.com/futurice/status/12677905095458
     <bpmn:sequenceFlow id="Flow_0ee9y9p" sourceRef="Activity_0bien1m" targetRef="Event_0v80r5n" />
     <bpmn:sequenceFlow id="topicThreadExists" name="topicThreadExists" sourceRef="router" targetRef="sendTweetToBlogTopic">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="groovy">println ("Check for process with BK: " + execution.getVariable("entity_path"))
-return execution.getProcessEngineServices().getRuntimeService().createProcessInstanceQuery()
-  .processInstanceBusinessKey(execution.getVariable("entity_path"))
-  .singleResult() != null</bpmn:conditionExpression>
+return execution.getVariable("entity_path") != null &amp;&amp; 
+    execution.getProcessEngineServices().getRuntimeService().createProcessInstanceQuery()
+      .processInstanceBusinessKey(execution.getVariable("entity_path"))
+      .singleResult() != null</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:scriptTask id="sendTweetToBlogTopic" name="Correlate Message" scriptFormat="groovy">
       <bpmn:incoming>topicThreadExists</bpmn:incoming>

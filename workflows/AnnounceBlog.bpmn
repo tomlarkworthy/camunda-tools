@@ -1043,8 +1043,7 @@ execution.setVariable("channel",
       <bpmn:outgoing>Flow_0qisv08</bpmn:outgoing>
       <bpmn:script>if (execution.getVariable("channel") == null) {
     execution.setVariable("channel",  "content-creators")
-}
-</bpmn:script>
+}</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:eventBasedGateway id="Gateway_0kubl9d">
       <bpmn:incoming>Flow_1o1bfc1</bpmn:incoming>
@@ -1062,15 +1061,15 @@ execution.setVariable("channel",
     <bpmn:sequenceFlow id="Flow_0b9wc10" sourceRef="Gateway_0kubl9d" targetRef="Event_022nq3s" />
     <bpmn:sequenceFlow id="Flow_0cibk96" sourceRef="Event_022nq3s" targetRef="Activity_06ul8ex" />
     <bpmn:sequenceFlow id="Flow_0cbmk9k" sourceRef="Activity_06ul8ex" targetRef="Gateway_1kvfyci" />
-    <bpmn:parallelGateway id="Gateway_1kvfyci">
+    <bpmn:sequenceFlow id="Flow_1pqx0gq" sourceRef="Activity_0i3et24" targetRef="Gateway_1kvfyci" />
+    <bpmn:sequenceFlow id="Flow_1qtq87i" sourceRef="Activity_0cepof8" targetRef="Gateway_1kvfyci" />
+    <bpmn:sequenceFlow id="Flow_1rz7pv8" sourceRef="Gateway_1kvfyci" targetRef="Gateway_0kubl9d" />
+    <bpmn:inclusiveGateway id="Gateway_1kvfyci">
       <bpmn:incoming>Flow_0cbmk9k</bpmn:incoming>
       <bpmn:incoming>Flow_1pqx0gq</bpmn:incoming>
       <bpmn:incoming>Flow_1qtq87i</bpmn:incoming>
       <bpmn:outgoing>Flow_1rz7pv8</bpmn:outgoing>
-    </bpmn:parallelGateway>
-    <bpmn:sequenceFlow id="Flow_1pqx0gq" sourceRef="Activity_0i3et24" targetRef="Gateway_1kvfyci" />
-    <bpmn:sequenceFlow id="Flow_1qtq87i" sourceRef="Activity_0cepof8" targetRef="Gateway_1kvfyci" />
-    <bpmn:sequenceFlow id="Flow_1rz7pv8" sourceRef="Gateway_1kvfyci" targetRef="Gateway_0kubl9d" />
+    </bpmn:inclusiveGateway>
     <bpmn:textAnnotation id="TextAnnotation_0fphrm0">
       <bpmn:text>Start chat thread</bpmn:text>
     </bpmn:textAnnotation>
@@ -1169,12 +1168,12 @@ execution.setVariable("channel",
         <di:waypoint x="622" y="227" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_022nq3s_di" bpmnElement="Event_022nq3s">
-        <dc:Bounds x="622" y="302" width="36" height="36" />
+        <dc:Bounds x="622" y="312" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0b9wc10_di" bpmnElement="Flow_0b9wc10">
         <di:waypoint x="561" y="252" />
-        <di:waypoint x="561" y="320" />
-        <di:waypoint x="622" y="320" />
+        <di:waypoint x="561" y="330" />
+        <di:waypoint x="622" y="330" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="TextAnnotation_0fphrm0_di" bpmnElement="TextAnnotation_0fphrm0">
         <dc:Bounds x="400" y="120" width="100" height="30" />
@@ -1184,11 +1183,11 @@ execution.setVariable("channel",
         <di:waypoint x="450" y="150" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="TextAnnotation_1x44i9y_di" bpmnElement="TextAnnotation_1x44i9y">
-        <dc:Bounds x="590" y="260" width="100" height="30" />
+        <dc:Bounds x="590" y="270" width="100" height="30" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Association_07xck3d_di" bpmnElement="Association_07xck3d">
-        <di:waypoint x="640" y="302" />
-        <di:waypoint x="640" y="290" />
+        <di:waypoint x="640" y="312" />
+        <di:waypoint x="640" y="300" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="TextAnnotation_1o8xdp1_di" bpmnElement="TextAnnotation_1o8xdp1">
         <dc:Bounds x="590" y="155" width="100" height="40" />
@@ -1198,9 +1197,7 @@ execution.setVariable("channel",
         <di:waypoint x="640" y="195" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0cibk96_di" bpmnElement="Flow_0cibk96">
-        <di:waypoint x="658" y="320" />
-        <di:waypoint x="679" y="320" />
-        <di:waypoint x="679" y="330" />
+        <di:waypoint x="658" y="330" />
         <di:waypoint x="700" y="330" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0cbmk9k_di" bpmnElement="Flow_0cbmk9k">
@@ -1208,9 +1205,6 @@ execution.setVariable("channel",
         <di:waypoint x="910" y="330" />
         <di:waypoint x="910" y="252" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Gateway_02rx0uf_di" bpmnElement="Gateway_1kvfyci">
-        <dc:Bounds x="885" y="202" width="50" height="50" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1pqx0gq_di" bpmnElement="Flow_1pqx0gq">
         <di:waypoint x="800" y="227" />
         <di:waypoint x="885" y="227" />
@@ -1222,11 +1216,14 @@ execution.setVariable("channel",
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1rz7pv8_di" bpmnElement="Flow_1rz7pv8">
         <di:waypoint x="935" y="227" />
-        <di:waypoint x="950" y="227" />
-        <di:waypoint x="950" y="50" />
+        <di:waypoint x="960" y="227" />
+        <di:waypoint x="960" y="50" />
         <di:waypoint x="550" y="50" />
         <di:waypoint x="550" y="213" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Gateway_18u6c9j_di" bpmnElement="Gateway_1kvfyci">
+        <dc:Bounds x="885" y="202" width="50" height="50" />
+      </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>
