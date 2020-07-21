@@ -1,0 +1,535 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1imimcj" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
+  <bpmn:process id="TestGoogleAnalytics" name="TestGoogleAnalytics" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_1n4urzy</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:callActivity id="getToken" name="Fetch Token" calledElement="FetchToken">
+      <bpmn:extensionElements>
+        <camunda:out source="token" target="token" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1n4urzy</bpmn:incoming>
+      <bpmn:outgoing>Flow_0sd2wvh</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_1n4urzy" sourceRef="StartEvent_1" targetRef="getToken" />
+    <bpmn:sequenceFlow id="Flow_0sd2wvh" sourceRef="getToken" targetRef="Activity_1lhtyv4" />
+    <bpmn:scriptTask id="printOutcome" scriptFormat="groovy">
+      <bpmn:incoming>Flow_0quv8rh</bpmn:incoming>
+      <bpmn:outgoing>Flow_1n8e002</bpmn:outgoing>
+      <bpmn:script>println( execution.getVariable("response"))</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="Event_1yne7nj">
+      <bpmn:incoming>Flow_1n8e002</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1n8e002" sourceRef="printOutcome" targetRef="Event_1yne7nj" />
+    <bpmn:sequenceFlow id="Flow_0quv8rh" sourceRef="Activity_1lhtyv4" targetRef="printOutcome" />
+    <bpmn:callActivity id="Activity_1lhtyv4" name="POST /v4/reports:batchGet" camunda:modelerTemplate="POST-/v4/reports:batchGet" calledElement="ApiClient">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="content">{}</camunda:inputParameter>
+          <camunda:inputParameter name="cp_reportRequests" />
+          <camunda:inputParameter name="cp_reportRequests_0_cohortGroup" />
+          <camunda:inputParameter name="cp_reportRequests_0_cohortGroup_cohorts" />
+          <camunda:inputParameter name="cp_reportRequests_0_cohortGroup_cohorts_0_dateRange" />
+          <camunda:inputParameter name="cp_reportRequests_0_cohortGroup_cohorts_0_dateRange_endDate" />
+          <camunda:inputParameter name="cp_reportRequests_0_cohortGroup_cohorts_0_dateRange_startDate" />
+          <camunda:inputParameter name="cp_reportRequests_0_cohortGroup_cohorts_0_name" />
+          <camunda:inputParameter name="cp_reportRequests_0_cohortGroup_cohorts_0_type" />
+          <camunda:inputParameter name="cp_reportRequests_0_cohortGroup_lifetimeValue" />
+          <camunda:inputParameter name="cp_reportRequests_0_dateRanges" />
+          <camunda:inputParameter name="cp_reportRequests_0_dimensionFilterClauses" />
+          <camunda:inputParameter name="cp_reportRequests_0_dimensionFilterClauses_0_filters_0_caseSensitive" />
+          <camunda:inputParameter name="cp_reportRequests_0_dimensionFilterClauses_0_filters_0_not" />
+          <camunda:inputParameter name="cp_reportRequests_0_dimensions_0_histogramBuckets" />
+          <camunda:inputParameter name="cp_reportRequests_0_filtersExpression" />
+          <camunda:inputParameter name="cp_reportRequests_0_hideTotals" />
+          <camunda:inputParameter name="cp_reportRequests_0_hideValueRanges" />
+          <camunda:inputParameter name="cp_reportRequests_0_includeEmptyRows" />
+          <camunda:inputParameter name="cp_reportRequests_0_metricFilterClauses" />
+          <camunda:inputParameter name="cp_reportRequests_0_metricFilterClauses_0_filters" />
+          <camunda:inputParameter name="cp_reportRequests_0_metricFilterClauses_0_filters_0_comparisonValue" />
+          <camunda:inputParameter name="cp_reportRequests_0_metricFilterClauses_0_filters_0_metricName" />
+          <camunda:inputParameter name="cp_reportRequests_0_metricFilterClauses_0_filters_0_not" />
+          <camunda:inputParameter name="cp_reportRequests_0_metricFilterClauses_0_filters_0_operator" />
+          <camunda:inputParameter name="cp_reportRequests_0_metricFilterClauses_0_operator" />
+          <camunda:inputParameter name="cp_reportRequests_0_metrics_0_expression" />
+          <camunda:inputParameter name="cp_reportRequests_0_metrics_0_formattingType" />
+          <camunda:inputParameter name="cp_reportRequests_0_orderBys" />
+          <camunda:inputParameter name="cp_reportRequests_0_orderBys_0_fieldName" />
+          <camunda:inputParameter name="cp_reportRequests_0_orderBys_0_orderType" />
+          <camunda:inputParameter name="cp_reportRequests_0_orderBys_0_sortOrder" />
+          <camunda:inputParameter name="cp_reportRequests_0_pageSize" />
+          <camunda:inputParameter name="cp_reportRequests_0_pageToken" />
+          <camunda:inputParameter name="cp_reportRequests_0_pivots" />
+          <camunda:inputParameter name="cp_reportRequests_0_pivots_0_dimensionFilterClauses" />
+          <camunda:inputParameter name="cp_reportRequests_0_pivots_0_dimensionFilterClauses_0_filters" />
+          <camunda:inputParameter name="cp_reportRequests_0_pivots_0_dimensionFilterClauses_0_filters_0_caseSensitive" />
+          <camunda:inputParameter name="cp_reportRequests_0_pivots_0_dimensionFilterClauses_0_filters_0_dimensionName" />
+          <camunda:inputParameter name="cp_reportRequests_0_pivots_0_dimensionFilterClauses_0_filters_0_expressions" />
+          <camunda:inputParameter name="cp_reportRequests_0_pivots_0_dimensionFilterClauses_0_filters_0_not" />
+          <camunda:inputParameter name="cp_reportRequests_0_pivots_0_dimensionFilterClauses_0_filters_0_operator" />
+          <camunda:inputParameter name="cp_reportRequests_0_pivots_0_dimensionFilterClauses_0_operator" />
+          <camunda:inputParameter name="cp_reportRequests_0_pivots_0_dimensions" />
+          <camunda:inputParameter name="cp_reportRequests_0_pivots_0_dimensions_0_histogramBuckets" />
+          <camunda:inputParameter name="cp_reportRequests_0_pivots_0_dimensions_0_name" />
+          <camunda:inputParameter name="cp_reportRequests_0_pivots_0_maxGroupCount" />
+          <camunda:inputParameter name="cp_reportRequests_0_pivots_0_metrics" />
+          <camunda:inputParameter name="cp_reportRequests_0_pivots_0_metrics_0_alias" />
+          <camunda:inputParameter name="cp_reportRequests_0_pivots_0_metrics_0_expression" />
+          <camunda:inputParameter name="cp_reportRequests_0_pivots_0_metrics_0_formattingType" />
+          <camunda:inputParameter name="cp_reportRequests_0_pivots_0_startGroup" />
+          <camunda:inputParameter name="cp_reportRequests_0_samplingLevel" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_name" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_not" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_firstStepShouldMatchFirstHit" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_matchType" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_caseSensitive" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_dimensionName" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_expressions" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_maxComparisonValue" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_minComparisonValue" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_operator" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_comparisonValue" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_maxComparisonValue" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_metricName" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_operator" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_scope" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_not" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_caseSensitive" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_dimensionName" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_expressions" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_maxComparisonValue" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_minComparisonValue" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_operator" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_comparisonValue" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_maxComparisonValue" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_metricName" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_operator" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_scope" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_not" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_not" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_firstStepShouldMatchFirstHit" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_matchType" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_caseSensitive" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_dimensionName" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_expressions" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_maxComparisonValue" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_minComparisonValue" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_operator" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_comparisonValue" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_maxComparisonValue" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_metricName" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_operator" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_scope" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_not" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_caseSensitive" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_dimensionName" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_expressions" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_maxComparisonValue" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_minComparisonValue" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_operator" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_comparisonValue" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_maxComparisonValue" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_metricName" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_operator" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_scope" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_not" />
+          <camunda:inputParameter name="cp_reportRequests_0_segments_0_segmentId" />
+          <camunda:inputParameter name="cp_useResourceQuotas" />
+          <camunda:inputParameter name="qp_alt" />
+          <camunda:inputParameter name="qp_access_token" />
+          <camunda:inputParameter name="qp_key" />
+          <camunda:inputParameter name="qp_upload_protocol" />
+          <camunda:inputParameter name="qp_quotaUser" />
+          <camunda:inputParameter name="qp_prettyPrint" />
+          <camunda:inputParameter name="qp_fields" />
+          <camunda:inputParameter name="qp_uploadType" />
+          <camunda:inputParameter name="qp_callback" />
+          <camunda:inputParameter name="qp_oauth_token" />
+          <camunda:inputParameter name="qp_$.xgafv" />
+          <camunda:inputParameter name="cp_reportRequests_0_dateRanges_0_startDate">2020-06-01</camunda:inputParameter>
+          <camunda:inputParameter name="cp_reportRequests_0_viewId">91878182</camunda:inputParameter>
+          <camunda:inputParameter name="cp_reportRequests_0_dateRanges_0_endDate">2020-07-01</camunda:inputParameter>
+          <camunda:inputParameter name="cp_reportRequests_0_metrics_0_alias"></camunda:inputParameter>
+          <camunda:inputParameter name="cp_reportRequests_0_dimensionFilterClauses_0_filters"></camunda:inputParameter>
+          <camunda:inputParameter name="cp_reportRequests_0_dimensionFilterClauses_0_filters_0_dimensionName">ga:landingPagePath</camunda:inputParameter>
+          <camunda:inputParameter name="cp_reportRequests_0_dimensionFilterClauses_0_filters_0_expressions">["/blog/openresty-a-swiss-army-proxy-for-serverless"]</camunda:inputParameter>
+          <camunda:inputParameter name="cp_reportRequests_0_dimensions_0_name"></camunda:inputParameter>
+          <camunda:inputParameter name="cp_reportRequests_0_dimensions">[{             "name":"ga:landingPagePath"         },{             "name":"ga:exitPagePath"         }]</camunda:inputParameter>
+          <camunda:inputParameter name="cp_reportRequests_0_metrics">[{             "expression":"ga:newUsers"         },{             "expression":"ga:pageviews"         },{             "expression":"ga:avgSessionDuration"         }]</camunda:inputParameter>
+          <camunda:inputParameter name="cp_reportRequests_0_dimensionFilterClauses_0_operator"></camunda:inputParameter>
+          <camunda:inputParameter name="cp_reportRequests_0_dimensionFilterClauses_0_filters_0_operator">BEGINS_WITH</camunda:inputParameter>
+          <camunda:inputParameter name="hp_Authorization">ya29.a0AfH6SMAwUS9M2tWihbq3RNHckDIpgJ5WA2jVkXIumfTlxmNqlR_XW86Bt5zCIWHiktA9IKSPmUS5gVtT42kmteLtstUtnVFrYqAIUSxASHD0B3LTLOQrpOEx9Szlkuax2mP_omDYsgyQG8CE98zoLoTnLMbp0nomD9Ay</camunda:inputParameter>
+          <camunda:outputParameter name="queryCost">${ res_queryCost }</camunda:outputParameter>
+          <camunda:outputParameter name="reports">${ res_reports }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_columnHeader">${ res_reports_0_columnHeader }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_columnHeader_dimensions">${ res_reports_0_columnHeader_dimensions }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_columnHeader_metricHeader">${ res_reports_0_columnHeader_metricHeader }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_columnHeader_metricHeader_metricHeaderEntries">${ res_reports_0_columnHeader_metricHeader_metricHeaderEntries }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_columnHeader_metricHeader_metricHeaderEntries_0_name">${ res_reports_0_columnHeader_metricHeader_metricHeaderEntries_0_name }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_columnHeader_metricHeader_metricHeaderEntries_0_type">${ res_reports_0_columnHeader_metricHeader_metricHeaderEntries_0_type }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_columnHeader_metricHeader_pivotHeaders">${ res_reports_0_columnHeader_metricHeader_pivotHeaders }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries">${ res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_dimensionNames">${ res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_dimensionNames }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_dimensionValues">${ res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_dimensionValues }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_metric">${ res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_metric }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_metric_name">${ res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_metric_name }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_metric_type">${ res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_metric_type }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_columnHeader_metricHeader_pivotHeaders_0_totalPivotGroupsCount">${ res_reports_0_columnHeader_metricHeader_pivotHeaders_0_totalPivotGroupsCount }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data">${ res_reports_0_data }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_dataLastRefreshed">${ res_reports_0_data_dataLastRefreshed }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_isDataGolden">${ res_reports_0_data_isDataGolden }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_maximums">${ res_reports_0_data_maximums }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_maximums_0_pivotValueRegions">${ res_reports_0_data_maximums_0_pivotValueRegions }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_maximums_0_pivotValueRegions_0_values">${ res_reports_0_data_maximums_0_pivotValueRegions_0_values }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_maximums_0_values">${ res_reports_0_data_maximums_0_values }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_minimums">${ res_reports_0_data_minimums }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_minimums_0_pivotValueRegions">${ res_reports_0_data_minimums_0_pivotValueRegions }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_minimums_0_pivotValueRegions_0_values">${ res_reports_0_data_minimums_0_pivotValueRegions_0_values }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_minimums_0_values">${ res_reports_0_data_minimums_0_values }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_rowCount">${ res_reports_0_data_rowCount }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_rows">${ res_reports_0_data_rows }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_rows_0_dimensions">${ res_reports_0_data_rows_0_dimensions }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_rows_0_metrics">${ res_reports_0_data_rows_0_metrics }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_rows_0_metrics_0_pivotValueRegions">${ res_reports_0_data_rows_0_metrics_0_pivotValueRegions }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_rows_0_metrics_0_pivotValueRegions_0_values">${ res_reports_0_data_rows_0_metrics_0_pivotValueRegions_0_values }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_rows_0_metrics_0_values">${ res_reports_0_data_rows_0_metrics_0_values }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_samplesReadCounts">${ res_reports_0_data_samplesReadCounts }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_samplingSpaceSizes">${ res_reports_0_data_samplingSpaceSizes }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_totals">${ res_reports_0_data_totals }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_totals_0_pivotValueRegions">${ res_reports_0_data_totals_0_pivotValueRegions }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_totals_0_pivotValueRegions_0_values">${ res_reports_0_data_totals_0_pivotValueRegions_0_values }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_data_totals_0_values">${ res_reports_0_data_totals_0_values }</camunda:outputParameter>
+          <camunda:outputParameter name="reports_0_nextPageToken">${ res_reports_0_nextPageToken }</camunda:outputParameter>
+          <camunda:outputParameter name="resourceQuotasRemaining">${ res_resourceQuotasRemaining }</camunda:outputParameter>
+          <camunda:outputParameter name="resourceQuotasRemaining_dailyQuotaTokensRemaining">${ res_resourceQuotasRemaining_dailyQuotaTokensRemaining }</camunda:outputParameter>
+          <camunda:outputParameter name="resourceQuotasRemaining_hourlyQuotaTokensRemaining">${ res_resourceQuotasRemaining_hourlyQuotaTokensRemaining }</camunda:outputParameter>
+          <camunda:outputParameter name="response">${ response }</camunda:outputParameter>
+        </camunda:inputOutput>
+        <camunda:in sourceExpression="POST" target="method" />
+        <camunda:in sourceExpression="https://analyticsreporting.googleapis.com//v4/reports:batchGet" target="url" />
+        <camunda:in sourceExpression="application/json" target="pre SET headers String $[&#39;Content-Type&#39;]" />
+        <camunda:in source="content" target="request" />
+        <camunda:in source="cp_reportRequests" target="pre SET request array $[&#39;reportRequests&#39;]" />
+        <camunda:in source="cp_reportRequests_0_cohortGroup" target="pre SET request object $[&#39;reportRequests&#39;][0][&#39;cohortGroup&#39;]" />
+        <camunda:in source="cp_reportRequests_0_cohortGroup_cohorts" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;cohortGroup&#39;][&#39;cohorts&#39;]" />
+        <camunda:in source="cp_reportRequests_0_cohortGroup_cohorts_0_dateRange" target="pre SET request object $[&#39;reportRequests&#39;][0][&#39;cohortGroup&#39;][&#39;cohorts&#39;][0][&#39;dateRange&#39;]" />
+        <camunda:in source="cp_reportRequests_0_cohortGroup_cohorts_0_dateRange_endDate" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;cohortGroup&#39;][&#39;cohorts&#39;][0][&#39;dateRange&#39;][&#39;endDate&#39;]" />
+        <camunda:in source="cp_reportRequests_0_cohortGroup_cohorts_0_dateRange_startDate" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;cohortGroup&#39;][&#39;cohorts&#39;][0][&#39;dateRange&#39;][&#39;startDate&#39;]" />
+        <camunda:in source="cp_reportRequests_0_cohortGroup_cohorts_0_name" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;cohortGroup&#39;][&#39;cohorts&#39;][0][&#39;name&#39;]" />
+        <camunda:in source="cp_reportRequests_0_cohortGroup_cohorts_0_type" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;cohortGroup&#39;][&#39;cohorts&#39;][0][&#39;type&#39;]" />
+        <camunda:in source="cp_reportRequests_0_cohortGroup_lifetimeValue" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;cohortGroup&#39;][&#39;lifetimeValue&#39;]" />
+        <camunda:in source="cp_reportRequests_0_dateRanges" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;dateRanges&#39;]" />
+        <camunda:in source="cp_reportRequests_0_dateRanges_0_endDate" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;dateRanges&#39;][0][&#39;endDate&#39;]" />
+        <camunda:in source="cp_reportRequests_0_dateRanges_0_startDate" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;dateRanges&#39;][0][&#39;startDate&#39;]" />
+        <camunda:in source="cp_reportRequests_0_dimensionFilterClauses" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;dimensionFilterClauses&#39;]" />
+        <camunda:in source="cp_reportRequests_0_dimensionFilterClauses_0_filters" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;dimensionFilterClauses&#39;][0][&#39;filters&#39;]" />
+        <camunda:in source="cp_reportRequests_0_dimensionFilterClauses_0_filters_0_caseSensitive" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;dimensionFilterClauses&#39;][0][&#39;filters&#39;][0][&#39;caseSensitive&#39;]" />
+        <camunda:in source="cp_reportRequests_0_dimensionFilterClauses_0_filters_0_dimensionName" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;dimensionFilterClauses&#39;][0][&#39;filters&#39;][0][&#39;dimensionName&#39;]" />
+        <camunda:in source="cp_reportRequests_0_dimensionFilterClauses_0_filters_0_expressions" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;dimensionFilterClauses&#39;][0][&#39;filters&#39;][0][&#39;expressions&#39;]" />
+        <camunda:in source="cp_reportRequests_0_dimensionFilterClauses_0_filters_0_not" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;dimensionFilterClauses&#39;][0][&#39;filters&#39;][0][&#39;not&#39;]" />
+        <camunda:in source="cp_reportRequests_0_dimensionFilterClauses_0_filters_0_operator" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;dimensionFilterClauses&#39;][0][&#39;filters&#39;][0][&#39;operator&#39;]" />
+        <camunda:in source="cp_reportRequests_0_dimensionFilterClauses_0_operator" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;dimensionFilterClauses&#39;][0][&#39;operator&#39;]" />
+        <camunda:in source="cp_reportRequests_0_dimensions" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;dimensions&#39;]" />
+        <camunda:in source="cp_reportRequests_0_dimensions_0_histogramBuckets" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;dimensions&#39;][0][&#39;histogramBuckets&#39;]" />
+        <camunda:in source="cp_reportRequests_0_dimensions_0_name" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;dimensions&#39;][0][&#39;name&#39;]" />
+        <camunda:in source="cp_reportRequests_0_filtersExpression" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;filtersExpression&#39;]" />
+        <camunda:in source="cp_reportRequests_0_hideTotals" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;hideTotals&#39;]" />
+        <camunda:in source="cp_reportRequests_0_hideValueRanges" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;hideValueRanges&#39;]" />
+        <camunda:in source="cp_reportRequests_0_includeEmptyRows" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;includeEmptyRows&#39;]" />
+        <camunda:in source="cp_reportRequests_0_metricFilterClauses" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;metricFilterClauses&#39;]" />
+        <camunda:in source="cp_reportRequests_0_metricFilterClauses_0_filters" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;metricFilterClauses&#39;][0][&#39;filters&#39;]" />
+        <camunda:in source="cp_reportRequests_0_metricFilterClauses_0_filters_0_comparisonValue" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;metricFilterClauses&#39;][0][&#39;filters&#39;][0][&#39;comparisonValue&#39;]" />
+        <camunda:in source="cp_reportRequests_0_metricFilterClauses_0_filters_0_metricName" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;metricFilterClauses&#39;][0][&#39;filters&#39;][0][&#39;metricName&#39;]" />
+        <camunda:in source="cp_reportRequests_0_metricFilterClauses_0_filters_0_not" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;metricFilterClauses&#39;][0][&#39;filters&#39;][0][&#39;not&#39;]" />
+        <camunda:in source="cp_reportRequests_0_metricFilterClauses_0_filters_0_operator" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;metricFilterClauses&#39;][0][&#39;filters&#39;][0][&#39;operator&#39;]" />
+        <camunda:in source="cp_reportRequests_0_metricFilterClauses_0_operator" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;metricFilterClauses&#39;][0][&#39;operator&#39;]" />
+        <camunda:in source="cp_reportRequests_0_metrics" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;metrics&#39;]" />
+        <camunda:in source="cp_reportRequests_0_metrics_0_alias" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;metrics&#39;][0][&#39;alias&#39;]" />
+        <camunda:in source="cp_reportRequests_0_metrics_0_expression" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;metrics&#39;][0][&#39;expression&#39;]" />
+        <camunda:in source="cp_reportRequests_0_metrics_0_formattingType" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;metrics&#39;][0][&#39;formattingType&#39;]" />
+        <camunda:in source="cp_reportRequests_0_orderBys" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;orderBys&#39;]" />
+        <camunda:in source="cp_reportRequests_0_orderBys_0_fieldName" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;orderBys&#39;][0][&#39;fieldName&#39;]" />
+        <camunda:in source="cp_reportRequests_0_orderBys_0_orderType" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;orderBys&#39;][0][&#39;orderType&#39;]" />
+        <camunda:in source="cp_reportRequests_0_orderBys_0_sortOrder" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;orderBys&#39;][0][&#39;sortOrder&#39;]" />
+        <camunda:in source="cp_reportRequests_0_pageSize" target="pre SET request integer $[&#39;reportRequests&#39;][0][&#39;pageSize&#39;]" />
+        <camunda:in source="cp_reportRequests_0_pageToken" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;pageToken&#39;]" />
+        <camunda:in source="cp_reportRequests_0_pivots" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;pivots&#39;]" />
+        <camunda:in source="cp_reportRequests_0_pivots_0_dimensionFilterClauses" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;pivots&#39;][0][&#39;dimensionFilterClauses&#39;]" />
+        <camunda:in source="cp_reportRequests_0_pivots_0_dimensionFilterClauses_0_filters" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;pivots&#39;][0][&#39;dimensionFilterClauses&#39;][0][&#39;filters&#39;]" />
+        <camunda:in source="cp_reportRequests_0_pivots_0_dimensionFilterClauses_0_filters_0_caseSensitive" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;pivots&#39;][0][&#39;dimensionFilterClauses&#39;][0][&#39;filters&#39;][0][&#39;caseSensitive&#39;]" />
+        <camunda:in source="cp_reportRequests_0_pivots_0_dimensionFilterClauses_0_filters_0_dimensionName" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;pivots&#39;][0][&#39;dimensionFilterClauses&#39;][0][&#39;filters&#39;][0][&#39;dimensionName&#39;]" />
+        <camunda:in source="cp_reportRequests_0_pivots_0_dimensionFilterClauses_0_filters_0_expressions" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;pivots&#39;][0][&#39;dimensionFilterClauses&#39;][0][&#39;filters&#39;][0][&#39;expressions&#39;]" />
+        <camunda:in source="cp_reportRequests_0_pivots_0_dimensionFilterClauses_0_filters_0_not" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;pivots&#39;][0][&#39;dimensionFilterClauses&#39;][0][&#39;filters&#39;][0][&#39;not&#39;]" />
+        <camunda:in source="cp_reportRequests_0_pivots_0_dimensionFilterClauses_0_filters_0_operator" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;pivots&#39;][0][&#39;dimensionFilterClauses&#39;][0][&#39;filters&#39;][0][&#39;operator&#39;]" />
+        <camunda:in source="cp_reportRequests_0_pivots_0_dimensionFilterClauses_0_operator" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;pivots&#39;][0][&#39;dimensionFilterClauses&#39;][0][&#39;operator&#39;]" />
+        <camunda:in source="cp_reportRequests_0_pivots_0_dimensions" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;pivots&#39;][0][&#39;dimensions&#39;]" />
+        <camunda:in source="cp_reportRequests_0_pivots_0_dimensions_0_histogramBuckets" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;pivots&#39;][0][&#39;dimensions&#39;][0][&#39;histogramBuckets&#39;]" />
+        <camunda:in source="cp_reportRequests_0_pivots_0_dimensions_0_name" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;pivots&#39;][0][&#39;dimensions&#39;][0][&#39;name&#39;]" />
+        <camunda:in source="cp_reportRequests_0_pivots_0_maxGroupCount" target="pre SET request integer $[&#39;reportRequests&#39;][0][&#39;pivots&#39;][0][&#39;maxGroupCount&#39;]" />
+        <camunda:in source="cp_reportRequests_0_pivots_0_metrics" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;pivots&#39;][0][&#39;metrics&#39;]" />
+        <camunda:in source="cp_reportRequests_0_pivots_0_metrics_0_alias" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;pivots&#39;][0][&#39;metrics&#39;][0][&#39;alias&#39;]" />
+        <camunda:in source="cp_reportRequests_0_pivots_0_metrics_0_expression" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;pivots&#39;][0][&#39;metrics&#39;][0][&#39;expression&#39;]" />
+        <camunda:in source="cp_reportRequests_0_pivots_0_metrics_0_formattingType" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;pivots&#39;][0][&#39;metrics&#39;][0][&#39;formattingType&#39;]" />
+        <camunda:in source="cp_reportRequests_0_pivots_0_startGroup" target="pre SET request integer $[&#39;reportRequests&#39;][0][&#39;pivots&#39;][0][&#39;startGroup&#39;]" />
+        <camunda:in source="cp_reportRequests_0_samplingLevel" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;samplingLevel&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;segments&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment" target="pre SET request object $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_name" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;name&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment" target="pre SET request object $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_not" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;not&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment" target="pre SET request object $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_firstStepShouldMatchFirstHit" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;firstStepShouldMatchFirstHit&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_matchType" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;matchType&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter" target="pre SET request object $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_caseSensitive" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;caseSensitive&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_dimensionName" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;dimensionName&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_expressions" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;expressions&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_maxComparisonValue" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;maxComparisonValue&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_minComparisonValue" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;minComparisonValue&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_operator" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;operator&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter" target="pre SET request object $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_comparisonValue" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;][&#39;comparisonValue&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_maxComparisonValue" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;][&#39;maxComparisonValue&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_metricName" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;][&#39;metricName&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_operator" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;][&#39;operator&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_scope" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;][&#39;scope&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_not" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;not&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment" target="pre SET request object $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter" target="pre SET request object $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_caseSensitive" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;caseSensitive&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_dimensionName" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;dimensionName&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_expressions" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;expressions&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_maxComparisonValue" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;maxComparisonValue&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_minComparisonValue" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;minComparisonValue&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_operator" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;operator&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter" target="pre SET request object $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_comparisonValue" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;][&#39;comparisonValue&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_maxComparisonValue" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;][&#39;maxComparisonValue&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_metricName" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;][&#39;metricName&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_operator" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;][&#39;operator&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_scope" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;][&#39;scope&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_sessionSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_not" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;sessionSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;not&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment" target="pre SET request object $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_not" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;not&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment" target="pre SET request object $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_firstStepShouldMatchFirstHit" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;firstStepShouldMatchFirstHit&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_matchType" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;matchType&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter" target="pre SET request object $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_caseSensitive" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;caseSensitive&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_dimensionName" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;dimensionName&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_expressions" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;expressions&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_maxComparisonValue" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;maxComparisonValue&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_minComparisonValue" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;minComparisonValue&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_operator" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;operator&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter" target="pre SET request object $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_comparisonValue" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;][&#39;comparisonValue&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_maxComparisonValue" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;][&#39;maxComparisonValue&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_metricName" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;][&#39;metricName&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_operator" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;][&#39;operator&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_scope" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;][&#39;scope&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_sequenceSegment_segmentSequenceSteps_0_orFiltersForSegment_0_segmentFilterClauses_0_not" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;sequenceSegment&#39;][&#39;segmentSequenceSteps&#39;][0][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;not&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment" target="pre SET request object $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter" target="pre SET request object $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_caseSensitive" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;caseSensitive&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_dimensionName" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;dimensionName&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_expressions" target="pre SET request array $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;expressions&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_maxComparisonValue" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;maxComparisonValue&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_minComparisonValue" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;minComparisonValue&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_dimensionFilter_operator" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;dimensionFilter&#39;][&#39;operator&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter" target="pre SET request object $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_comparisonValue" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;][&#39;comparisonValue&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_maxComparisonValue" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;][&#39;maxComparisonValue&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_metricName" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;][&#39;metricName&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_operator" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;][&#39;operator&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_metricFilter_scope" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;metricFilter&#39;][&#39;scope&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_dynamicSegment_userSegment_segmentFilters_0_simpleSegment_orFiltersForSegment_0_segmentFilterClauses_0_not" target="pre SET request boolean $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;dynamicSegment&#39;][&#39;userSegment&#39;][&#39;segmentFilters&#39;][0][&#39;simpleSegment&#39;][&#39;orFiltersForSegment&#39;][0][&#39;segmentFilterClauses&#39;][0][&#39;not&#39;]" />
+        <camunda:in source="cp_reportRequests_0_segments_0_segmentId" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;segments&#39;][0][&#39;segmentId&#39;]" />
+        <camunda:in source="cp_reportRequests_0_viewId" target="pre SET request string $[&#39;reportRequests&#39;][0][&#39;viewId&#39;]" />
+        <camunda:in source="cp_useResourceQuotas" target="pre SET request boolean $[&#39;useResourceQuotas&#39;]" />
+        <camunda:in sourceExpression="res_queryCost" target="post EXTRACT response integer $[&#39;queryCost&#39;]" />
+        <camunda:out source="res_queryCost" target="res_queryCost" />
+        <camunda:in sourceExpression="res_reports" target="post EXTRACT response array $[&#39;reports&#39;]" />
+        <camunda:out source="res_reports" target="res_reports" />
+        <camunda:in sourceExpression="res_reports_0_columnHeader" target="post EXTRACT response object $[&#39;reports&#39;][0][&#39;columnHeader&#39;]" />
+        <camunda:out source="res_reports_0_columnHeader" target="res_reports_0_columnHeader" />
+        <camunda:in sourceExpression="res_reports_0_columnHeader_dimensions" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;columnHeader&#39;][&#39;dimensions&#39;]" />
+        <camunda:out source="res_reports_0_columnHeader_dimensions" target="res_reports_0_columnHeader_dimensions" />
+        <camunda:in sourceExpression="res_reports_0_columnHeader_metricHeader" target="post EXTRACT response object $[&#39;reports&#39;][0][&#39;columnHeader&#39;][&#39;metricHeader&#39;]" />
+        <camunda:out source="res_reports_0_columnHeader_metricHeader" target="res_reports_0_columnHeader_metricHeader" />
+        <camunda:in sourceExpression="res_reports_0_columnHeader_metricHeader_metricHeaderEntries" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;columnHeader&#39;][&#39;metricHeader&#39;][&#39;metricHeaderEntries&#39;]" />
+        <camunda:out source="res_reports_0_columnHeader_metricHeader_metricHeaderEntries" target="res_reports_0_columnHeader_metricHeader_metricHeaderEntries" />
+        <camunda:in sourceExpression="res_reports_0_columnHeader_metricHeader_metricHeaderEntries_0_name" target="post EXTRACT response string $[&#39;reports&#39;][0][&#39;columnHeader&#39;][&#39;metricHeader&#39;][&#39;metricHeaderEntries&#39;][0][&#39;name&#39;]" />
+        <camunda:out source="res_reports_0_columnHeader_metricHeader_metricHeaderEntries_0_name" target="res_reports_0_columnHeader_metricHeader_metricHeaderEntries_0_name" />
+        <camunda:in sourceExpression="res_reports_0_columnHeader_metricHeader_metricHeaderEntries_0_type" target="post EXTRACT response string $[&#39;reports&#39;][0][&#39;columnHeader&#39;][&#39;metricHeader&#39;][&#39;metricHeaderEntries&#39;][0][&#39;type&#39;]" />
+        <camunda:out source="res_reports_0_columnHeader_metricHeader_metricHeaderEntries_0_type" target="res_reports_0_columnHeader_metricHeader_metricHeaderEntries_0_type" />
+        <camunda:in sourceExpression="res_reports_0_columnHeader_metricHeader_pivotHeaders" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;columnHeader&#39;][&#39;metricHeader&#39;][&#39;pivotHeaders&#39;]" />
+        <camunda:out source="res_reports_0_columnHeader_metricHeader_pivotHeaders" target="res_reports_0_columnHeader_metricHeader_pivotHeaders" />
+        <camunda:in sourceExpression="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;columnHeader&#39;][&#39;metricHeader&#39;][&#39;pivotHeaders&#39;][0][&#39;pivotHeaderEntries&#39;]" />
+        <camunda:out source="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries" target="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries" />
+        <camunda:in sourceExpression="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_dimensionNames" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;columnHeader&#39;][&#39;metricHeader&#39;][&#39;pivotHeaders&#39;][0][&#39;pivotHeaderEntries&#39;][0][&#39;dimensionNames&#39;]" />
+        <camunda:out source="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_dimensionNames" target="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_dimensionNames" />
+        <camunda:in sourceExpression="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_dimensionValues" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;columnHeader&#39;][&#39;metricHeader&#39;][&#39;pivotHeaders&#39;][0][&#39;pivotHeaderEntries&#39;][0][&#39;dimensionValues&#39;]" />
+        <camunda:out source="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_dimensionValues" target="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_dimensionValues" />
+        <camunda:in sourceExpression="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_metric" target="post EXTRACT response object $[&#39;reports&#39;][0][&#39;columnHeader&#39;][&#39;metricHeader&#39;][&#39;pivotHeaders&#39;][0][&#39;pivotHeaderEntries&#39;][0][&#39;metric&#39;]" />
+        <camunda:out source="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_metric" target="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_metric" />
+        <camunda:in sourceExpression="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_metric_name" target="post EXTRACT response string $[&#39;reports&#39;][0][&#39;columnHeader&#39;][&#39;metricHeader&#39;][&#39;pivotHeaders&#39;][0][&#39;pivotHeaderEntries&#39;][0][&#39;metric&#39;][&#39;name&#39;]" />
+        <camunda:out source="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_metric_name" target="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_metric_name" />
+        <camunda:in sourceExpression="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_metric_type" target="post EXTRACT response string $[&#39;reports&#39;][0][&#39;columnHeader&#39;][&#39;metricHeader&#39;][&#39;pivotHeaders&#39;][0][&#39;pivotHeaderEntries&#39;][0][&#39;metric&#39;][&#39;type&#39;]" />
+        <camunda:out source="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_metric_type" target="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_pivotHeaderEntries_0_metric_type" />
+        <camunda:in sourceExpression="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_totalPivotGroupsCount" target="post EXTRACT response integer $[&#39;reports&#39;][0][&#39;columnHeader&#39;][&#39;metricHeader&#39;][&#39;pivotHeaders&#39;][0][&#39;totalPivotGroupsCount&#39;]" />
+        <camunda:out source="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_totalPivotGroupsCount" target="res_reports_0_columnHeader_metricHeader_pivotHeaders_0_totalPivotGroupsCount" />
+        <camunda:in sourceExpression="res_reports_0_data" target="post EXTRACT response object $[&#39;reports&#39;][0][&#39;data&#39;]" />
+        <camunda:out source="res_reports_0_data" target="res_reports_0_data" />
+        <camunda:in sourceExpression="res_reports_0_data_dataLastRefreshed" target="post EXTRACT response string $[&#39;reports&#39;][0][&#39;data&#39;][&#39;dataLastRefreshed&#39;]" />
+        <camunda:out source="res_reports_0_data_dataLastRefreshed" target="res_reports_0_data_dataLastRefreshed" />
+        <camunda:in sourceExpression="res_reports_0_data_isDataGolden" target="post EXTRACT response boolean $[&#39;reports&#39;][0][&#39;data&#39;][&#39;isDataGolden&#39;]" />
+        <camunda:out source="res_reports_0_data_isDataGolden" target="res_reports_0_data_isDataGolden" />
+        <camunda:in sourceExpression="res_reports_0_data_maximums" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;data&#39;][&#39;maximums&#39;]" />
+        <camunda:out source="res_reports_0_data_maximums" target="res_reports_0_data_maximums" />
+        <camunda:in sourceExpression="res_reports_0_data_maximums_0_pivotValueRegions" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;data&#39;][&#39;maximums&#39;][0][&#39;pivotValueRegions&#39;]" />
+        <camunda:out source="res_reports_0_data_maximums_0_pivotValueRegions" target="res_reports_0_data_maximums_0_pivotValueRegions" />
+        <camunda:in sourceExpression="res_reports_0_data_maximums_0_pivotValueRegions_0_values" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;data&#39;][&#39;maximums&#39;][0][&#39;pivotValueRegions&#39;][0][&#39;values&#39;]" />
+        <camunda:out source="res_reports_0_data_maximums_0_pivotValueRegions_0_values" target="res_reports_0_data_maximums_0_pivotValueRegions_0_values" />
+        <camunda:in sourceExpression="res_reports_0_data_maximums_0_values" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;data&#39;][&#39;maximums&#39;][0][&#39;values&#39;]" />
+        <camunda:out source="res_reports_0_data_maximums_0_values" target="res_reports_0_data_maximums_0_values" />
+        <camunda:in sourceExpression="res_reports_0_data_minimums" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;data&#39;][&#39;minimums&#39;]" />
+        <camunda:out source="res_reports_0_data_minimums" target="res_reports_0_data_minimums" />
+        <camunda:in sourceExpression="res_reports_0_data_minimums_0_pivotValueRegions" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;data&#39;][&#39;minimums&#39;][0][&#39;pivotValueRegions&#39;]" />
+        <camunda:out source="res_reports_0_data_minimums_0_pivotValueRegions" target="res_reports_0_data_minimums_0_pivotValueRegions" />
+        <camunda:in sourceExpression="res_reports_0_data_minimums_0_pivotValueRegions_0_values" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;data&#39;][&#39;minimums&#39;][0][&#39;pivotValueRegions&#39;][0][&#39;values&#39;]" />
+        <camunda:out source="res_reports_0_data_minimums_0_pivotValueRegions_0_values" target="res_reports_0_data_minimums_0_pivotValueRegions_0_values" />
+        <camunda:in sourceExpression="res_reports_0_data_minimums_0_values" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;data&#39;][&#39;minimums&#39;][0][&#39;values&#39;]" />
+        <camunda:out source="res_reports_0_data_minimums_0_values" target="res_reports_0_data_minimums_0_values" />
+        <camunda:in sourceExpression="res_reports_0_data_rowCount" target="post EXTRACT response integer $[&#39;reports&#39;][0][&#39;data&#39;][&#39;rowCount&#39;]" />
+        <camunda:out source="res_reports_0_data_rowCount" target="res_reports_0_data_rowCount" />
+        <camunda:in sourceExpression="res_reports_0_data_rows" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;data&#39;][&#39;rows&#39;]" />
+        <camunda:out source="res_reports_0_data_rows" target="res_reports_0_data_rows" />
+        <camunda:in sourceExpression="res_reports_0_data_rows_0_dimensions" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;data&#39;][&#39;rows&#39;][0][&#39;dimensions&#39;]" />
+        <camunda:out source="res_reports_0_data_rows_0_dimensions" target="res_reports_0_data_rows_0_dimensions" />
+        <camunda:in sourceExpression="res_reports_0_data_rows_0_metrics" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;data&#39;][&#39;rows&#39;][0][&#39;metrics&#39;]" />
+        <camunda:out source="res_reports_0_data_rows_0_metrics" target="res_reports_0_data_rows_0_metrics" />
+        <camunda:in sourceExpression="res_reports_0_data_rows_0_metrics_0_pivotValueRegions" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;data&#39;][&#39;rows&#39;][0][&#39;metrics&#39;][0][&#39;pivotValueRegions&#39;]" />
+        <camunda:out source="res_reports_0_data_rows_0_metrics_0_pivotValueRegions" target="res_reports_0_data_rows_0_metrics_0_pivotValueRegions" />
+        <camunda:in sourceExpression="res_reports_0_data_rows_0_metrics_0_pivotValueRegions_0_values" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;data&#39;][&#39;rows&#39;][0][&#39;metrics&#39;][0][&#39;pivotValueRegions&#39;][0][&#39;values&#39;]" />
+        <camunda:out source="res_reports_0_data_rows_0_metrics_0_pivotValueRegions_0_values" target="res_reports_0_data_rows_0_metrics_0_pivotValueRegions_0_values" />
+        <camunda:in sourceExpression="res_reports_0_data_rows_0_metrics_0_values" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;data&#39;][&#39;rows&#39;][0][&#39;metrics&#39;][0][&#39;values&#39;]" />
+        <camunda:out source="res_reports_0_data_rows_0_metrics_0_values" target="res_reports_0_data_rows_0_metrics_0_values" />
+        <camunda:in sourceExpression="res_reports_0_data_samplesReadCounts" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;data&#39;][&#39;samplesReadCounts&#39;]" />
+        <camunda:out source="res_reports_0_data_samplesReadCounts" target="res_reports_0_data_samplesReadCounts" />
+        <camunda:in sourceExpression="res_reports_0_data_samplingSpaceSizes" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;data&#39;][&#39;samplingSpaceSizes&#39;]" />
+        <camunda:out source="res_reports_0_data_samplingSpaceSizes" target="res_reports_0_data_samplingSpaceSizes" />
+        <camunda:in sourceExpression="res_reports_0_data_totals" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;data&#39;][&#39;totals&#39;]" />
+        <camunda:out source="res_reports_0_data_totals" target="res_reports_0_data_totals" />
+        <camunda:in sourceExpression="res_reports_0_data_totals_0_pivotValueRegions" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;data&#39;][&#39;totals&#39;][0][&#39;pivotValueRegions&#39;]" />
+        <camunda:out source="res_reports_0_data_totals_0_pivotValueRegions" target="res_reports_0_data_totals_0_pivotValueRegions" />
+        <camunda:in sourceExpression="res_reports_0_data_totals_0_pivotValueRegions_0_values" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;data&#39;][&#39;totals&#39;][0][&#39;pivotValueRegions&#39;][0][&#39;values&#39;]" />
+        <camunda:out source="res_reports_0_data_totals_0_pivotValueRegions_0_values" target="res_reports_0_data_totals_0_pivotValueRegions_0_values" />
+        <camunda:in sourceExpression="res_reports_0_data_totals_0_values" target="post EXTRACT response array $[&#39;reports&#39;][0][&#39;data&#39;][&#39;totals&#39;][0][&#39;values&#39;]" />
+        <camunda:out source="res_reports_0_data_totals_0_values" target="res_reports_0_data_totals_0_values" />
+        <camunda:in sourceExpression="res_reports_0_nextPageToken" target="post EXTRACT response string $[&#39;reports&#39;][0][&#39;nextPageToken&#39;]" />
+        <camunda:out source="res_reports_0_nextPageToken" target="res_reports_0_nextPageToken" />
+        <camunda:in sourceExpression="res_resourceQuotasRemaining" target="post EXTRACT response object $[&#39;resourceQuotasRemaining&#39;]" />
+        <camunda:out source="res_resourceQuotasRemaining" target="res_resourceQuotasRemaining" />
+        <camunda:in sourceExpression="res_resourceQuotasRemaining_dailyQuotaTokensRemaining" target="post EXTRACT response integer $[&#39;resourceQuotasRemaining&#39;][&#39;dailyQuotaTokensRemaining&#39;]" />
+        <camunda:out source="res_resourceQuotasRemaining_dailyQuotaTokensRemaining" target="res_resourceQuotasRemaining_dailyQuotaTokensRemaining" />
+        <camunda:in sourceExpression="res_resourceQuotasRemaining_hourlyQuotaTokensRemaining" target="post EXTRACT response integer $[&#39;resourceQuotasRemaining&#39;][&#39;hourlyQuotaTokensRemaining&#39;]" />
+        <camunda:out source="res_resourceQuotasRemaining_hourlyQuotaTokensRemaining" target="res_resourceQuotasRemaining_hourlyQuotaTokensRemaining" />
+        <camunda:out source="response" target="response" />
+        <camunda:in source="qp_alt" target="pre SET query String $[&#39;alt&#39;]" />
+        <camunda:in source="qp_access_token" target="pre SET query String $[&#39;access_token&#39;]" />
+        <camunda:in source="qp_key" target="pre SET query String $[&#39;key&#39;]" />
+        <camunda:in source="qp_upload_protocol" target="pre SET query String $[&#39;upload_protocol&#39;]" />
+        <camunda:in source="qp_quotaUser" target="pre SET query String $[&#39;quotaUser&#39;]" />
+        <camunda:in source="qp_prettyPrint" target="pre SET query String $[&#39;prettyPrint&#39;]" />
+        <camunda:in source="qp_fields" target="pre SET query String $[&#39;fields&#39;]" />
+        <camunda:in source="qp_uploadType" target="pre SET query String $[&#39;uploadType&#39;]" />
+        <camunda:in source="qp_callback" target="pre SET query String $[&#39;callback&#39;]" />
+        <camunda:in source="qp_oauth_token" target="pre SET query String $[&#39;oauth_token&#39;]" />
+        <camunda:in source="qp_$.xgafv" target="pre SET query String $[&#39;$.xgafv&#39;]" />
+        <camunda:in sourceExpression="Bearer ${hp_Authorization}" target="pre SET headers String $[&#39;Authorization&#39;]" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0sd2wvh</bpmn:incoming>
+      <bpmn:outgoing>Flow_0quv8rh</bpmn:outgoing>
+    </bpmn:callActivity>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="TestGoogleAnalytics">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1sm6a1o_di" bpmnElement="getToken">
+        <dc:Bounds x="220" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1n4urzy_di" bpmnElement="Flow_1n4urzy">
+        <di:waypoint x="188" y="120" />
+        <di:waypoint x="220" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0sd2wvh_di" bpmnElement="Flow_0sd2wvh">
+        <di:waypoint x="320" y="117" />
+        <di:waypoint x="340" y="117" />
+        <di:waypoint x="340" y="120" />
+        <di:waypoint x="360" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_1hn95tm_di" bpmnElement="printOutcome">
+        <dc:Bounds x="500" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1yne7nj_di" bpmnElement="Event_1yne7nj">
+        <dc:Bounds x="642" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1n8e002_di" bpmnElement="Flow_1n8e002">
+        <di:waypoint x="600" y="117" />
+        <di:waypoint x="642" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0quv8rh_di" bpmnElement="Flow_0quv8rh">
+        <di:waypoint x="460" y="120" />
+        <di:waypoint x="480" y="120" />
+        <di:waypoint x="480" y="117" />
+        <di:waypoint x="500" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0gim2zq_di" bpmnElement="Activity_1lhtyv4">
+        <dc:Bounds x="360" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

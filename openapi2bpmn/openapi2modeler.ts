@@ -4,18 +4,26 @@ import * as mustache from 'mustache';
 
 const operationTemplate = fs.readFileSync('operation.mustache').toString();
 
+const refs = {};
 function resolveRef<T>(doc: openapi3.OpenAPIObject, ref: openapi3.ReferenceObject | T): T {
     if (ref == null) return null;
     if ("$ref" in ref) {
+        if (refs[ref["$ref"]]) return refs[ref["$ref"]];
+        
         if (ref["$ref"].startsWith("#/")) {
             // Root of local document
             const path = ref["$ref"].substring(2).split("/");
+
+            console.log("path", path)
             // Walk curser through doc
             const subdoc = path.reduce(
                 (curser, segment) => curser[segment],
                 doc
             )
+            refs[ref["$ref"]] = subdoc;
             return <T>subdoc;
+        } else {
+            throw new Error("Cannot handle: " + ref["$ref"])
         }
     } else {
         return ref;
@@ -157,9 +165,19 @@ function extractContentFields(api: openapi3.OpenAPIObject, schema: openapi3.Sche
                     type: "array",
                     path: `['${name}']`,
                     description: subschema.description ? JSON.stringify(subschema.description): "null"
-                })
+                });
+                const itemsRef = resolveRef(api, subschema.items);
+                const items = extractContentFields(api, itemsRef);
+
+                console.log("array", name, items)
+                results.push(...items.map (child => ({
+                        name: name + "_0_" + child.name,
+                        type: child.type,
+                        path: `['${name}'][0]` + child.path,
+                        description: child.description
+                })));
                 break;
-            
+
             case "object":
                 results.push({
                     name: name,
@@ -175,6 +193,7 @@ function extractContentFields(api: openapi3.OpenAPIObject, schema: openapi3.Sche
                         description: child.description
                 })));
                 break;
+
             default:
                 console.error("Unknown content_field type", subschema.type)
                 break;
@@ -182,7 +201,7 @@ function extractContentFields(api: openapi3.OpenAPIObject, schema: openapi3.Sche
     }
     return results;
 }
-
+/*
 {
     const api: openapi3.OpenAPIObject = require("./tasks_v1.json")
     const out = fs.createWriteStream("../.camunda/element-templates/tasks_v1.json");
@@ -206,7 +225,21 @@ function extractContentFields(api: openapi3.OpenAPIObject, schema: openapi3.Sche
     const out = fs.createWriteStream("../.camunda/element-templates/rebrandly.json");
     writeOperations(api, out);
     out.end();    
+}*/
+{
+    const api: openapi3.OpenAPIObject = require("./analyticsreporting.v4.json")
+    const out = fs.createWriteStream("../.camunda/element-templates/analyticsreporting.json");
+    writeOperations(api, out);
+    out.end();    
 }
+
+/* BigQuery has a recursive definition
+{
+    const api: openapi3.OpenAPIObject = require("./bigquery_v2.json")
+    const out = fs.createWriteStream("../.camunda/element-templates/bigquery.json");
+    writeOperations(api, out);
+    out.end();    
+} */
 /*
 {
     const api: openapi3.OpenAPIObject = require("./docs_v1.json")

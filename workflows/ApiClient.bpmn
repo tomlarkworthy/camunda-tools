@@ -56,12 +56,12 @@ request</camunda:script>
       <bpmn:incoming>Flow_0kebagn</bpmn:incoming>
       <bpmn:outgoing>Flow_1o4gipc</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_088fktg" sourceRef="StartEvent_1" targetRef="Activity_0cb9vmr" />
+    <bpmn:sequenceFlow id="Flow_088fktg" sourceRef="StartEvent_1" targetRef="PRE" />
     <bpmn:endEvent id="Event_1xx666m">
       <bpmn:incoming>Flow_046k02p</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_1o4gipc" sourceRef="HtttCall" targetRef="statusChoice" />
-    <bpmn:scriptTask id="Activity_0cb9vmr" scriptFormat="groovy">
+    <bpmn:scriptTask id="PRE" name="PRE" scriptFormat="groovy">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="prefix">pre</camunda:inputParameter>
@@ -91,15 +91,17 @@ def command_re = ~/^(\S+) (\S+) (\S+) (.*)$/
 def prefix = execution.getVariableLocal("prefix") ? execution.getVariableLocal("prefix") + " ": " ";
 
 def popPath(path) { // This is bullshit that we need
-    def parentkey_re = ~/^(?&lt;parent&gt;.*)\['(?&lt;key&gt;.*)'\]$/
+    def parentkey_re = ~/^(?&lt;parent&gt;.*)\[('(?&lt;key&gt;.*)'|(?&lt;index&gt;\d+))\]$/
     fullPath = JsonPath.compile(path).getPath(); // Canonicalize the path so simplify the regex
     def matcher = fullPath =~ parentkey_re
     matcher.matches()
-    return [matcher.group('parent'), matcher.group('key')]
+    def key = matcher.group('key')
+    def index = matcher.group('index');
+    return [matcher.group('parent'), key != null ? key : index.toInteger() ]
 }
 
 def exec(command, target, datatype, path, value) {
-    println command + " " + target + " " + datatype + " " + path + " " + value
+    // println command + " " + target + " " + datatype + " " + path + " " + value
     
     def configuration = Configuration
         .defaultConfiguration()
@@ -111,8 +113,10 @@ def exec(command, target, datatype, path, value) {
         // read current value for the output
         def output = execution.getVariable(target);
         if (output == null) output = "{}";
-        println ("Set " + output.toString() + " path " + path + " value " + value);
+        // println ("Set " + output.toString() + " path " + path + " value " + value + " datatype " + datatype);
         (parentPath, key) = popPath(path)
+
+        //println ("parse " + output.toString());
 
         Object document = JsonPath
             .using(configuration)
@@ -120,39 +124,66 @@ def exec(command, target, datatype, path, value) {
 
         def (ancestor, akey) = popPath(path)
         def emptyNodes = []
-
+        def parentStringy = akey instanceof String
         while (true) {
             try {
+                // println ("read " + ancestor);
                 // No idea why Option.SUPPRESS_EXCEPTIONS is not fireing
                 document.read(ancestor) // PathNotFoundException
                 // OK its not null so we founda full one can can break while
                 break;
             } catch (e) {
-                emptyNodes.push(ancestor)
+                def original_ancestor = ancestor
                 (ancestor, akey) = popPath(ancestor)
+                // println ("ancestor " + ancestor);
+                // println ("akey " + akey);
+                emptyNodes.push([original_ancestor, parentStringy])
+                parentStringy = akey instanceof String
             }
         }
         while (emptyNodes.size() &gt; 0) {
-            (holder, akey) = popPath(emptyNodes.pop())
-            document.put(holder, akey, [:]);
+            (ancestor, stringy) = emptyNodes.pop()
+            (holder, akey) = popPath(ancestor)
+            def holderVal = stringy ? [:] : []
+            if (akey instanceof String) {
+                document.put(holder, akey, holderVal);
+            } else {
+                document.add(holder, holderVal);
+            }
+        }
+        // println ("parentPath " + parentPath);
+        // println ("key " + key);
+        // println ("value " + value);
+        // println ("datatype " + datatype);
+        switch (datatype) {
+            case "array":
+            case "object":
+                value = JsonPath
+                    .using(configuration)
+                    .parse(value.toString())
+                    .json();
+                break;
+            default:
+                value = value;
         }
 
         result = document
-            .put(parentPath, key, value) // see https://github.com/json-path/JsonPath/issues/570
+            .put(parentPath.toString(), key.toString(), value) // see https://github.com/json-path/JsonPath/issues/570
             .jsonString(); // TODO we should probably stay in Spin
-        println("Result " + result.toString());
-        execution.setVariable(target, result);
+        // println("Result " + result.toString());
+        execution.setVariable(target, result.toString());
     } else if (command == "EXTRACT") {
         // read current value for the target
         def input = execution.getVariable(target)
         if (input == null) input = "{}";
-        println("input " + input.toString());
+        // println("input " + input.toString());
+        
         try {
             Object data = JsonPath
                     .using(configuration)
                     .parse(input.toString())
                     .read(path);
-            println "Extracted: " + data.toString();
+            // println "Extracted: " + data.toString();
             execution.setVariable(value, data);
         } catch (PathNotFoundException e) {
             System.err.println(e.getMessage()); 
@@ -182,8 +213,8 @@ execution.getVariables().findAll {
     }
 }</bpmn:script>
     </bpmn:scriptTask>
-    <bpmn:sequenceFlow id="Flow_0kebagn" sourceRef="Activity_0cb9vmr" targetRef="HtttCall" />
-    <bpmn:scriptTask id="Activity_06rnj4a" scriptFormat="groovy">
+    <bpmn:sequenceFlow id="Flow_0kebagn" sourceRef="PRE" targetRef="HtttCall" />
+    <bpmn:scriptTask id="POST" name="POST" scriptFormat="groovy">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="prefix">post</camunda:inputParameter>
@@ -213,15 +244,17 @@ def command_re = ~/^(\S+) (\S+) (\S+) (.*)$/
 def prefix = execution.getVariableLocal("prefix") ? execution.getVariableLocal("prefix") + " ": " ";
 
 def popPath(path) { // This is bullshit that we need
-    def parentkey_re = ~/^(?&lt;parent&gt;.*)\['(?&lt;key&gt;.*)'\]$/
+    def parentkey_re = ~/^(?&lt;parent&gt;.*)\[('(?&lt;key&gt;.*)'|(?&lt;index&gt;\d+))\]$/
     fullPath = JsonPath.compile(path).getPath(); // Canonicalize the path so simplify the regex
     def matcher = fullPath =~ parentkey_re
     matcher.matches()
-    return [matcher.group('parent'), matcher.group('key')]
+    def key = matcher.group('key')
+    def index = matcher.group('index');
+    return [matcher.group('parent'), key != null ? key : index.toInteger() ]
 }
 
 def exec(command, target, datatype, path, value) {
-    println command + " " + target + " " + datatype + " " + path + " " + value
+    // println command + " " + target + " " + datatype + " " + path + " " + value
     
     def configuration = Configuration
         .defaultConfiguration()
@@ -233,8 +266,10 @@ def exec(command, target, datatype, path, value) {
         // read current value for the output
         def output = execution.getVariable(target);
         if (output == null) output = "{}";
-        println ("Set " + output.toString() + " path " + path + " value " + value);
+        // println ("Set " + output.toString() + " path " + path + " value " + value + " datatype " + datatype);
         (parentPath, key) = popPath(path)
+
+        //println ("parse " + output.toString());
 
         Object document = JsonPath
             .using(configuration)
@@ -242,39 +277,66 @@ def exec(command, target, datatype, path, value) {
 
         def (ancestor, akey) = popPath(path)
         def emptyNodes = []
-
+        def parentStringy = akey instanceof String
         while (true) {
             try {
+                // println ("read " + ancestor);
                 // No idea why Option.SUPPRESS_EXCEPTIONS is not fireing
                 document.read(ancestor) // PathNotFoundException
                 // OK its not null so we founda full one can can break while
                 break;
             } catch (e) {
-                emptyNodes.push(ancestor)
+                def original_ancestor = ancestor
                 (ancestor, akey) = popPath(ancestor)
+                // println ("ancestor " + ancestor);
+                // println ("akey " + akey);
+                emptyNodes.push([original_ancestor, parentStringy])
+                parentStringy = akey instanceof String
             }
         }
         while (emptyNodes.size() &gt; 0) {
-            (holder, akey) = popPath(emptyNodes.pop())
-            document.put(holder, akey, [:]);
+            (ancestor, stringy) = emptyNodes.pop()
+            (holder, akey) = popPath(ancestor)
+            def holderVal = stringy ? [:] : []
+            if (akey instanceof String) {
+                document.put(holder, akey, holderVal);
+            } else {
+                document.add(holder, holderVal);
+            }
+        }
+        // println ("parentPath " + parentPath);
+        // println ("key " + key);
+        // println ("value " + value);
+        // println ("datatype " + datatype);
+        switch (datatype) {
+            case "array":
+            case "object":
+                value = JsonPath
+                    .using(configuration)
+                    .parse(value.toString())
+                    .json();
+                break;
+            default:
+                value = value;
         }
 
         result = document
-            .put(parentPath, key, value) // see https://github.com/json-path/JsonPath/issues/570
+            .put(parentPath.toString(), key.toString(), value) // see https://github.com/json-path/JsonPath/issues/570
             .jsonString(); // TODO we should probably stay in Spin
-        println("Result " + result.toString());
-        execution.setVariable(target, result);
+        // println("Result " + result.toString());
+        execution.setVariable(target, result.toString());
     } else if (command == "EXTRACT") {
         // read current value for the target
         def input = execution.getVariable(target)
         if (input == null) input = "{}";
-        println("input " + input.toString());
+        // println("input " + input.toString());
+        
         try {
             Object data = JsonPath
                     .using(configuration)
                     .parse(input.toString())
                     .read(path);
-            println "Extracted: " + data.toString();
+            // println "Extracted: " + data.toString();
             execution.setVariable(value, data);
         } catch (PathNotFoundException e) {
             System.err.println(e.getMessage()); 
@@ -304,13 +366,13 @@ execution.getVariables().findAll {
     }
 }</bpmn:script>
     </bpmn:scriptTask>
-    <bpmn:sequenceFlow id="Flow_046k02p" sourceRef="Activity_06rnj4a" targetRef="Event_1xx666m" />
+    <bpmn:sequenceFlow id="Flow_046k02p" sourceRef="POST" targetRef="Event_1xx666m" />
     <bpmn:exclusiveGateway id="statusChoice" default="default">
       <bpmn:incoming>Flow_1o4gipc</bpmn:incoming>
       <bpmn:outgoing>default</bpmn:outgoing>
       <bpmn:outgoing>Flow_1x6ma8n</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="default" sourceRef="statusChoice" targetRef="Activity_06rnj4a" />
+    <bpmn:sequenceFlow id="default" sourceRef="statusChoice" targetRef="POST" />
     <bpmn:sequenceFlow id="Flow_1x6ma8n" sourceRef="statusChoice" targetRef="Activity_0ryk9tu">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${statusCode &gt;= 300}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
@@ -346,14 +408,14 @@ println (execution.getVariable("response"))</bpmn:script>
         <di:waypoint x="440" y="117" />
         <di:waypoint x="475" y="117" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Activity_0cb9vmr_di" bpmnElement="Activity_0cb9vmr">
+      <bpmndi:BPMNShape id="Activity_0cb9vmr_di" bpmnElement="PRE">
         <dc:Bounds x="210" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0kebagn_di" bpmnElement="Flow_0kebagn">
         <di:waypoint x="310" y="117" />
         <di:waypoint x="340" y="117" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Activity_06rnj4a_di" bpmnElement="Activity_06rnj4a">
+      <bpmndi:BPMNShape id="Activity_06rnj4a_di" bpmnElement="POST">
         <dc:Bounds x="550" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_046k02p_di" bpmnElement="Flow_046k02p">

@@ -23,7 +23,8 @@
       <bpmn:incoming>Flow_0lpw26y</bpmn:incoming>
       <bpmn:outgoing>Flow_1i9dsem</bpmn:outgoing>
       <bpmn:script>url = new java.net.URL(execution.getVariable("link"));
-execution.setVariable("path", url.getPath())</bpmn:script>
+execution.setVariable("path", url.getPath())
+println("BlogPostHandler path: " + url.getPath())</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:startEvent id="Event_1kupqmj">
       <bpmn:outgoing>Flow_0gg4m1l</bpmn:outgoing>
@@ -33,13 +34,13 @@ execution.setVariable("path", url.getPath())</bpmn:script>
       <bpmn:incoming>Flow_0gg4m1l</bpmn:incoming>
       <bpmn:outgoing>Flow_0lpw26y</bpmn:outgoing>
       <bpmn:script>execution.setVariable("title", 
-"Case Corosim - Operationalising a Data-Driven Management System"
+"Business forecasting with Facebook Prophet"
 )
 execution.setVariable("link", 
-"https://www.futurice.com/blog/case-corosim-operationalising-a-data-driven-management-system"
+"https://www.futurice.com/blog/business-forecasting-with-facebook-prophet"
 )
 execution.setVariable("description", 
-"The story behind Corosim, an epidemic calculator for Finland."
+"In this article you are going to learn how to do solid time-series analysis and forecasts with the Facebook Prophet library."
 )
 execution.setVariable("channel", 
 "larktest2"
@@ -53,54 +54,77 @@ execution.setVariable("channel",
     <bpmn:sequenceFlow id="Flow_0pe0xrs" sourceRef="Activity_0ty6hmd" targetRef="decode" />
     <bpmn:sequenceFlow id="Flow_09v14a6" sourceRef="consumeSignal" targetRef="Activity_0ty6hmd" />
     <bpmn:sequenceFlow id="Flow_0lpw26y" sourceRef="Activity_1in6x63" targetRef="decode" />
+    <bpmn:textAnnotation id="TextAnnotation_10ulimx">
+      <bpmn:text>url, link, description</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_13johmf" sourceRef="consumeSignal" targetRef="TextAnnotation_10ulimx" />
+    <bpmn:textAnnotation id="TextAnnotation_16psp0n">
+      <bpmn:text>title, link, description, channel
+businessKey = path</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1ig4d68" sourceRef="emitSignal" targetRef="TextAnnotation_16psp0n" />
   </bpmn:process>
   <bpmn:signal id="Signal_16wtb4z" name="NewBlogPost" />
   <bpmn:signal id="Signal_1l77c36" name="NewBlogPostKey" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="BlogPostHandler">
       <bpmndi:BPMNShape id="Event_1kexrmr_di" bpmnElement="consumeSignal">
-        <dc:Bounds x="172" y="102" width="36" height="36" />
+        <dc:Bounds x="172" y="162" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="158" y="145" width="67" height="27" />
+          <dc:Bounds x="158" y="205" width="67" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_13s9zki_di" bpmnElement="emitSignal">
-        <dc:Bounds x="432" y="222" width="36" height="36" />
+        <dc:Bounds x="432" y="282" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="410" y="265" width="85" height="14" />
+          <dc:Bounds x="410" y="325" width="85" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1i9dsem_di" bpmnElement="Flow_1i9dsem">
-        <di:waypoint x="360" y="240" />
-        <di:waypoint x="432" y="240" />
+        <di:waypoint x="360" y="300" />
+        <di:waypoint x="432" y="300" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_1hzyz40_di" bpmnElement="decode">
-        <dc:Bounds x="260" y="200" width="100" height="80" />
+        <dc:Bounds x="260" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1kupqmj_di" bpmnElement="Event_1kupqmj">
-        <dc:Bounds x="172" y="352" width="36" height="36" />
+        <dc:Bounds x="172" y="412" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0gg4m1l_di" bpmnElement="Flow_0gg4m1l">
-        <di:waypoint x="208" y="370" />
-        <di:waypoint x="260" y="370" />
+        <di:waypoint x="208" y="430" />
+        <di:waypoint x="260" y="430" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_0frpke7_di" bpmnElement="Activity_1in6x63">
-        <dc:Bounds x="260" y="330" width="100" height="80" />
+        <dc:Bounds x="260" y="390" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0ty6hmd_di" bpmnElement="Activity_0ty6hmd">
-        <dc:Bounds x="260" y="80" width="100" height="80" />
+        <dc:Bounds x="260" y="140" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0pe0xrs_di" bpmnElement="Flow_0pe0xrs">
-        <di:waypoint x="310" y="160" />
-        <di:waypoint x="310" y="200" />
+        <di:waypoint x="310" y="220" />
+        <di:waypoint x="310" y="260" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_09v14a6_di" bpmnElement="Flow_09v14a6">
-        <di:waypoint x="208" y="120" />
-        <di:waypoint x="260" y="120" />
+        <di:waypoint x="208" y="180" />
+        <di:waypoint x="260" y="180" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0lpw26y_di" bpmnElement="Flow_0lpw26y">
-        <di:waypoint x="310" y="330" />
-        <di:waypoint x="310" y="280" />
+        <di:waypoint x="310" y="390" />
+        <di:waypoint x="310" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_10ulimx_di" bpmnElement="TextAnnotation_10ulimx">
+        <dc:Bounds x="210" y="80" width="100" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_13johmf_di" bpmnElement="Association_13johmf">
+        <di:waypoint x="202" y="167" />
+        <di:waypoint x="243" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_16psp0n_di" bpmnElement="TextAnnotation_16psp0n">
+        <dc:Bounds x="470" y="200" width="150" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1ig4d68_di" bpmnElement="Association_1ig4d68">
+        <di:waypoint x="464" y="289" />
+        <di:waypoint x="505" y="260" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

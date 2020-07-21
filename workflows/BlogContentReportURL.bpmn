@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0i81y3s" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
+  <bpmn:process id="BlogContentReportURL" name="BlogContentReportURL" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_1tcyvtx</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1tcyvtx" sourceRef="StartEvent_1" targetRef="Activity_0c7pb15" />
+    <bpmn:scriptTask id="ComputeURL" name="ComputeURL" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1hyurhj</bpmn:incoming>
+      <bpmn:outgoing>Flow_0dep86g</bpmn:outgoing>
+      <bpmn:script>def path = execution.getVariable("path")
+def startDate = execution.getVariable("startDate")
+def days = execution.getVariable("days")
+
+def days_url = ""
+def format = new java.text.SimpleDateFormat("yyyyMMdd")
+def cal = java.util.Calendar.getInstance();
+cal.setTime(format.parse(startDate));
+for (i = 0; i &lt; (days as Integer); i++) {
+    print ("i" + i) 
+    days_url = days_url + '%EE%80%80' + format.format(cal.getTime())
+    cal.add(Calendar.DATE, 1);  
+}
+
+def data = [
+  "df4":"include%EE%80%800%EE%80%80IN%EE%80%80${path}",
+  "df5":"include%EE%80%800%EE%80%80IN${days_url}"
+]
+
+def data_url = java.net.URLEncoder.encode(groovy.json.JsonOutput.toJson(data), "UTF-8")
+
+def url = "https://datastudio.google.com/reporting/1XAGzyAcXG2wLSaKqe1tBsmmzUVoqvktl/page/Kq7UB?params=${data_url}"
+
+println("Blog Content Report URL: " + url)
+
+execution.setVariable("url", url)</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_1hyurhj" sourceRef="Activity_0c7pb15" targetRef="ComputeURL" />
+    <bpmn:scriptTask id="Activity_0c7pb15" name="Test Setup" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1tcyvtx</bpmn:incoming>
+      <bpmn:outgoing>Flow_1hyurhj</bpmn:outgoing>
+      <bpmn:script>if (execution.getVariable("path") == null) {
+    execution.setVariable("startDate", "20200601")
+    execution.setVariable("path", "/blog/openresty-a-swiss-army-proxy-for-serverless")
+    execution.setVariable("days", 30)
+}
+
+println ("ContentReport for: " + execution.getVariable("path"));</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="Event_0s0108c">
+      <bpmn:incoming>Flow_0dep86g</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0dep86g" sourceRef="ComputeURL" targetRef="Event_0s0108c" />
+    <bpmn:textAnnotation id="TextAnnotation_03yaq1c">
+      <bpmn:text>input: path, startDate, days
+output: url</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_154tj09" sourceRef="StartEvent_1" targetRef="TextAnnotation_03yaq1c" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="BlogContentReportURL">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="169" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1tcyvtx_di" bpmnElement="Flow_1tcyvtx">
+        <di:waypoint x="188" y="187" />
+        <di:waypoint x="210" y="187" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0imxc5u_di" bpmnElement="ComputeURL">
+        <dc:Bounds x="340" y="147" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1hyurhj_di" bpmnElement="Flow_1hyurhj">
+        <di:waypoint x="310" y="187" />
+        <di:waypoint x="340" y="187" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0n6hia9_di" bpmnElement="Activity_0c7pb15">
+        <dc:Bounds x="210" y="147" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0s0108c_di" bpmnElement="Event_0s0108c">
+        <dc:Bounds x="462" y="169" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0dep86g_di" bpmnElement="Flow_0dep86g">
+        <di:waypoint x="440" y="187" />
+        <di:waypoint x="462" y="187" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_03yaq1c_di" bpmnElement="TextAnnotation_03yaq1c">
+        <dc:Bounds x="155" y="80" width="210" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_154tj09_di" bpmnElement="Association_154tj09">
+        <di:waypoint x="183" y="175" />
+        <di:waypoint x="239" y="120" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

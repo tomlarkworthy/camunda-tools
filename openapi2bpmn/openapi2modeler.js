@@ -10,16 +10,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs");
 const mustache = __importStar(require("mustache"));
 const operationTemplate = fs.readFileSync('operation.mustache').toString();
+const refs = {};
 function resolveRef(doc, ref) {
     if (ref == null)
         return null;
     if ("$ref" in ref) {
+        if (refs[ref["$ref"]])
+            return refs[ref["$ref"]];
         if (ref["$ref"].startsWith("#/")) {
             // Root of local document
             const path = ref["$ref"].substring(2).split("/");
+            console.log("path", path);
             // Walk curser through doc
             const subdoc = path.reduce((curser, segment) => curser[segment], doc);
+            refs[ref["$ref"]] = subdoc;
             return subdoc;
+        }
+        else {
+            throw new Error("Cannot handle: " + ref["$ref"]);
         }
     }
     else {
@@ -140,6 +148,15 @@ function extractContentFields(api, schema) {
                     path: `['${name}']`,
                     description: subschema.description ? JSON.stringify(subschema.description) : "null"
                 });
+                const itemsRef = resolveRef(api, subschema.items);
+                const items = extractContentFields(api, itemsRef);
+                console.log("array", name, items);
+                results.push(...items.map(child => ({
+                    name: name + "_0_" + child.name,
+                    type: child.type,
+                    path: `['${name}'][0]` + child.path,
+                    description: child.description
+                })));
                 break;
             case "object":
                 results.push({
@@ -163,30 +180,44 @@ function extractContentFields(api, schema) {
     }
     return results;
 }
+/*
 {
-    const api = require("./tasks_v1.json");
+    const api: openapi3.OpenAPIObject = require("./tasks_v1.json")
     const out = fs.createWriteStream("../.camunda/element-templates/tasks_v1.json");
     writeOperations(api, out);
     out.end();
 }
 {
-    const api = require("./slack_web_openapi_v2.json");
+    const api: openapi3.OpenAPIObject = require("./slack_web_openapi_v2.json")
     const out = fs.createWriteStream("../.camunda/element-templates/slack.json");
     writeOperations(api, out);
     out.end();
 }
 {
-    const api = require("./secretsmanager_v1.json");
+    const api: openapi3.OpenAPIObject = require("./secretsmanager_v1.json")
     const out = fs.createWriteStream("../.camunda/element-templates/secretsmanager.json");
     writeOperations(api, out);
     out.end();
 }
 {
-    const api = require("./rebrandly.json");
+    const api: openapi3.OpenAPIObject = require("./rebrandly.json")
     const out = fs.createWriteStream("../.camunda/element-templates/rebrandly.json");
     writeOperations(api, out);
     out.end();
+}*/
+{
+    const api = require("./analyticsreporting.v4.json");
+    const out = fs.createWriteStream("../.camunda/element-templates/analyticsreporting.json");
+    writeOperations(api, out);
+    out.end();
 }
+/* BigQuery has a recursive definition
+{
+    const api: openapi3.OpenAPIObject = require("./bigquery_v2.json")
+    const out = fs.createWriteStream("../.camunda/element-templates/bigquery.json");
+    writeOperations(api, out);
+    out.end();
+} */
 /*
 {
     const api: openapi3.OpenAPIObject = require("./docs_v1.json")

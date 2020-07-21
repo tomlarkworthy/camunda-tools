@@ -1034,6 +1034,63 @@
             }
         }
         ,{
+            "label": "JSON Content field: links_0_description (string)",
+            "type": "String",
+            "description": "The description. In HTML speak: Everything between <a> and </a>.",
+            "value": null,
+            "binding": {
+                "type": "camunda:inputParameter",
+                "name": "cp_links_0_description"
+            }
+        }
+        ,{
+            "label": "Content",
+            "type": "Hidden",
+            "value": "cp_links_0_description",
+            "binding": {
+                "type": "camunda:in",
+                "target": "pre SET request string $['links'][0]['description']"
+            }
+        }
+        ,{
+            "label": "JSON Content field: links_0_link (string)",
+            "type": "String",
+            "description": "The URL.",
+            "value": null,
+            "binding": {
+                "type": "camunda:inputParameter",
+                "name": "cp_links_0_link"
+            }
+        }
+        ,{
+            "label": "Content",
+            "type": "Hidden",
+            "value": "cp_links_0_link",
+            "binding": {
+                "type": "camunda:in",
+                "target": "pre SET request string $['links'][0]['link']"
+            }
+        }
+        ,{
+            "label": "JSON Content field: links_0_type (string)",
+            "type": "String",
+            "description": "Type of the link, e.g. \"email\".",
+            "value": null,
+            "binding": {
+                "type": "camunda:inputParameter",
+                "name": "cp_links_0_type"
+            }
+        }
+        ,{
+            "label": "Content",
+            "type": "Hidden",
+            "value": "cp_links_0_type",
+            "binding": {
+                "type": "camunda:in",
+                "target": "pre SET request string $['links'][0]['type']"
+            }
+        }
+        ,{
             "label": "JSON Content field: notes (string)",
             "type": "String",
             "description": "Notes describing the task. Optional.",
@@ -1396,6 +1453,93 @@
             "binding": {
                 "type": "camunda:out",
                 "source": "res_links"
+            }
+        }
+        ,{
+            "label": "JSON response binding: links_0_description (string)",
+            "type": "String",
+            "description": "The description. In HTML speak: Everything between <a> and </a>.",
+            "value": "links_0_description",
+            "binding": {
+                "type": "camunda:outputParameter",
+                "source": "${ res_links_0_description }"
+            }
+        }
+        ,{
+            "label": "JSON response",
+            "type": "Hidden",
+            "value": "res_links_0_description",
+            "binding": {
+                "type": "camunda:in",
+                "target": "post EXTRACT response string $['links'][0]['description']",
+                "expression": true
+            }
+        }
+        ,{
+            "label": "links_0_description",
+            "type": "Hidden",
+            "value": "res_links_0_description",
+            "binding": {
+                "type": "camunda:out",
+                "source": "res_links_0_description"
+            }
+        }
+        ,{
+            "label": "JSON response binding: links_0_link (string)",
+            "type": "String",
+            "description": "The URL.",
+            "value": "links_0_link",
+            "binding": {
+                "type": "camunda:outputParameter",
+                "source": "${ res_links_0_link }"
+            }
+        }
+        ,{
+            "label": "JSON response",
+            "type": "Hidden",
+            "value": "res_links_0_link",
+            "binding": {
+                "type": "camunda:in",
+                "target": "post EXTRACT response string $['links'][0]['link']",
+                "expression": true
+            }
+        }
+        ,{
+            "label": "links_0_link",
+            "type": "Hidden",
+            "value": "res_links_0_link",
+            "binding": {
+                "type": "camunda:out",
+                "source": "res_links_0_link"
+            }
+        }
+        ,{
+            "label": "JSON response binding: links_0_type (string)",
+            "type": "String",
+            "description": "Type of the link, e.g. \"email\".",
+            "value": "links_0_type",
+            "binding": {
+                "type": "camunda:outputParameter",
+                "source": "${ res_links_0_type }"
+            }
+        }
+        ,{
+            "label": "JSON response",
+            "type": "Hidden",
+            "value": "res_links_0_type",
+            "binding": {
+                "type": "camunda:in",
+                "target": "post EXTRACT response string $['links'][0]['type']",
+                "expression": true
+            }
+        }
+        ,{
+            "label": "links_0_type",
+            "type": "Hidden",
+            "value": "res_links_0_type",
+            "binding": {
+                "type": "camunda:out",
+                "source": "res_links_0_type"
             }
         }
         ,{
@@ -2372,6 +2516,93 @@
             }
         }
         ,{
+            "label": "JSON response binding: links_0_description (string)",
+            "type": "String",
+            "description": "The description. In HTML speak: Everything between <a> and </a>.",
+            "value": "links_0_description",
+            "binding": {
+                "type": "camunda:outputParameter",
+                "source": "${ res_links_0_description }"
+            }
+        }
+        ,{
+            "label": "JSON response",
+            "type": "Hidden",
+            "value": "res_links_0_description",
+            "binding": {
+                "type": "camunda:in",
+                "target": "post EXTRACT response string $['links'][0]['description']",
+                "expression": true
+            }
+        }
+        ,{
+            "label": "links_0_description",
+            "type": "Hidden",
+            "value": "res_links_0_description",
+            "binding": {
+                "type": "camunda:out",
+                "source": "res_links_0_description"
+            }
+        }
+        ,{
+            "label": "JSON response binding: links_0_link (string)",
+            "type": "String",
+            "description": "The URL.",
+            "value": "links_0_link",
+            "binding": {
+                "type": "camunda:outputParameter",
+                "source": "${ res_links_0_link }"
+            }
+        }
+        ,{
+            "label": "JSON response",
+            "type": "Hidden",
+            "value": "res_links_0_link",
+            "binding": {
+                "type": "camunda:in",
+                "target": "post EXTRACT response string $['links'][0]['link']",
+                "expression": true
+            }
+        }
+        ,{
+            "label": "links_0_link",
+            "type": "Hidden",
+            "value": "res_links_0_link",
+            "binding": {
+                "type": "camunda:out",
+                "source": "res_links_0_link"
+            }
+        }
+        ,{
+            "label": "JSON response binding: links_0_type (string)",
+            "type": "String",
+            "description": "Type of the link, e.g. \"email\".",
+            "value": "links_0_type",
+            "binding": {
+                "type": "camunda:outputParameter",
+                "source": "${ res_links_0_type }"
+            }
+        }
+        ,{
+            "label": "JSON response",
+            "type": "Hidden",
+            "value": "res_links_0_type",
+            "binding": {
+                "type": "camunda:in",
+                "target": "post EXTRACT response string $['links'][0]['type']",
+                "expression": true
+            }
+        }
+        ,{
+            "label": "links_0_type",
+            "type": "Hidden",
+            "value": "res_links_0_type",
+            "binding": {
+                "type": "camunda:out",
+                "source": "res_links_0_type"
+            }
+        }
+        ,{
             "label": "JSON response binding: notes (string)",
             "type": "String",
             "description": "Notes describing the task. Optional.",
@@ -3005,6 +3236,63 @@
             }
         }
         ,{
+            "label": "JSON Content field: links_0_description (string)",
+            "type": "String",
+            "description": "The description. In HTML speak: Everything between <a> and </a>.",
+            "value": null,
+            "binding": {
+                "type": "camunda:inputParameter",
+                "name": "cp_links_0_description"
+            }
+        }
+        ,{
+            "label": "Content",
+            "type": "Hidden",
+            "value": "cp_links_0_description",
+            "binding": {
+                "type": "camunda:in",
+                "target": "pre SET request string $['links'][0]['description']"
+            }
+        }
+        ,{
+            "label": "JSON Content field: links_0_link (string)",
+            "type": "String",
+            "description": "The URL.",
+            "value": null,
+            "binding": {
+                "type": "camunda:inputParameter",
+                "name": "cp_links_0_link"
+            }
+        }
+        ,{
+            "label": "Content",
+            "type": "Hidden",
+            "value": "cp_links_0_link",
+            "binding": {
+                "type": "camunda:in",
+                "target": "pre SET request string $['links'][0]['link']"
+            }
+        }
+        ,{
+            "label": "JSON Content field: links_0_type (string)",
+            "type": "String",
+            "description": "Type of the link, e.g. \"email\".",
+            "value": null,
+            "binding": {
+                "type": "camunda:inputParameter",
+                "name": "cp_links_0_type"
+            }
+        }
+        ,{
+            "label": "Content",
+            "type": "Hidden",
+            "value": "cp_links_0_type",
+            "binding": {
+                "type": "camunda:in",
+                "target": "pre SET request string $['links'][0]['type']"
+            }
+        }
+        ,{
             "label": "JSON Content field: notes (string)",
             "type": "String",
             "description": "Notes describing the task. Optional.",
@@ -3367,6 +3655,93 @@
             "binding": {
                 "type": "camunda:out",
                 "source": "res_links"
+            }
+        }
+        ,{
+            "label": "JSON response binding: links_0_description (string)",
+            "type": "String",
+            "description": "The description. In HTML speak: Everything between <a> and </a>.",
+            "value": "links_0_description",
+            "binding": {
+                "type": "camunda:outputParameter",
+                "source": "${ res_links_0_description }"
+            }
+        }
+        ,{
+            "label": "JSON response",
+            "type": "Hidden",
+            "value": "res_links_0_description",
+            "binding": {
+                "type": "camunda:in",
+                "target": "post EXTRACT response string $['links'][0]['description']",
+                "expression": true
+            }
+        }
+        ,{
+            "label": "links_0_description",
+            "type": "Hidden",
+            "value": "res_links_0_description",
+            "binding": {
+                "type": "camunda:out",
+                "source": "res_links_0_description"
+            }
+        }
+        ,{
+            "label": "JSON response binding: links_0_link (string)",
+            "type": "String",
+            "description": "The URL.",
+            "value": "links_0_link",
+            "binding": {
+                "type": "camunda:outputParameter",
+                "source": "${ res_links_0_link }"
+            }
+        }
+        ,{
+            "label": "JSON response",
+            "type": "Hidden",
+            "value": "res_links_0_link",
+            "binding": {
+                "type": "camunda:in",
+                "target": "post EXTRACT response string $['links'][0]['link']",
+                "expression": true
+            }
+        }
+        ,{
+            "label": "links_0_link",
+            "type": "Hidden",
+            "value": "res_links_0_link",
+            "binding": {
+                "type": "camunda:out",
+                "source": "res_links_0_link"
+            }
+        }
+        ,{
+            "label": "JSON response binding: links_0_type (string)",
+            "type": "String",
+            "description": "Type of the link, e.g. \"email\".",
+            "value": "links_0_type",
+            "binding": {
+                "type": "camunda:outputParameter",
+                "source": "${ res_links_0_type }"
+            }
+        }
+        ,{
+            "label": "JSON response",
+            "type": "Hidden",
+            "value": "res_links_0_type",
+            "binding": {
+                "type": "camunda:in",
+                "target": "post EXTRACT response string $['links'][0]['type']",
+                "expression": true
+            }
+        }
+        ,{
+            "label": "links_0_type",
+            "type": "Hidden",
+            "value": "res_links_0_type",
+            "binding": {
+                "type": "camunda:out",
+                "source": "res_links_0_type"
             }
         }
         ,{
@@ -4003,6 +4378,63 @@
             }
         }
         ,{
+            "label": "JSON Content field: links_0_description (string)",
+            "type": "String",
+            "description": "The description. In HTML speak: Everything between <a> and </a>.",
+            "value": null,
+            "binding": {
+                "type": "camunda:inputParameter",
+                "name": "cp_links_0_description"
+            }
+        }
+        ,{
+            "label": "Content",
+            "type": "Hidden",
+            "value": "cp_links_0_description",
+            "binding": {
+                "type": "camunda:in",
+                "target": "pre SET request string $['links'][0]['description']"
+            }
+        }
+        ,{
+            "label": "JSON Content field: links_0_link (string)",
+            "type": "String",
+            "description": "The URL.",
+            "value": null,
+            "binding": {
+                "type": "camunda:inputParameter",
+                "name": "cp_links_0_link"
+            }
+        }
+        ,{
+            "label": "Content",
+            "type": "Hidden",
+            "value": "cp_links_0_link",
+            "binding": {
+                "type": "camunda:in",
+                "target": "pre SET request string $['links'][0]['link']"
+            }
+        }
+        ,{
+            "label": "JSON Content field: links_0_type (string)",
+            "type": "String",
+            "description": "Type of the link, e.g. \"email\".",
+            "value": null,
+            "binding": {
+                "type": "camunda:inputParameter",
+                "name": "cp_links_0_type"
+            }
+        }
+        ,{
+            "label": "Content",
+            "type": "Hidden",
+            "value": "cp_links_0_type",
+            "binding": {
+                "type": "camunda:in",
+                "target": "pre SET request string $['links'][0]['type']"
+            }
+        }
+        ,{
             "label": "JSON Content field: notes (string)",
             "type": "String",
             "description": "Notes describing the task. Optional.",
@@ -4365,6 +4797,93 @@
             "binding": {
                 "type": "camunda:out",
                 "source": "res_links"
+            }
+        }
+        ,{
+            "label": "JSON response binding: links_0_description (string)",
+            "type": "String",
+            "description": "The description. In HTML speak: Everything between <a> and </a>.",
+            "value": "links_0_description",
+            "binding": {
+                "type": "camunda:outputParameter",
+                "source": "${ res_links_0_description }"
+            }
+        }
+        ,{
+            "label": "JSON response",
+            "type": "Hidden",
+            "value": "res_links_0_description",
+            "binding": {
+                "type": "camunda:in",
+                "target": "post EXTRACT response string $['links'][0]['description']",
+                "expression": true
+            }
+        }
+        ,{
+            "label": "links_0_description",
+            "type": "Hidden",
+            "value": "res_links_0_description",
+            "binding": {
+                "type": "camunda:out",
+                "source": "res_links_0_description"
+            }
+        }
+        ,{
+            "label": "JSON response binding: links_0_link (string)",
+            "type": "String",
+            "description": "The URL.",
+            "value": "links_0_link",
+            "binding": {
+                "type": "camunda:outputParameter",
+                "source": "${ res_links_0_link }"
+            }
+        }
+        ,{
+            "label": "JSON response",
+            "type": "Hidden",
+            "value": "res_links_0_link",
+            "binding": {
+                "type": "camunda:in",
+                "target": "post EXTRACT response string $['links'][0]['link']",
+                "expression": true
+            }
+        }
+        ,{
+            "label": "links_0_link",
+            "type": "Hidden",
+            "value": "res_links_0_link",
+            "binding": {
+                "type": "camunda:out",
+                "source": "res_links_0_link"
+            }
+        }
+        ,{
+            "label": "JSON response binding: links_0_type (string)",
+            "type": "String",
+            "description": "Type of the link, e.g. \"email\".",
+            "value": "links_0_type",
+            "binding": {
+                "type": "camunda:outputParameter",
+                "source": "${ res_links_0_type }"
+            }
+        }
+        ,{
+            "label": "JSON response",
+            "type": "Hidden",
+            "value": "res_links_0_type",
+            "binding": {
+                "type": "camunda:in",
+                "target": "post EXTRACT response string $['links'][0]['type']",
+                "expression": true
+            }
+        }
+        ,{
+            "label": "links_0_type",
+            "type": "Hidden",
+            "value": "res_links_0_type",
+            "binding": {
+                "type": "camunda:out",
+                "source": "res_links_0_type"
             }
         }
         ,{
@@ -5049,6 +5568,93 @@
             "binding": {
                 "type": "camunda:out",
                 "source": "res_links"
+            }
+        }
+        ,{
+            "label": "JSON response binding: links_0_description (string)",
+            "type": "String",
+            "description": "The description. In HTML speak: Everything between <a> and </a>.",
+            "value": "links_0_description",
+            "binding": {
+                "type": "camunda:outputParameter",
+                "source": "${ res_links_0_description }"
+            }
+        }
+        ,{
+            "label": "JSON response",
+            "type": "Hidden",
+            "value": "res_links_0_description",
+            "binding": {
+                "type": "camunda:in",
+                "target": "post EXTRACT response string $['links'][0]['description']",
+                "expression": true
+            }
+        }
+        ,{
+            "label": "links_0_description",
+            "type": "Hidden",
+            "value": "res_links_0_description",
+            "binding": {
+                "type": "camunda:out",
+                "source": "res_links_0_description"
+            }
+        }
+        ,{
+            "label": "JSON response binding: links_0_link (string)",
+            "type": "String",
+            "description": "The URL.",
+            "value": "links_0_link",
+            "binding": {
+                "type": "camunda:outputParameter",
+                "source": "${ res_links_0_link }"
+            }
+        }
+        ,{
+            "label": "JSON response",
+            "type": "Hidden",
+            "value": "res_links_0_link",
+            "binding": {
+                "type": "camunda:in",
+                "target": "post EXTRACT response string $['links'][0]['link']",
+                "expression": true
+            }
+        }
+        ,{
+            "label": "links_0_link",
+            "type": "Hidden",
+            "value": "res_links_0_link",
+            "binding": {
+                "type": "camunda:out",
+                "source": "res_links_0_link"
+            }
+        }
+        ,{
+            "label": "JSON response binding: links_0_type (string)",
+            "type": "String",
+            "description": "Type of the link, e.g. \"email\".",
+            "value": "links_0_type",
+            "binding": {
+                "type": "camunda:outputParameter",
+                "source": "${ res_links_0_type }"
+            }
+        }
+        ,{
+            "label": "JSON response",
+            "type": "Hidden",
+            "value": "res_links_0_type",
+            "binding": {
+                "type": "camunda:in",
+                "target": "post EXTRACT response string $['links'][0]['type']",
+                "expression": true
+            }
+        }
+        ,{
+            "label": "links_0_type",
+            "type": "Hidden",
+            "value": "res_links_0_type",
+            "binding": {
+                "type": "camunda:out",
+                "source": "res_links_0_type"
             }
         }
         ,{
