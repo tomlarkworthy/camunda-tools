@@ -464,7 +464,7 @@
       <bpmn:outgoing>Flow_1q4dl6s</bpmn:outgoing>
     </bpmn:callActivity>
     <bpmn:sequenceFlow id="Flow_1q4dl6s" sourceRef="Activity_146dy49" targetRef="Activity_0bien1m" />
-    <bpmn:scriptTask id="decode" name="Decode URL" scriptFormat="groovy">
+    <bpmn:scriptTask id="decode" name="Resolve URI" scriptFormat="groovy">
       <bpmn:incoming>Flow_1shlmq8</bpmn:incoming>
       <bpmn:incoming>Flow_07xifhr</bpmn:incoming>
       <bpmn:outgoing>Flow_0tqdkv8</bpmn:outgoing>
@@ -552,6 +552,10 @@ return execution.getVariable("entity_path") != null &amp;&amp;
       <bpmn:script>execution.setVariable("channel", "content-creators")</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:sequenceFlow id="Flow_07xifhr" sourceRef="Activity_1bww18q" targetRef="decode" />
+    <bpmn:textAnnotation id="TextAnnotation_122or0d">
+      <bpmn:text>username, text , entity_url, url</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_0q4vbrb" sourceRef="consumeSignal" targetRef="TextAnnotation_122or0d" />
   </bpmn:process>
   <bpmn:signal id="Signal_16wtb4z" name="Tweet" />
   <bpmn:signal id="Signal_1l77c36" name="NewBlogPostKey" />
@@ -559,14 +563,14 @@ return execution.getVariable("entity_path") != null &amp;&amp;
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="TweetRouter">
       <bpmndi:BPMNShape id="Event_1kexrmr_di" bpmnElement="consumeSignal">
-        <dc:Bounds x="162" y="102" width="36" height="36" />
+        <dc:Bounds x="182" y="122" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="156" y="145" width="52" height="27" />
+          <dc:Bounds x="176" y="165" width="52" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_00533no_di" bpmnElement="Flow_00533no">
-        <di:waypoint x="198" y="120" />
-        <di:waypoint x="270" y="120" />
+        <di:waypoint x="218" y="140" />
+        <di:waypoint x="270" y="140" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Gateway_1o80gaq_di" bpmnElement="router" isMarkerVisible="true">
         <dc:Bounds x="415" y="225" width="50" height="50" />
@@ -596,18 +600,18 @@ return execution.getVariable("entity_path") != null &amp;&amp;
         <dc:Bounds x="270" y="210" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1c485g0_di" bpmnElement="Event_1c485g0">
-        <dc:Bounds x="162" y="372" width="36" height="36" />
+        <dc:Bounds x="182" y="342" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1eo4kmt_di" bpmnElement="Flow_1eo4kmt">
-        <di:waypoint x="198" y="390" />
-        <di:waypoint x="270" y="390" />
+        <di:waypoint x="218" y="360" />
+        <di:waypoint x="270" y="360" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1shlmq8_di" bpmnElement="Flow_1shlmq8">
-        <di:waypoint x="320" y="350" />
+        <di:waypoint x="320" y="320" />
         <di:waypoint x="320" y="290" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_006rd1l_di" bpmnElement="test">
-        <dc:Bounds x="270" y="350" width="100" height="80" />
+        <dc:Bounds x="270" y="320" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0v80r5n_di" bpmnElement="Event_0v80r5n">
         <dc:Bounds x="832" y="232" width="36" height="36" />
@@ -635,11 +639,18 @@ return execution.getVariable("entity_path") != null &amp;&amp;
         <di:waypoint x="682" y="360" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_1bww18q_di" bpmnElement="Activity_1bww18q">
-        <dc:Bounds x="270" y="80" width="100" height="80" />
+        <dc:Bounds x="270" y="100" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_07xifhr_di" bpmnElement="Flow_07xifhr">
-        <di:waypoint x="320" y="160" />
+        <di:waypoint x="320" y="180" />
         <di:waypoint x="320" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_122or0d_di" bpmnElement="TextAnnotation_122or0d">
+        <dc:Bounds x="220" y="40" width="100" height="39" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_0q4vbrb_di" bpmnElement="Association_0q4vbrb">
+        <di:waypoint x="212" y="127" />
+        <di:waypoint x="253" y="79" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
