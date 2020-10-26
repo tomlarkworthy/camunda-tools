@@ -92,7 +92,7 @@ execution.setVariable("channel",
     </bpmn:scriptTask>
     <bpmn:sequenceFlow id="Flow_0ihoszi" sourceRef="Event_1tvhgdi" targetRef="Activity_0fzdxhy" />
     <bpmn:sequenceFlow id="Flow_1vxlyae" sourceRef="Activity_0fzdxhy" targetRef="Activity_060b7s2" />
-    <bpmn:sequenceFlow id="Flow_19ll0af" sourceRef="Activity_060b7s2" targetRef="Activity_1jw5ixt" />
+    <bpmn:sequenceFlow id="Flow_19ll0af" sourceRef="Activity_060b7s2" targetRef="Activity_1lv9nc0" />
     <bpmn:callActivity id="Activity_1jw5ixt" name="POST /chat.postMessage" camunda:modelerTemplate="POST-/chat.postMessage" calledElement="ApiClient">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -532,7 +532,7 @@ execution.setVariable("channel",
         <camunda:in source="hp_token" target="pre SET headers String $[&#39;token&#39;]" />
         <camunda:in sourceExpression="Bearer ${hp_Authorization}" target="pre SET headers String $[&#39;Authorization&#39;]" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_19ll0af</bpmn:incoming>
+      <bpmn:incoming>Flow_1rgjmn3</bpmn:incoming>
       <bpmn:outgoing>Flow_1jalkp9</bpmn:outgoing>
     </bpmn:callActivity>
     <bpmn:callActivity id="Activity_06ul8ex" name="POST /chat.postMessage" camunda:modelerTemplate="POST-/chat.postMessage" calledElement="ApiClient">
@@ -983,7 +983,8 @@ execution.setVariable("channel",
       <bpmn:outgoing>Flow_0qisv08</bpmn:outgoing>
       <bpmn:script>if (execution.getVariable("channel") == null) {
     execution.setVariable("channel",  "content-creators")
-}</bpmn:script>
+}
+</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:eventBasedGateway id="EventGateway">
       <bpmn:incoming>Flow_1drzmog</bpmn:incoming>
@@ -1049,6 +1050,19 @@ execution.setVariable("path",
     </bpmn:inclusiveGateway>
     <bpmn:sequenceFlow id="Flow_04khdqm" sourceRef="Gateway_1kvfyci" targetRef="EventGateway" />
     <bpmn:sequenceFlow id="Flow_0nmajht" sourceRef="contentReport" targetRef="Gateway_1fi8e1z" />
+    <bpmn:scriptTask id="Activity_1lv9nc0" name="Ensure one copy running" scriptFormat="groovy">
+      <bpmn:incoming>Flow_19ll0af</bpmn:incoming>
+      <bpmn:outgoing>Flow_1rgjmn3</bpmn:outgoing>
+      <bpmn:script>println("check only one instance running")
+// check only one instance running
+sameKeyCount = execution.getProcessEngineServices().getRuntimeService()
+      .createProcessInstanceQuery()
+      .processInstanceBusinessKey(execution.getBusinessKey())
+      .count()
+println("sameKeyCount = " + sameKeyCount)
+if (sameKeyCount != 0) throw new org.camunda.bpm.engine.ProcessEngineException();</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_1rgjmn3" sourceRef="Activity_1lv9nc0" targetRef="Activity_1jw5ixt" />
     <bpmn:textAnnotation id="TextAnnotation_0fphrm0">
       <bpmn:text>Start chat thread</bpmn:text>
     </bpmn:textAnnotation>
@@ -1116,7 +1130,7 @@ execution.setVariable("path",
         <di:waypoint x="400" y="287" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_1xbki0c_di" bpmnElement="Activity_1jw5ixt">
-        <dc:Bounds x="400" y="247" width="100" height="80" />
+        <dc:Bounds x="530" y="140" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_06ul8ex_di" bpmnElement="Activity_06ul8ex">
         <dc:Bounds x="830" y="140" width="100" height="80" />
@@ -1139,11 +1153,11 @@ execution.setVariable("path",
         <di:waypoint x="772" y="180" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="TextAnnotation_0fphrm0_di" bpmnElement="TextAnnotation_0fphrm0">
-        <dc:Bounds x="400" y="180" width="100" height="30" />
+        <dc:Bounds x="400" y="85" width="100" height="30" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Association_1ch8lle_di" bpmnElement="Association_1ch8lle">
-        <di:waypoint x="450" y="247" />
-        <di:waypoint x="450" y="210" />
+        <di:waypoint x="530" y="149" />
+        <di:waypoint x="474" y="115" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="TextAnnotation_1x44i9y_di" bpmnElement="TextAnnotation_1x44i9y">
         <dc:Bounds x="740" y="110" width="100" height="30" />
@@ -1180,15 +1194,15 @@ execution.setVariable("path",
         <di:waypoint x="752" y="390" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_0ma0yvk_di" bpmnElement="updateStartDate">
-        <dc:Bounds x="400" y="350" width="100" height="80" />
+        <dc:Bounds x="530" y="247" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1jalkp9_di" bpmnElement="Flow_1jalkp9">
-        <di:waypoint x="450" y="327" />
-        <di:waypoint x="450" y="350" />
+        <di:waypoint x="580" y="220" />
+        <di:waypoint x="580" y="247" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0z5ztdw_di" bpmnElement="Flow_0z5ztdw">
-        <di:waypoint x="500" y="390" />
-        <di:waypoint x="530" y="390" />
+        <di:waypoint x="580" y="327" />
+        <di:waypoint x="580" y="350" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_163t1wt_di" bpmnElement="contentReport">
         <dc:Bounds x="530" y="350" width="100" height="80" />
@@ -1234,6 +1248,14 @@ execution.setVariable("path",
       <bpmndi:BPMNEdge id="Flow_0nmajht_di" bpmnElement="Flow_0nmajht">
         <di:waypoint x="630" y="390" />
         <di:waypoint x="655" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0okbacz_di" bpmnElement="Activity_1lv9nc0">
+        <dc:Bounds x="400" y="247" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1rgjmn3_di" bpmnElement="Flow_1rgjmn3">
+        <di:waypoint x="450" y="247" />
+        <di:waypoint x="450" y="180" />
+        <di:waypoint x="530" y="180" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

@@ -37,7 +37,7 @@ println("BlogPostHandler path: " + url.getPath())</bpmn:script>
 "Business forecasting with Facebook Prophet"
 )
 execution.setVariable("link", 
-"https://www.futurice.com/blog/business-forecasting-with-facebook-prophet"
+"https://www.futurice.com/blog/business-forecasting-with-facebook-prophet2"
 )
 execution.setVariable("description", 
 "In this article you are going to learn how to do solid time-series analysis and forecasts with the Facebook Prophet library."
