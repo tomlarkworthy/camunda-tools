@@ -1060,7 +1060,8 @@ sameKeyCount = execution.getProcessEngineServices().getRuntimeService()
       .processInstanceBusinessKey(execution.getBusinessKey())
       .count()
 println("sameKeyCount = " + sameKeyCount)
-if (sameKeyCount != 0) throw new org.camunda.bpm.engine.ProcessEngineException();</bpmn:script>
+
+if (sameKeyCount != 0) throw new org.camunda.bpm.engine.delegate.BpmnError("Duplicate process")</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:sequenceFlow id="Flow_1rgjmn3" sourceRef="Activity_1lv9nc0" targetRef="Activity_1jw5ixt" />
     <bpmn:textAnnotation id="TextAnnotation_0fphrm0">
